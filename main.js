@@ -112,7 +112,7 @@ class timeline {
   }
 
   switchChara(id_currentChara, id_switchToChara) {
-    console.log(id_currentChara ,this.ID_of_firstChara());
+    // console.log(id_currentChara ,this.ID_of_firstChara());
     if(id_currentChara === this.ID_of_firstChara()){
       this.current[this.placeToChara(id_currentChara)].id = id_switchToChara;
     this.current[
@@ -423,7 +423,11 @@ function main() {
 
   //   TL.current.map((x) => console.log(x.id + ":" + x.timeline_OrderValue));
 
-  let chara_array = [];
+  let chara_array = []
+  for(let i in chara_list){
+    chara_array.push(i)
+  }
+  
   //   console.log(chara_list.length);
   let outputTL = Array.from(new Array(Object.keys(chara_list).length), () =>
     new Array(TL.current.length).fill(undefined)
@@ -439,11 +443,11 @@ function main() {
     let chara_id = i.id;
     let OrderValue = i.timeline_OrderValue;
     let charaPlace = chara_array.indexOf(chara_id);
-    if (charaPlace === -1) {
-      chara_array.push(chara_id);
-      charaPlace = chara_array.length - 1;
-      //   outputTL.push([])
-    }
+    // if (charaPlace === -1) {
+    //   chara_array.push(chara_id);
+    //   charaPlace = chara_array.length - 1;
+    //   //   outputTL.push([])
+    // }
     // console.dir(outputTL);
 
     //add empty timeline
