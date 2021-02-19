@@ -8,82 +8,126 @@
   </head>
   <body>
     <div id="TL_table">
-      <table width="100" height="200" border="1">
-          
-      </table>
+      <table width="100" height="200" border="1"></table>
     </div>
 
-    現在先頭のキャラ:<span id="firstchara" >
-
-    </span><br>
+    現在先頭のキャラ:<span id="firstchara"> </span><br />
     現在 <span id="now_place"></span> 行目
-    <div id= "error">
-
-    </div>
+    <div id="error"></div>
 
     <div id="TL_datainput">
       <textarea id="input_txt" cols="60" rows="25"></textarea>
     </div>
 
     <div>
-        <strong>使い方<br></strong>
-        コマンドは半角で、またスペース区切りで設定すること<br>
-        []内が引数(かっこ自体は書かない) <br>
-        ()内のものは省略できる(バフなど) <br>
-        <br>
+      <strong>使い方<br /></strong>
+      コマンドは半角で、またスペース区切りで設定すること<br />
+      []内が引数(かっこ自体は書かない) <br />
+      ()内のものは省略できる(バフなど) <br />
+      <br />
 
-        <strong>#[comment]<br></strong>
-        #から始まるものは行末まで無視されます(コメントに使用)<br>
-        命令の最後に書いてもよい<br>
-        例: <br>
-        move 125 enemy <br> 
-        #ここからデバフを入れる <br>
-        例: <br>
-         move 125 momo #とっておき<br> 
-        <br>
+      <strong>#[comment]<br /></strong>
+      #から始まるものは行末まで無視されます(コメントに使用)<br />
+      命令の最後に書いてもよい<br />
+      例: <br />
+      move 125 enemy <br />
+      #ここからデバフを入れる <br />
+      例: <br />
+      move 125 momo #とっておき<br />
+      <br />
 
-        <strong>set [name] [SPD] ([buff(%)]) <br></strong>
-        開始(start)前にフィールドに出すキャラを設定<br>
-        SPDの優先度の高いキャラから先に書く<br>
-        nameにスペースを含めるのは禁止 <br>
-        <br>
-        
-        <strong>start</strong><br>
-        setを書き終わったら記入<br>
-        <br>
+      <strong>set [name] [SPD] ([buff(%)]) <br /></strong>
+      開始(start)前にフィールドに出すキャラを設定<br />
+      SPDの優先度の高いキャラから先に書く<br />
+      nameにスペースを含めるのは禁止 <br />
+      <br />
 
-        <strong>move [硬直(%)] [name]</strong><br>
-        行動 <br>
-        先頭のキャラ以外をnameに記入した場合errorを吐く <br>
-        moveの代わりにmでも可<br>
-        <br>
+      <strong>start</strong><br />
+      メインモード切り替え <br />
+      setを書き終わったら記入<br />
+      <br />
 
-        <strong>
-            ----ここからほとんどデバッグしていないので正しく動かない可能性大---- 
-            <br>
-        </strong>
-        <br>
-        <strong> buffset [name] [buff(%)] </strong><br>
-        <strong> buffadd [name] [buff(%)] </strong><br>
-        <strong> buffminus [name] [buff(%)] </strong><br>
-        バフ設定 <br>
-        それぞれ b,b+,b-と省略可 <br>
-        <br>
+      <strong>end</strong><br />
+      メインモードモード終了<br />
+      その後ろにstart、start_sortを書くことでまた別のモードに切り替えられる<br />
+      <br />
 
-        <strong> switch [from_name] [to_name] [SPD] ([buff]) </strong><br>
-        from_nameに交代前のキャラ名、to_nameに交代後のキャラ名を記入<br>
-        swと省略可 <br>
+      <strong>move [硬直(%)] [name]</strong><br />
+      行動 <br />
+      先頭のキャラ以外をnameに記入した場合errorを吐く <br />
+      moveの代わりにmでも可<br />
+      <br />
 
+      <strong>start_sort</strong><br />
+      ソートモード<br />
+      end_sortを記入すると誰かのmove_listで書かれた硬直リストがなくなるまで行動する
+      <br />
+      (他のキャラにまだ硬直リストが残っていても終了) <br />
+      <br />
 
+      <strong>end_sort</strong><br />
+      ソートモード終了<br />
+      これを書かないとソートされない <br />
+      その後ろにstart、start_sortを書くことでまた別のモードに切り替えられる<br />
+      <br />
 
+      <strong>move_list [name] [[硬直(%)],[硬直(%)],...]</strong><br />
+      行動リスト <br />
+      move_list nagi [40,100,100] <br />
+      のように書く <br />
+      スペースを空けるのは厳禁 <br />
+      move_listの代わりにmv_lsでも可<br />
+      <br />
 
+      <br />
 
+      <strong>
+        ----ここからほとんどデバッグしていないので正しく動かない可能性大----
+        <br />
+      </strong>
+      <br />
+      <strong> buffset [name] [buff(%)] </strong><br />
+      <strong> buffadd [name] [buff(%)] </strong><br />
+      <strong> buffminus [name] [buff(%)] </strong><br />
+      バフ設定 <br />
+      それぞれ b,b+,b-と省略可 <br />
+      <br />
 
+      <strong> switch [from_name] [to_name] [SPD] ([buff]) </strong><br />
+      from_nameに交代前のキャラ名、to_nameに交代後のキャラ名を記入<br />
+      swと省略可 <br />
 
-        
-        
+      <br />
+      <br />
+      <strong>例</strong><br>
+      <textarea readonly cols="60" rows="30">
+set tsubaki 121
+set hanako 138
+set ren 141
 
+set fennel 155
+set maid 155
 
+start_sort
+
+move_list tsubaki [40,40,125]
+move_list fennel [70,70,75]
+move_list maid [75,120]
+move_list ren [40,100]
+move_list hanako [40,40,100]
+
+end_sort
+
+start
+ switch ren syaro 144
+ move 125 syaro 
+end
+
+start_sort
+  move_list maid [50000,120]
+  move_list fennel [50000,120]
+end_sort
+</textarea>
     </div>
   </body>
 </html>

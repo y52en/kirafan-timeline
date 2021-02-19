@@ -1,13 +1,5 @@
 "use strict";
 
-// Number.prototype.toString()
-// let inputdata = function () {
-
-//     [document.querySelector("#TL_data_input>.chara1>SPD").textContent, document.querySelector("#TL_data_input>.chara1>OrderValue").textContent]
-
-// }
-
-//test methods
 function objectCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -25,6 +17,7 @@ class timeline {
     id = this.ID_of_firstChara(),
     canMoveWithout1stChara = false
   ) {
+    // console.log(id);
     if (
       id !== this.current[this.place_of_currentTimeline].id &&
       canMoveWithout1stChara === false
@@ -79,6 +72,7 @@ class timeline {
     this.place_of_currentTimeline++;
   }
 
+  //古いコードのままになっている
   move_stun(id, OrderValue) {
     let movechara_nowPlace = this.placeToChara(id);
     this.current[movechara_nowPlace].timeline_OrderValue += OrderValue;
@@ -186,27 +180,20 @@ class chara {
   }
 }
 
-// class Operate {
-//     constructor() {
-
-//     }
-// }
-
 window.onload = () => {
   document.getElementById("input_txt").oninput = main;
   main();
 };
 
 function main() {
-//   console.log(new Date());
   let str = document.getElementById("input_txt").value;
   let chara_list = {};
   let TL = new timeline();
 
-  let output_table = [];
+  let chara_move_list = {};
 
-  const err = document.getElementById("error")
-err.innerHTML = ""
+  const err = document.getElementById("error");
+  err.innerHTML = "";
 
   //delete space
   str = str.replaceAll(/^\s+/gm, "");
@@ -222,11 +209,16 @@ err.innerHTML = ""
       x.split(" ").map((x) => (isNaN(parseInt(x)) ? x : parseInt(x)))
     );
 
-  // console.log(str_splited);
-// let now_placeing = 0;
-
-  let started = false;
-  for (let i = 0; i < str_splited.length;i++) {
+  const mode_list = {
+    init: "init",
+    start: "start",
+    start_sort: "start_sort",
+    sorting: "sorting",
+    waiting_mode: "waiting_mode",
+  };
+  // let started = false;
+  let mode = mode_list.init;
+  for (let i = 0; i < str_splited.length; i++) {
     try {
       const load_text_command = str_splited[i]?.[0];
       const load_text_arg1 = str_splited[i]?.[1];
@@ -234,101 +226,179 @@ err.innerHTML = ""
       const load_text_arg3 = str_splited[i]?.[3];
       const load_text_arg4 = str_splited[i]?.[4];
 
-      let id, SPD, buff;
-      // console.log(str_splited[i]);
+      let id, SPD, buff, LoadFactor, LoadFactor_list;
 
-      if (started === false) {
-        switch (load_text_command) {
-          case "set":
-            id = load_text_arg1.toString();
-            SPD = load_text_arg2;
-            buff = load_text_arg3 || 0;
-            chara_list[id] = new chara(id, SPD, buff);
-            TL.setChara(id, chara_list[id].initOrderValue());
-            //   output_table.push([])
-            break;
+      switch (mode) {
+        case mode_list.init:
+          switch (load_text_command) {
+            case "set":
+              id = load_text_arg1.toString();
+              SPD = load_text_arg2;
+              buff = load_text_arg3 || 0;
+              chara_list[id] = new chara(id, SPD, buff);
+              TL.setChara(id, chara_list[id].initOrderValue());
+              //   output_table.push([])
+              break;
 
+            case "start":
+              mode = mode_list.start;
+              TL.inited();
+              break;
+
+            case "start_sort":
+              mode = mode_list.start_sort;
+              TL.inited();
+              break;
+
+            case "":
+              break;
+
+            default:
+              throw Error("need 'start'");
+          }
+          break;
+        case mode_list.start:
+          switch (load_text_command) {
+            case "buffset":
+            case "b":
+              id = load_text_arg1.toString();
+              buff = load_text_arg2 || 0;
+              chara_list[id].SPD_buff = buff;
+              break;
+
+            case "buffadd":
+            case "b+":
+              id = load_text_arg1.toString();
+              buff = load_text_arg2 || 0;
+              chara_list[id].SPD_buff += buff;
+              break;
+
+            case "buffminus":
+            case "b-":
+              id = load_text_arg1.toString();
+              buff = load_text_arg2 || 0;
+              chara_list[id].SPD_buff -= buff;
+              break;
+
+            case "add":
+            case "a":
+              id = load_text_arg1.toString();
+              SPD = load_text_arg2;
+              buff = load_text_arg3 || 0;
+              chara_list[id] = new chara(id, SPD, buff);
+              TL.addChara(id, chara_list[id].initOrderValue());
+              break;
+
+            case "move":
+            case "m":
+              LoadFactor = load_text_arg1;
+              id = load_text_arg2.toString();
+              const canMoveWithout1stChara = load_text_arg3 === "true";
+              //   console.log(chara_list[TL.ID_of_firstChara()]);
+              TL.move(
+                chara_list[TL.ID_of_firstChara()].calculateOrderValue(
+                  LoadFactor
+                ),
+                id,
+                canMoveWithout1stChara
+              );
+              break;
+
+            case "switch":
+            case "sw":
+              const to = load_text_arg1.toString();
+              const from = load_text_arg2.toString();
+              SPD = load_text_arg3;
+              buff = load_text_arg4 || 0;
+              TL.switchChara(to, from, SPD, buff);
+              chara_list[from] = new chara(from, SPD, buff);
+              break;
+
+            case "end":
+              mode = mode_list.waiting_mode;
+              break;
+
+            case "":
+              break;
+
+            default:
+              throw Error("no command found");
+          }
+          break;
+        case mode_list.start_sort:
+          switch (load_text_command) {
+            case "move_list":
+            case "mv_ls":
+              id = load_text_arg1.toString();
+
+              LoadFactor_list = JSON.parse(load_text_arg2);
+              chara_move_list[id] = LoadFactor_list;
+              break;
+
+            case "end_sort":
+              sorting();
+              mode = mode_list.waiting_mode;
+              break;
+
+            case "":
+              break;
+
+            default:
+              throw Error("no command found");
+          }
+
+          break;
+        case mode_list.waiting_mode:
+         switch(load_text_command){
           case "start":
-            started = true;
-            TL.inited();
+            mode = mode_list.start;
             break;
-
+  
+          case "start_sort":
+            mode = mode_list.start_sort;
+            break;
+  
           case "":
             break;
-
+  
           default:
             throw Error("need 'start'");
-        }
-      } else {
-        switch (load_text_command) {
-          case "buffset":
-          case "b":
-            id = load_text_arg1.toString();
-            buff = load_text_arg2 || 0;
-            chara_list[id].SPD_buff = buff;
-            break;
-
-          case "buffadd":
-          case "b+":
-            id = load_text_arg1.toString();
-            buff = load_text_arg2 || 0;
-            chara_list[id].SPD_buff += buff;
-            break;
-
-          case "buffminus":
-          case "b-":
-            id = load_text_arg1.toString();
-            buff = load_text_arg2 || 0;
-            chara_list[id].SPD_buff -= buff;
-            break;
-
-          case "add":
-          case "a":
-            id = load_text_arg1.toString();
-            SPD = load_text_arg2;
-            buff = load_text_arg3 || 0;
-            chara_list[id] = new chara(id, SPD, buff);
-            TL.addChara(id, chara_list[id].initOrderValue());
-            break;
-
-          case "move":
-          case "m":
-            const LoadFactor = load_text_arg1;
-            id = load_text_arg2.toString();
-            const canMoveWithout1stChara = load_text_arg3 === "true";
-            //   console.log(chara_list[TL.ID_of_firstChara()]);
-            TL.move(
-              chara_list[TL.ID_of_firstChara()].calculateOrderValue(LoadFactor),
-              id,
-              canMoveWithout1stChara
-            );
-            break;
-
-          case "switch":
-          case "sw":
-            const to = load_text_arg1.toString();
-            const from = load_text_arg2.toString();
-            SPD = load_text_arg3;
-            buff = load_text_arg4 || 0;
-            TL.switchChara(to, from, SPD, buff);
-            chara_list[from] = new chara(from, SPD, buff);
-            break;
-
-          case "":
-            break;
-
-          default:
-            throw Error("no command found");
-        }
+         }
       }
+
+      function sorting() {
+        while (true) {
+          const id = TL.ID_of_firstChara();
+          if (chara_move_list[id]?.[0] === undefined) {
+            chara_move_list = {}
+            break;
+          }
+
+          LoadFactor = chara_move_list[id].splice(0, 1);
+          //   console.log(chara_list[TL.ID_of_firstChara()]);
+          TL.move(
+            chara_list[id].calculateOrderValue(LoadFactor),
+            id,
+            false
+          );
+        }
+
+        // break;
+      }
+      // if (started === false) {
+
+      // } else {
+
+      // }
     } catch (e) {
       console.error(i + 1 + "行目にエラー", e);
-      err.innerHTML = i + 1 + "行目にエラー(" + str_splited[i].join(" ") + ")<br>" + e
+      err.innerHTML =
+        i + 1 + "行目にエラー(" + str_splited[i].join(" ") + ")<br>" + e;
     }
   }
-//   console.log(TL.current);
+  //   console.log(TL.current);
 
-//   TL.current.map((x) => console.log(x.id + ":" + x.timeline_OrderValue));
+  //   TL.current.map((x) => console.log(x.id + ":" + x.timeline_OrderValue));
 
   let chara_array = [];
   //   console.log(chara_list.length);
@@ -366,47 +436,41 @@ err.innerHTML = ""
     //   console.log(i);
     //   TL.
   });
-  document.getElementById("firstchara").innerHTML = TL.ID_of_firstChara()
-  document.getElementById("now_place").innerHTML = TL.place_of_currentTimeline + 1
+  document.getElementById("firstchara").innerHTML = TL.ID_of_firstChara();
+  document.getElementById("now_place").innerHTML =
+    TL.place_of_currentTimeline + 1;
 
-//   console.dir(outputTL);
+  //   console.dir(outputTL);
 
-  outputAsTable(outputTL,chara_array)
+  outputAsTable(outputTL, chara_array);
 }
 
-function outputAsTable(json,charalist) {
-    let output = "";
-    output += "<thead><tr>"
+function outputAsTable(json, charalist) {
+  let output = "";
+  output += "<thead><tr>";
 
-    output += htmltag("th","")
+  output += htmltag("th", "");
 
-    for(let i = 0;i<json[0].length;i++){
-        output += htmltag(
-            "th",
-            i + 1
-        )
+  for (let i = 0; i < json[0].length; i++) {
+    output += htmltag("th", i + 1);
+  }
+
+  for (let x = 0; x < json.length; x++) {
+    output += "<tr>";
+    output += htmltag("td", charalist[x]);
+    for (let y = 0; y < json[0].length; y++) {
+      output += htmltag("td", json[x][y] || "");
     }
+    output += "</tr>";
+  }
+  output += "</tr></thead>";
 
-    for(let x=0;x<json.length;x++){
-        output += "<tr>"
-        output += htmltag("td",charalist[x])
-        for(let y = 0;y<json[0].length;y++){
-            output += htmltag(
-                "td",
-                json[x][y] || ""
-            )
-        }
-        output += "</tr>"
-    }
-    output += "</tr></thead>"
+  function htmltag(name, inner) {
+    return "<" + name + ">" + inner + "</" + name + ">";
+  }
 
-    function htmltag(name,inner){
-
-        return "<" + name + ">"+ inner + "</" + name + ">"
-    }
-
-    // console.log(output);
-    document.querySelector("table").innerHTML = output
+  // console.log(output);
+  document.querySelector("table").innerHTML = output;
 }
 
 /*
