@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="jp">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TL生成ツール</title>
+    <script src="main.js"></script>
+  </head>
+  <body>
+    <div id="TL_table">
+      <table width="100" height="200" border="1">
+          
+      </table>
+    </div>
+
+    現在先頭のキャラ:<span id="firstchara" >
+
+    </span><br>
+    現在 <span id="now_place"></span> 行目
+    <div id= "error">
+
+    </div>
+
+    <div id="TL_datainput">
+      <textarea id="input_txt" cols="60" rows="25"></textarea>
+    </div>
+
+    <div>
+        <strong>使い方<br></strong>
+        コマンドは半角で、またスペース区切りで設定すること<br>
+        []内が引数(かっこ自体は書かない) <br>
+        ()内のものは省略できる(バフなど) <br>
+        <br>
+
+        <strong>#[comment]<br></strong>
+        #から始まるものは行末まで無視されます(コメントに使用)<br>
+        命令の最後に書いてもよい<br>
+        例: <br>
+        move 125 enemy <br> 
+        #ここからデバフを入れる <br>
+        例: <br>
+         move 125 momo #とっておき<br> 
+        <br>
+
+        <strong>set [name] [SPD] ([buff(%)]) <br></strong>
+        開始(start)前にフィールドに出すキャラを設定<br>
+        SPDの優先度の高いキャラから先に書く<br>
+        nameにスペースを含めるのは禁止 <br>
+        <br>
+        
+        <strong>start</strong><br>
+        setを書き終わったら記入<br>
+        <br>
+
+        <strong>move [硬直(%)] [name]</strong><br>
+        行動 <br>
+        先頭のキャラ以外をnameに記入した場合errorを吐く <br>
+        moveの代わりにmでも可<br>
+        <br>
+
+        <strong>
+            ----ここからほとんどデバッグしていないので正しく動かない可能性大---- 
+            <br>
+        </strong>
+        <br>
+        <strong> buffset [name] [buff(%)] </strong><br>
+        <strong> buffadd [name] [buff(%)] </strong><br>
+        <strong> buffminus [name] [buff(%)] </strong><br>
+        バフ設定 <br>
+        それぞれ b,b+,b-と省略可 <br>
+        <br>
+
+        <strong> switch [from_name] [to_name] [SPD] ([buff]) </strong><br>
+        from_nameに交代前のキャラ名、to_nameに交代後のキャラ名を記入<br>
+        swと省略可 <br>
+
+
+
+
+
+
+
+        
+        
+
+
+    </div>
+  </body>
+</html>
