@@ -103,6 +103,7 @@ class timeline {
     this.current.push({ id: id, timeline_OrderValue: initOrderValue });
   }
 
+
   addChara(id, initOrderValue) {
     this.current.splice(this.place_of_currentTimeline, 0, {
       id: id,
@@ -111,10 +112,21 @@ class timeline {
   }
 
   switchChara(id_currentChara, id_switchToChara) {
-    this.current[this.placeToChara(id_currentChara)].id = id_switchToChara;
+    console.log(id_currentChara ,this.ID_of_firstChara());
+    if(id_currentChara === this.ID_of_firstChara()){
+      this.current[this.placeToChara(id_currentChara)].id = id_switchToChara;
     this.current[
       this.placeToChara(id_switchToChara)
     ].timeline_OrderValue = this.OrderValue_of_firstChara();
+    }else{
+      this.switchSupportChara(...arguments)
+    }
+    
+  }
+
+  switchSupportChara(id_currentChara, id_switchToChara) {
+    this.current.splice(this.placeToChara(id_currentChara), 1)
+    this.addChara(id_switchToChara,this.OrderValue_of_firstChara())
   }
 
   inited() {
@@ -226,7 +238,7 @@ function main() {
       const load_text_arg3 = str_splited[i]?.[3];
       const load_text_arg4 = str_splited[i]?.[4];
 
-      let id, SPD, buff, LoadFactor, LoadFactor_list;
+      let id, SPD, buff, LoadFactor, LoadFactor_list,to,from;
 
       switch (mode) {
         case mode_list.init:
@@ -306,14 +318,25 @@ function main() {
 
             case "switch":
             case "sw":
-              const to = load_text_arg1.toString();
-              const from = load_text_arg2.toString();
+              to = load_text_arg1.toString();
+              from = load_text_arg2.toString();
               SPD = load_text_arg3;
               buff = load_text_arg4 || 0;
-              TL.switchChara(to, from, SPD, buff);
+              TL.switchChara(to, from);
               chara_list[from] = new chara(from, SPD, buff);
               break;
 
+            case "switchSupport":
+            case "swS":
+              to = load_text_arg1.toString();
+              from = load_text_arg2.toString();
+              SPD = load_text_arg3;
+              buff = load_text_arg4 || 0;
+              TL.switchSupportChara(to, from);
+              chara_list[from] = new chara(from, SPD, buff);
+
+              
+                  break;
             case "end":
               mode = mode_list.waiting_mode;
               break;
