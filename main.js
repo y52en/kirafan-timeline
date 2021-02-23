@@ -1,5 +1,9 @@
 "use strict";
 
+(()=>{
+
+
+
 function objectCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -17,10 +21,7 @@ class timeline {
     id = this.ID_of_firstChara(),
     canMoveWithout1stChara = false
   ) {
-    if (
-      id !== this.current[this.place_of_currentTimeline].id &&
-      canMoveWithout1stChara === false
-    ) {
+    if (id !== this.ID_of_firstChara() && canMoveWithout1stChara === false) {
       throw new Error("最初のキャラ以外は操作できません");
     }
     let movechara_nowPlace = this.placeToChara(id);
@@ -48,7 +49,7 @@ class timeline {
         break;
       }
     }
-    // splice 0 elm 1 elm
+    // splice 0 elm 1 elm 2
     // iter      0     1
     if (place_to_moved === -1) {
       this.current.splice(this.place_of_currentTimeline + 1, 0, tmp_movechara);
@@ -167,11 +168,22 @@ class chara {
 
 window.onload = () => {
   document.getElementById("input_txt").oninput = main;
+  document.getElementById("csvDownload").onclick = outputAsCSV;
   main();
 };
 
+
+let tableData = []
+
 function main() {
   let str = document.getElementById("input_txt").value;
+  // let bak_str = str
+  // .replaceAll("　"," ")
+  // .split("\n")
+  // .map((x) =>
+  //   x.split(/^[^ ]+| +|(?=#)/)
+  // );
+  // console.log(bak_str);
   let chara_list = {};
   let TL = new timeline();
 
@@ -180,13 +192,23 @@ function main() {
   const err = document.getElementById("error");
   err.innerHTML = "";
 
-  //delete space
-  str = str.replaceAll(/^\s+/gm, "");
+  // debugger
+
+  // 長い[]は[\s&&[^\n]]と同じ(jsではその記法が使えなかった)
+
+  //全角スペース => 半角
+  str = str.replaceAll("　"," ")
+
+  //delete space(半角)
+  .replaceAll(/^( )+/gm, "")
+  
   //delete comment
-  str = str.replaceAll(/#.*$/gm, "");
+  .replaceAll(/#.*$/gm, "")
 
   //trim space
-  str = str.replaceAll(/\s{2,}/gm, "\n");
+  .replaceAll(/[\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]{2,}/gm, " ");
+
+
 
   let str_splited = str
     .split("\n")
@@ -286,6 +308,19 @@ function main() {
               );
               break;
 
+            case "action":
+            case "ac":
+              id = load_text_arg1.toString();
+              LoadFactor = load_text_arg2;
+              const canMoveWithout1stChara_act = load_text_arg3 === "true";
+              TL.move(
+                chara_list[TL.ID_of_firstChara()].calculateOrderValue(
+                  LoadFactor
+                ),
+                id,
+                canMoveWithout1stChara_act
+              );
+              break;
             case "switch":
             case "sw":
               to = load_text_arg1.toString();
@@ -374,6 +409,7 @@ function main() {
       console.error(i + 1 + "行目にエラー", e);
       err.innerHTML =
         i + 1 + "行目にエラー(" + str_splited[i].join(" ") + ")<br>" + e;
+      break;
     }
   }
 
@@ -397,6 +433,7 @@ function main() {
   document.getElementById("now_place").innerHTML =
     TL.place_of_currentTimeline + 1;
 
+  tableData = [outputTL, chara_array]
   outputAsTable(outputTL, chara_array);
 }
 
@@ -425,3 +462,41 @@ function outputAsTable(json, charalist) {
   }
   document.querySelector("table").innerHTML = output;
 }
+
+function outputAsCSV(){
+  const [json, charalist] = tableData;
+  let output = "";
+
+  for (let i = 0; i < json[0].length; i++) {
+    output += "," + (i + 1);
+  }
+  output += "\n"
+
+  for (let x = 0; x < json.length; x++) {
+    output += charalist[x];
+    for (let y = 0; y < json[0].length; y++) {
+      output += ","
+      output +=  json[x][y] || "";
+    }
+    output += "\n"
+  }
+  makeCSVfile_download(output);
+}
+
+function makeCSVfile_download(csv,fileName = "timeline.csv"){
+    let bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+    let blob = new Blob([bom, csv], { type: "text/csv" });
+    let imgUrl = URL.createObjectURL(blob);
+
+    let link = document.createElement("a");
+    link.href = imgUrl;
+    link.download = fileName;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(imgUrl);
+}
+
+
+})()
