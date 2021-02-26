@@ -5,6 +5,37 @@
     return JSON.parse(JSON.stringify(obj));
   }
 
+  function textCopy(string) {
+    // 空div 生成
+    var tmp = document.createElement("div");
+    // 選択用のタグ生成
+    var pre = document.createElement("pre");
+
+    // 親要素のCSSで user-select: none だとコピーできないので書き換える
+    pre.style.webkitUserSelect = "auto";
+    pre.style.userSelect = "auto";
+
+    tmp.appendChild(pre).textContent = string;
+
+    // 要素を画面外へ
+    var s = tmp.style;
+    s.position = "fixed";
+    s.right = "200%";
+
+    // body に追加
+    document.body.appendChild(tmp);
+    // 要素を選択
+    document.getSelection().selectAllChildren(tmp);
+
+    // クリップボードにコピー
+    var result = document.execCommand("copy");
+
+    // 要素削除
+    document.body.removeChild(tmp);
+
+    return result;
+  }
+
   class timeline {
     constructor() {
       this.current = new Array();
@@ -185,6 +216,36 @@
     input_elm.oninput = main;
     document.getElementById("csvDownload").onclick = outputAsCSV;
 
+    // textCopy
+    input_elm.addEventListener("keydown", (e) => {
+      if (e.key === "c" && e.ctrlKey) {
+        // debugger
+        let cursorPlace_start = input_elm.selectionStart;
+        let cursorPlace_end = input_elm.selectionEnd;
+        if (cursorPlace_start === cursorPlace_end) {
+          let textValue = input_elm.value;
+          const numOfLines_start = [
+            ...textValue
+              .slice(0, cursorPlace_start)
+              // .cursorBeforeText
+              .matchAll(/\n/g),
+          ].length;
+          const beforeLines_regex = "^(.*\\n){" + (numOfLines_start) + "}";
+          
+          textCopy(
+            textValue.replace(
+              new RegExp(beforeLines_regex + "(.*)($|[\\s\\S]*$)")
+              ,
+              "$2"
+            )
+          );
+
+          return false;
+        } else {
+          return true;
+        }
+      }
+    });
 
     //comment ctrl + /
     input_elm.addEventListener("keydown", (e) => {
@@ -222,7 +283,6 @@
               cursorPlace_start--;
             }
             cursorPlace_end--;
-
           } else {
             textValue = textValue.replace(
               new RegExp("(" + beforeLines_regex + ")"),
@@ -231,16 +291,16 @@
             // console.log(1);
             if (i === numOfLines_start) {
               cursorPlace_start++;
-            } 
+            }
             // else {
-              cursorPlace_end++;
+            cursorPlace_end++;
             // }
           }
         }
 
         input_elm.value = textValue;
         input_elm.setSelectionRange(cursorPlace_start, cursorPlace_end);
-        main()
+        main();
       }
     });
     main();
