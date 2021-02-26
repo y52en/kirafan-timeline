@@ -4,37 +4,57 @@
   function objectCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
-
-  function textCopy(string) {
-    // 空div 生成
-    var tmp = document.createElement("div");
-    // 選択用のタグ生成
-    var pre = document.createElement("pre");
-
-    // 親要素のCSSで user-select: none だとコピーできないので書き換える
-    pre.style.webkitUserSelect = "auto";
-    pre.style.userSelect = "auto";
-
-    tmp.appendChild(pre).textContent = string;
-
-    // 要素を画面外へ
-    var s = tmp.style;
-    s.position = "fixed";
-    s.right = "200%";
-
-    // body に追加
-    document.body.appendChild(tmp);
-    // 要素を選択
-    document.getSelection().selectAllChildren(tmp);
-
-    // クリップボードにコピー
-    var result = document.execCommand("copy");
-
-    // 要素削除
-    document.body.removeChild(tmp);
-
-    return result;
+  function textCopy(textVal){
+    // テキストエリアを用意する
+    var copyFrom = document.createElement("textarea");
+    // テキストエリアへ値をセット
+    copyFrom.textContent = textVal;
+   
+    // bodyタグの要素を取得
+    var bodyElm = document.getElementsByTagName("body")[0];
+    // 子要素にテキストエリアを配置
+    bodyElm.appendChild(copyFrom);
+   
+    // テキストエリアの値を選択
+    copyFrom.select();
+    // コピーコマンド発行
+    var retVal = document.execCommand('copy');
+    // 追加テキストエリアを削除
+    bodyElm.removeChild(copyFrom);
+    // 処理結果を返却
+    return retVal;
   }
+
+  // function textCopy(string) {
+  //   // 空div 生成
+  //   var tmp = document.createElement("div");
+  //   // 選択用のタグ生成
+  //   var pre = document.createElement("pre");
+
+  //   // 親要素のCSSで user-select: none だとコピーできないので書き換える
+  //   pre.style.webkitUserSelect = "auto";
+  //   pre.style.userSelect = "auto";
+
+  //   tmp.appendChild(pre).textContent = string;
+
+  //   // 要素を画面外へ
+  //   var s = tmp.style;
+  //   s.position = "fixed";
+  //   s.right = "200%";
+
+  //   // body に追加
+  //   document.body.appendChild(tmp);
+  //   // 要素を選択
+  //   document.getSelection().selectAllChildren(tmp);
+
+  //   // クリップボードにコピー
+  //   var result = document.execCommand("copy");
+
+  //   // 要素削除
+  //   document.body.removeChild(tmp);
+
+  //   return result;
+  // }
 
   class timeline {
     constructor() {
@@ -232,13 +252,14 @@
           ].length;
           const beforeLines_regex = "^(.*\\n){" + (numOfLines_start) + "}";
           
-          textCopy(
+          let s = textCopy(
             textValue.replace(
               new RegExp(beforeLines_regex + "(.*)($|[\\s\\S]*$)")
               ,
               "$2"
             )
           );
+          console.log(s);
 
           return false;
         } else {
