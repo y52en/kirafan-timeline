@@ -4,21 +4,21 @@
   function objectCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
-  function textCopy(textVal){
+  function textCopy(textVal) {
     // テキストエリアを用意する
     var copyFrom = document.createElement("textarea");
     // テキストエリアへ値をセット
     copyFrom.textContent = textVal;
-   
+
     // bodyタグの要素を取得
     var bodyElm = document.getElementsByTagName("body")[0];
     // 子要素にテキストエリアを配置
     bodyElm.appendChild(copyFrom);
-   
+
     // テキストエリアの値を選択
     copyFrom.select();
     // コピーコマンド発行
-    var retVal = document.execCommand('copy');
+    var retVal = document.execCommand("copy");
     // 追加テキストエリアを削除
     bodyElm.removeChild(copyFrom);
     // 処理結果を返却
@@ -250,12 +250,11 @@
               // .cursorBeforeText
               .matchAll(/\n/g),
           ].length;
-          const beforeLines_regex = "^(.*\\n){" + (numOfLines_start) + "}";
-          
+          const beforeLines_regex = "^(.*\\n){" + numOfLines_start + "}";
+
           let s = textCopy(
             textValue.replace(
-              new RegExp(beforeLines_regex + "(.*)($|[\\s\\S]*$)")
-              ,
+              new RegExp(beforeLines_regex + "(.*)($|[\\s\\S]*$)"),
               "$2"
             )
           );
@@ -315,6 +314,67 @@
             }
             // else {
             cursorPlace_end++;
+            // }
+          }
+        }
+
+        input_elm.value = textValue;
+        input_elm.setSelectionRange(cursorPlace_start, cursorPlace_end);
+        main();
+      }
+    });
+
+    input_elm.addEventListener("keydown", (e) => {
+      if (e.key === "[" || (e.key === "]" && e.ctrlKey)) {
+        // debugger
+        let cursorPlace_start = input_elm.selectionStart;
+        let cursorPlace_end = input_elm.selectionEnd;
+        let textValue = input_elm.value;
+        // const cursorBeforeText = ;
+
+        const numOfLines_start = [
+          ...textValue
+            .slice(0, cursorPlace_start)
+            // .cursorBeforeText
+            .matchAll(/\n/g),
+        ].length;
+        const numOfLines_end = [
+          ...textValue
+            .slice(0, cursorPlace_end)
+            // .cursorBeforeText
+            .matchAll(/\n/g),
+        ].length;
+
+        // console.log(numOfLines);
+        for (let i = numOfLines_start; i <= numOfLines_end; i++) {
+          const beforeLines_regex = "^(.*\n){" + i + "}";
+          const beforeReplace_textValue = textValue;
+
+          // if comment found
+          if (e.key === "[") {
+            textValue = textValue.replace(
+              new RegExp("(" + beforeLines_regex + ") "),
+              "$1"
+            );
+            if (beforeReplace_textValue !== textValue) {
+              if (i === numOfLines_start) {
+                cursorPlace_start--;
+              }
+              cursorPlace_end--;
+            }
+          } else {
+            textValue = textValue.replace(
+              new RegExp("(" + beforeLines_regex + ")"),
+              "$1 "
+            );
+            // console.log(1);
+            if (beforeReplace_textValue !== textValue) {
+              if (i === numOfLines_start) {
+                cursorPlace_start++;
+              }
+              // else {
+              cursorPlace_end++;
+            }
             // }
           }
         }
