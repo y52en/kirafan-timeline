@@ -92,6 +92,7 @@
     constructor() {
       this.current = new Array();
       this.output = new Array();
+      this.switchData = new Array();
 
       this.place_of_currentTimeline = 0;
     }
@@ -185,6 +186,12 @@
     }
 
     switchChara(id_currentChara, id_switchToChara) {
+      this.switchData.push(
+        [this.place_of_currentTimeline,
+        id_currentChara,
+        id_switchToChara]
+      );
+
       if (id_currentChara === this.ID_of_firstChara()) {
         this.current[this.placeToChara(id_currentChara)].id = id_switchToChara;
         this.current[
@@ -608,22 +615,22 @@
                 // debugger
                 LoadFactor_list = [
                   ...load_text_arg2
-                  .replaceAll(/^\[|\]$/g, "")
-                  .matchAll(/\d+|\[[^,]+,\d+\]/g)
+                    .replaceAll(/^\[|\]$/g, "")
+                    .matchAll(/\d+|\[[^,]+,\d+\]/g),
                 ]
-                // alert(LoadFactor_list);
-                  .map(x => {
-                    const tmp = x[0]
-                    if(/^\d+$/.test(tmp)){
-                      return Number(tmp)
-                    }else{
+                  // alert(LoadFactor_list);
+                  .map((x) => {
+                    const tmp = x[0];
+                    if (/^\d+$/.test(tmp)) {
+                      return Number(tmp);
+                    } else {
                       // console.log(x[0].split(","));
                       return tmp
-                      .replaceAll(/^\[|\]$/g, "")
-                      .split(",")
-                      .map(x => (/^\d+$/.test(x)? Number(x) :x))
+                        .replaceAll(/^\[|\]$/g, "")
+                        .split(",")
+                        .map((x) => (/^\d+$/.test(x) ? Number(x) : x));
                     }
-                  })
+                  });
                 // alert(LoadFactor_list);
                 chara_move_list[id] = LoadFactor_list;
                 break;
@@ -672,7 +679,6 @@
             // console.log(chara_move_list[id]);
             // console.log(input);
 
-
             if (/^\d+$/.test(input)) {
               const LoadFactor = input;
               // console.log(LoadFactor);
@@ -683,10 +689,10 @@
               );
             } else {
               // const convertedJSONed_input = input.replaceAll('"','""').replace("[",'["').replace(",",'",')
-              
-              const [switchedName, SPD, buff] = input
-                // .replaceAll(/^\[|\]$/g, "")
-                // .split(",")
+
+              const [switchedName, SPD, buff] = input;
+              // .replaceAll(/^\[|\]$/g, "")
+              // .split(",")
 
               TL.switchChara(id, switchedName);
               chara_list[switchedName] = new chara(
@@ -699,7 +705,6 @@
               chara_move_list[id] = [];
               // console.log(chara_move_list[switchedName],chara_move_list[id]);
             }
-            
           }
         }
       } catch (e) {
@@ -726,12 +731,28 @@
 
       outputTL[charaPlace][index] = OrderValue;
     });
+    console.log(TL.switchData);
+    TL.switchData.forEach(x =>{
+      const [place , from_id , to_id] = x;
+      let from_charaPlace = chara_array.indexOf(from_id);
+      let to_charaPlace = chara_array.indexOf(to_id);
+      let arrow_str = "";
+      if(from_charaPlace < to_charaPlace){
+        arrow_str = "↓↓"
+      }else{
+        arrow_str = "↑↑"
+      }
+
+      outputTL[from_charaPlace][place] = arrow_str;
+
+    })
     document.getElementById("firstchara").innerHTML = TL.ID_of_firstChara();
     document.getElementById("now_place").innerHTML =
       TL.place_of_currentTimeline + 1;
 
     tableData = [outputTL, chara_array];
     outputAsTable(outputTL, chara_array);
+    // console.log(TL.switchData);
   }
 
   function outputAsTable(json, charalist) {
