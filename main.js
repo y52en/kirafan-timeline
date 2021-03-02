@@ -36,7 +36,7 @@
       return decodeURIComponent(this._urlAPI.searchParams.get(param) || "");
     }
 
-    setParam(name, value) {
+    setParam(name, value = "") {
       this._urlAPI.searchParams.set(name, encodeURIComponent(value));
       if(this.autochange){
         this._setURL(this._urlAPI.href);
