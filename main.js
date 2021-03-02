@@ -26,36 +26,56 @@
   }
 
   class OperateURL {
-    constructor(URL = location.href) {
-      this.URL = URL;
+    constructor(URL = location.href,autochange= true) {
+      this._href = URL;
       this._reflesh();
+      this.autochange = autochange
     }
 
     getParam(param) {
-      return this._urlAPI.searchParams.get(param);
+      return decodeURIComponent(this._urlAPI.searchParams.get(param));
     }
 
     setParam(name, value) {
-      this._urlAPI.searchParams.set(name, value);
-      history.replaceState("", "", `#${val}`);
+      this._urlAPI.searchParams.set(name, encodeURIComponent(value));
+      if(this.autochange){
+        this._setURL(this._urlAPI.href);
+
+      }
     }
 
     get hash() {
-      return location.hash;
+      return this._urlAPI.hash;
     }
 
     set hash(val) {
       this._setURL(`#${val}`);
     }
 
+    get href() {
+      console.log(this);
+      return this._urlAPI.protocol + "//" + this._urlAPI.host + this._urlAPI.pathname + "?TL=" + 
+      encodeURIComponent(this.getParam("TL"))
+      // encodeURIComponent(this._urlAPI.search.replace(/^\?/,""));
+
+    }
+
+    set href(val) {
+      this._urlAPI.href = val
+      // this._reflesh()
+    }
+
     _setURL(arg3) {
-      history.replaceState("", "", arg3);
+      if(this.autochange){
+        history.replaceState("", "", arg3);
+      }
     }
 
     _reflesh() {
-      this._urlAPI = new URL(this.URL);
+      this._urlAPI = new URL(this._href);
     }
   }
+  const url = new OperateURL(undefined,false)
 
   // function textCopy(string) {
   //   // 空div 生成
@@ -186,11 +206,11 @@
     }
 
     switchChara(id_currentChara, id_switchToChara) {
-      this.switchData.push(
-        [this.place_of_currentTimeline,
+      this.switchData.push([
+        this.place_of_currentTimeline,
         id_currentChara,
-        id_switchToChara]
-      );
+        id_switchToChara,
+      ]);
 
       if (id_currentChara === this.ID_of_firstChara()) {
         this.current[this.placeToChara(id_currentChara)].id = id_switchToChara;
@@ -272,9 +292,14 @@
 
   window.onload = () => {
     const input_elm = document.getElementById("input_txt");
+    const TLparam = url.getParam("TL")
+    // console.log(TLparam);
+    if(TLparam !== undefined){
+      input_elm.textContent = TLparam
+    }
     input_elm.oninput = main;
     document.getElementById("csvDownload").onclick = outputAsCSV;
-
+    document.getElementById("copyTL").onclick = copyDataAsURL
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
@@ -430,6 +455,7 @@
 
   function main() {
     let str = document.getElementById("input_txt").value;
+    url.setParam("TL",str);
     // let bak_str = str
     // .replaceAll("　"," ")
     // .split("\n")
@@ -443,7 +469,9 @@
     let chara_move_list = {};
 
     const err = document.getElementById("error");
+    const info = document.getElementById("info");
     err.innerHTML = "";
+    info.innerHTML = "";
 
     // debugger
 
@@ -468,7 +496,7 @@
     let str_splited = str
       .split("\n")
       .map((x) =>
-        x.split(" ").map((x) => (isNaN(parseInt(x)) ? x : parseInt(x)))
+        x.split(" ").map((x) => (/^\d+$/.test(x)) ? Number(x) : x)
       );
 
     const mode_list = {
@@ -613,6 +641,7 @@
               case "mv_ls":
                 id = load_text_arg1.toString();
                 // debugger
+                console.log(load_text_arg2);
                 LoadFactor_list = [
                   ...load_text_arg2
                     .replaceAll(/^\[|\]$/g, "")
@@ -670,7 +699,21 @@
           while (true) {
             const id = TL.ID_of_firstChara();
             if (chara_move_list[id]?.[0] === undefined) {
-              chara_move_list = {};
+              let output = new Object();
+              Object.keys(chara_move_list).forEach(function (key) {
+                if (chara_move_list[key].length !== 0) {
+                  output[key] = chara_move_list[key]
+                }
+              })
+              if (Object.keys(output).length !== 0) {
+                info.insertAdjacentText(
+                  "beforeend",
+                  "ⓘinfo :move_listに使われていないスキルがあります:" +
+                    JSON.stringify(output)
+                );
+
+                // chara_move_list = {};
+              }
               break;
             }
 
@@ -709,8 +752,11 @@
         }
       } catch (e) {
         console.error(i + 1 + "行目にエラー", e);
-        err.innerHTML =
-          i + 1 + "行目にエラー(" + str_splited[i].join(" ") + ")<br>" + e;
+
+        err.innerText =
+          i + 1 + "行目にエラー(" + str_splited[i].join(" ") + ")";
+        err.innerHTML += "<br>";
+        err.insertAdjacentText("beforeend", e);
         break;
       }
     }
@@ -731,23 +777,22 @@
 
       outputTL[charaPlace][index] = OrderValue;
     });
-    console.log(TL.switchData);
-    TL.switchData.forEach(x =>{
-      const [place , from_id , to_id] = x;
+    // console.log(TL.switchData);
+    TL.switchData.forEach((x) => {
+      const [place, from_id, to_id] = x;
       let from_charaPlace = chara_array.indexOf(from_id);
       let to_charaPlace = chara_array.indexOf(to_id);
       let arrow_str = "";
-      if(from_charaPlace < to_charaPlace){
-        arrow_str = "↓↓"
-      }else{
-        arrow_str = "↑↑"
+      if (from_charaPlace < to_charaPlace) {
+        arrow_str = "↓↓";
+      } else {
+        arrow_str = "↑↑";
       }
 
       outputTL[from_charaPlace][place] = arrow_str;
-
-    })
-    document.getElementById("firstchara").innerHTML = TL.ID_of_firstChara();
-    document.getElementById("now_place").innerHTML =
+    });
+    document.getElementById("firstchara").innerText = TL.ID_of_firstChara();
+    document.getElementById("now_place").innerText =
       TL.place_of_currentTimeline + 1;
 
     tableData = [outputTL, chara_array];
@@ -804,15 +849,22 @@
   function makeCSVfile_download(csv, fileName = "timeline.csv") {
     let bom = new Uint8Array([0xef, 0xbb, 0xbf]);
     let blob = new Blob([bom, csv], { type: "text/csv" });
-    let imgUrl = URL.createObjectURL(blob);
+    let blobUrl = URL.createObjectURL(blob);
 
     let link = document.createElement("a");
-    link.href = imgUrl;
+    link.href = blobUrl;
     link.download = fileName;
     link.style.display = "none";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(imgUrl);
+    URL.revokeObjectURL(blobUrl);
+  }
+
+  function copyDataAsURL(){
+    textCopy(url.href)
+    const copyed = document.getElementById("copyed");
+    copyed.style.display = "block"
+    setTimeout(()=>{copyed.style.display = "none"},1000)
   }
 })();

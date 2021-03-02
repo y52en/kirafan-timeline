@@ -15,15 +15,26 @@
     現在先頭のキャラ:<span id="firstchara"> </span><br />
     現在 <span id="now_place"></span> 行目
     <div id="error"></div>
+    <div id="info"></div>
 
     <div id="TL_datainput">
-      <textarea id="input_txt" cols="60" rows="25"></textarea>
+      <textarea id="input_txt" cols="60" rows="25" spellcheck="false"></textarea>
     </div>
 
     <div>
       <button id="csvDownload">CSV形式で表をダウンロード</button>
     </div>
 
+    <!-- <div>
+      <button id="QRDownload">QRコードでタイムラインのテキストを保存</button>
+    </div> -->
+
+    <div>
+      <button id="copyTL">タイムラインデータ付きのURLをコピー</button>
+    </div>
+    <div id="copyed" style="display: none;">コピーしました</div>
+
+    <br>
     <div>
       <strong>使い方<br /></strong>
       コマンドは半角で、またスペース区切りで設定すること<br />
@@ -145,8 +156,8 @@ start
 end
 
 start_sort
-  move_list maid [50000,120]
-  move_list fennel [50000,120]
+  move_list maid [50000]
+  move_list fennel [50000]
 end_sort
 </textarea
       >
