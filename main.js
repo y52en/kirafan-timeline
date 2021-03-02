@@ -25,6 +25,38 @@
     return retVal;
   }
 
+  class OperateURL {
+    constructor(URL = location.href) {
+      this.URL = URL;
+      this._reflesh();
+    }
+
+    getParam(param) {
+      return this._urlAPI.searchParams.get(param);
+    }
+
+    setParam(name, value) {
+      this._urlAPI.searchParams.set(name, value);
+      history.replaceState("", "", `#${val}`);
+    }
+
+    get hash() {
+      return location.hash;
+    }
+
+    set hash(val) {
+      this._setURL(`#${val}`);
+    }
+
+    _setURL(arg3) {
+      history.replaceState("", "", arg3);
+    }
+
+    _reflesh() {
+      this._urlAPI = new URL(this.URL);
+    }
+  }
+
   // function textCopy(string) {
   //   // 空div 生成
   //   var tmp = document.createElement("div");
@@ -547,16 +579,16 @@
                 chara_list[from] = new chara(from, SPD, buff);
                 break;
 
-              case "switchSupport":
-              case "swS":
-                to = load_text_arg1.toString();
-                from = load_text_arg2.toString();
-                SPD = load_text_arg3;
-                buff = load_text_arg4 || 0;
-                TL.switchSupportChara(to, from);
-                chara_list[from] = new chara(from, SPD, buff);
+              // case "switchSupport":
+              // case "swS":
+              //   to = load_text_arg1.toString();
+              //   from = load_text_arg2.toString();
+              //   SPD = load_text_arg3;
+              //   buff = load_text_arg4 || 0;
+              //   TL.switchSupportChara(to, from);
+              //   chara_list[from] = new chara(from, SPD, buff);
+              //   break;
 
-                break;
               case "end":
                 mode = mode_list.waiting_mode;
                 break;
@@ -573,8 +605,26 @@
               case "move_list":
               case "mv_ls":
                 id = load_text_arg1.toString();
-
-                LoadFactor_list = JSON.parse(load_text_arg2);
+                // debugger
+                LoadFactor_list = [
+                  ...load_text_arg2
+                  .replaceAll(/^\[|\]$/g, "")
+                  .matchAll(/\d+|\[[^,]+,\d+\]/g)
+                ]
+                // alert(LoadFactor_list);
+                  .map(x => {
+                    const tmp = x[0]
+                    if(/^\d+$/.test(tmp)){
+                      return Number(tmp)
+                    }else{
+                      // console.log(x[0].split(","));
+                      return tmp
+                      .replaceAll(/^\[|\]$/g, "")
+                      .split(",")
+                      .map(x => (/^\d+$/.test(x)? Number(x) :x))
+                    }
+                  })
+                // alert(LoadFactor_list);
                 chara_move_list[id] = LoadFactor_list;
                 break;
 
@@ -617,8 +667,39 @@
               break;
             }
 
-            LoadFactor = chara_move_list[id].splice(0, 1);
-            TL.move(chara_list[id].calculateOrderValue(LoadFactor), id, false);
+            //LoadFactor
+            const input = chara_move_list[id].shift();
+            // console.log(chara_move_list[id]);
+            // console.log(input);
+
+
+            if (/^\d+$/.test(input)) {
+              const LoadFactor = input;
+              // console.log(LoadFactor);
+              TL.move(
+                chara_list[id].calculateOrderValue(LoadFactor),
+                id,
+                false
+              );
+            } else {
+              // const convertedJSONed_input = input.replaceAll('"','""').replace("[",'["').replace(",",'",')
+              
+              const [switchedName, SPD, buff] = input
+                // .replaceAll(/^\[|\]$/g, "")
+                // .split(",")
+
+              TL.switchChara(id, switchedName);
+              chara_list[switchedName] = new chara(
+                switchedName,
+                SPD,
+                buff || 0
+              );
+
+              chara_move_list[switchedName] = chara_move_list[id];
+              chara_move_list[id] = [];
+              // console.log(chara_move_list[switchedName],chara_move_list[id]);
+            }
+            
           }
         }
       } catch (e) {
