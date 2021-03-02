@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="./favicon.png">
+    <link rel="icon" href="./favicon.png" />
     <title>TL生成ツール</title>
     <script src="main.js"></script>
   </head>
@@ -21,10 +21,7 @@
     </div>
 
     <div>
-      <button id="csvDownload">
-      CSV形式で表をダウンロード
-
-      </button>
+      <button id="csvDownload">CSV形式で表をダウンロード</button>
     </div>
 
     <div>
@@ -37,7 +34,7 @@
       <strong>#[comment]<br /></strong>
       #から始まるものは行末まで無視されます(コメントに使用)<br />
       命令の最後に書いてもよい<br />
-      ショートカットは「Ctrl + /」 <br>
+      ショートカットは「Ctrl + /」 <br />
       例: <br />
       move 125 enemy <br />
       #ここからデバフを入れる <br />
@@ -86,11 +83,15 @@
       その後ろにstart、start_sortを書くことでまた別のモードに切り替えられる<br />
       <br />
 
-      <strong>move_list [name] [[硬直(%)],[硬直(%)],...]</strong><br />
+      <strong
+        >move_list [name]
+        [[硬直(%)],[交代後のname,SPD,(buff)],[硬直(%)],...]</strong
+      ><br />
       行動リスト <br />
-      move_list nagi [40,100,100] <br />
+      move_list nagi [40,100,[ren,141,100],100] <br />
       のように書く <br />
       スペースを空けるのは厳禁 <br />
+      内側にある[]は途中で交代することを示す <br />
       move_listの代わりにmv_lsでも可<br />
       <br />
 
@@ -111,7 +112,7 @@
       <strong> switch [from_name] [to_name] [SPD] ([buff]) </strong><br />
       from_nameに交代前のキャラ名、to_nameに交代後のキャラ名を記入<br />
       swと省略可 <br />
-<!-- 
+      <!-- 
       <strong> switchSupport [from_name] [to_name] [SPD] ([buff]) </strong><br />
       switchのサポート/フレンド版 <br>
       from_nameに交代前のキャラ名、to_nameに交代後のキャラ名を記入<br />
@@ -119,7 +120,7 @@
 
       <br />
       <br />
-      <strong>例</strong><br>
+      <strong>例</strong><br />
       <textarea readonly cols="60" rows="30">
 set tsubaki 121
 set hanako 138
@@ -147,7 +148,8 @@ start_sort
   move_list maid [50000,120]
   move_list fennel [50000,120]
 end_sort
-</textarea>
+</textarea
+      >
     </div>
   </body>
 </html>
