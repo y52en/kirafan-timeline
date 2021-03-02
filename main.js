@@ -33,7 +33,7 @@
     }
 
     getParam(param) {
-      return decodeURIComponent(this._urlAPI.searchParams.get(param));
+      return decodeURIComponent(this._urlAPI.searchParams.get(param) || "");
     }
 
     setParam(name, value) {
@@ -293,8 +293,8 @@
   window.onload = () => {
     const input_elm = document.getElementById("input_txt");
     const TLparam = url.getParam("TL")
-    // console.log(TLparam);
-    if(TLparam !== undefined){
+    // console.log(typeof TLparam);
+    if(typeof TLparam !== null){
       input_elm.textContent = TLparam
     }
     input_elm.oninput = main;
