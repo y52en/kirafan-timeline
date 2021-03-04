@@ -273,6 +273,9 @@
     input_elm.oninput = main;
     document.getElementById("csvDownload").onclick = outputAsCSV;
     document.getElementById("copyTL").onclick = copyDataAsURL;
+    document.getElementById("log_convertedTL").onclick = printConvertedTL
+    
+    document.getElementById("copy_ConvertedTL").onclick = copyConvertedTL
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
@@ -295,7 +298,7 @@
               "$2"
             )
           );
-          console.log(s);
+          // console.log(s);
 
           return false;
         } else {
@@ -362,7 +365,7 @@
     });
 
     input_elm.addEventListener("keydown", (e) => {
-      if (e.key === "[" || (e.key === "]" && e.ctrlKey)) {
+      if ((e.key === "[" || (e.key === "]") && e.ctrlKey)) {
         // debugger
         let cursorPlace_start = input_elm.selectionStart;
         let cursorPlace_end = input_elm.selectionEnd;
@@ -426,9 +429,13 @@
 
   let tableData = [];
 
+  let convertedTLdata = {}
+
   function main() {
     let str = document.getElementById("input_txt").value;
     url.setParam("TL", str);
+
+    convertedTLdata = {"main":[],"set":[]}
     // let bak_str = str
     // .replaceAll("　"," ")
     // .split("\n")
@@ -497,7 +504,9 @@
                 buff = load_text_arg3 || 0;
                 chara_list[id] = new chara(id, SPD, buff);
                 TL.setChara(id, chara_list[id].initOrderValue());
+                convertedTLdata.set.push(str_splited[i])
                 break;
+
 
               case "start":
                 mode = mode_list.start;
@@ -530,7 +539,7 @@
               case "mv_ls":
                 id = load_text_arg1.toString();
                 // debugger
-                console.log(load_text_arg2);
+                // console.log(load_text_arg2);
                 LoadFactor_list = [
                   ...load_text_arg2
                     .replaceAll(/^\[|\]$/g, "")
@@ -548,7 +557,7 @@
                     output.value = [...tmp.matchAll(/[^,{}]+/g)].map((x) =>
                       /^[\d-.]+$/.test(x[0]) ? Number(x[0]) : x[0]
                     );
-                    console.log(output);
+                    // console.log(output);
                     return output;
                   } else {
                     return tmp
@@ -557,7 +566,7 @@
                       .map((x) => (/^[\d.-]+$/.test(x) ? Number(x) : x));
                   }
                 });
-                console.dir(LoadFactor_list);
+                // console.dir(LoadFactor_list);
                 // alert(LoadFactor_list);
                 chara_move_list[id] = LoadFactor_list;
                 break;
@@ -618,17 +627,18 @@
             //LoadFactor
             const input = chara_move_list[id].shift();
             // console.log(chara_move_list[id]);
-            console.log(input);
+            // console.log(input);
 
             //expected input
             if (/^\d+$/.test(input)) {
               const LoadFactor = input;
               // console.log(LoadFactor);
-              TL.move(
-                chara_list[id].calculateOrderValue(LoadFactor),
-                id,
-                false
-              );
+              // TL.move(
+              //   chara_list[id].calculateOrderValue(LoadFactor),
+              //   id,
+              //   false
+              // );
+              mainMode("action",id,LoadFactor,false)
             } else if (Array.isArray(input)) {
               // const convertedJSONed_input = input.replaceAll('"','""').replace("[",'["').replace(",",'",')
 
@@ -636,7 +646,8 @@
               // .replaceAll(/^\[|\]$/g, "")
               // .split(",")
 
-              TL.switchChara(id, switchedName);
+              // TL.switchChara(id, switchedName);
+              mainMode("switch",id,...input)
               chara_list[switchedName] = new chara(
                 switchedName,
                 SPD,
@@ -647,7 +658,7 @@
               chara_move_list[id] = [];
               // console.log(chara_move_list[switchedName],chara_move_list[id]);
             } else {
-              console.log(input);
+              // console.log(input);
               try {
                 mainMode(...input.value);
               } catch (e) {
@@ -664,6 +675,11 @@
             load_text_arg2,
             load_text_arg3,
           ] = arg;
+
+          if(load_text_command !== "" && load_text_command !== "end"){
+           convertedTLdata.main.push(arg.filter(x => x))
+
+          }
 
           let id, buff;
           switch (load_text_command) {
@@ -803,6 +819,9 @@
     tableData = [outputTL, chara_array];
     outputAsTable(outputTL, chara_array);
     // console.log(TL.switchData);
+
+    // console.log(convertedTLdata);
+    printConvertedTL()
   }
 
   function outputAsTable(json, charalist) {
@@ -874,4 +893,29 @@
       copyed.style.display = "none";
     }, 1000);
   }
+
+  function printConvertedTL(){
+    document.getElementById("popup").innerText = joinedTLdata()  
+  }
+
+  function copyConvertedTL(){
+    textCopy(joinedTLdata())
+    const copyed = document.getElementById("copyed_popup");
+    copyed.style.display = "block";
+    setTimeout(() => {
+      copyed.style.display = "none";
+    }, 1000);
+  }
+
+  function joinedTLdata(){
+    return ( convertedTLdata.set.map(x => x.join(" ")) ).join("\n")
+      +
+      "\n\nstart\n"
+      +
+      ( convertedTLdata.main.map(x =>"  " + x.join(" ")) ).join("\n")
+      +
+      "\nend" 
+  }
 })();
+
+
