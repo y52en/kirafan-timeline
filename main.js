@@ -527,10 +527,7 @@
             break;
           case mode_list.start:
             mainMode(
-              load_text_command,
-              load_text_arg1,
-              load_text_arg2,
-              load_text_arg3
+              ...str_splited[i]
             );
             break;
           case mode_list.start_sort:
@@ -674,6 +671,7 @@
             load_text_arg1,
             load_text_arg2,
             load_text_arg3,
+            load_text_arg4
           ] = arg;
 
           if(load_text_command !== "" && load_text_command !== "end"){
