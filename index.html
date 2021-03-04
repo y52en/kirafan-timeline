@@ -96,13 +96,14 @@
 
       <strong
         >move_list [name]
-        [[硬直(%)],[交代後のname,SPD,(buff)],[硬直(%)],...]</strong
+        [[硬直(%)],[交代後のname,SPD,(buff)],[硬直(%)],{command,argments1,argments2...}...]</strong
       ><br />
       行動リスト <br />
-      move_list nagi [40,100,[ren,141,100],100] <br />
+      move_list nagi [40,{buffset,nagi,24},100,[ren,141,100],100] <br />
       のように書く <br />
       スペースを空けるのは厳禁 <br />
       内側にある[]は途中で交代することを示す <br />
+      {}でコマンドを使用可能 <br />
       move_listの代わりにmv_lsでも可<br />
       <br />
 

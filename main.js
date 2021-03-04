@@ -26,10 +26,10 @@
   }
 
   class OperateURL {
-    constructor(URL = location.href,autochange= true) {
+    constructor(URL = location.href, autochange = true) {
       this._href = URL;
       this._reflesh();
-      this.autochange = autochange
+      this.autochange = autochange;
     }
 
     getParam(param) {
@@ -38,9 +38,8 @@
 
     setParam(name, value = "") {
       this._urlAPI.searchParams.set(name, encodeURIComponent(value));
-      if(this.autochange){
+      if (this.autochange) {
         this._setURL(this._urlAPI.href);
-
       }
     }
 
@@ -53,20 +52,25 @@
     }
 
     get href() {
-      console.log(this);
-      return this._urlAPI.protocol + "//" + this._urlAPI.host + this._urlAPI.pathname + "?TL=" + 
-      encodeURIComponent(this.getParam("TL"))
+      // console.log(this);
+      return (
+        this._urlAPI.protocol +
+        "//" +
+        this._urlAPI.host +
+        this._urlAPI.pathname +
+        "?TL=" +
+        encodeURIComponent(this.getParam("TL"))
+      );
       // encodeURIComponent(this._urlAPI.search.replace(/^\?/,""));
-
     }
 
     set href(val) {
-      this._urlAPI.href = val
+      this._urlAPI.href = val;
       // this._reflesh()
     }
 
     _setURL(arg3) {
-      if(this.autochange){
+      if (this.autochange) {
         history.replaceState("", "", arg3);
       }
     }
@@ -75,38 +79,7 @@
       this._urlAPI = new URL(this._href);
     }
   }
-  const url = new OperateURL(undefined,false)
-
-  // function textCopy(string) {
-  //   // 空div 生成
-  //   var tmp = document.createElement("div");
-  //   // 選択用のタグ生成
-  //   var pre = document.createElement("pre");
-
-  //   // 親要素のCSSで user-select: none だとコピーできないので書き換える
-  //   pre.style.webkitUserSelect = "auto";
-  //   pre.style.userSelect = "auto";
-
-  //   tmp.appendChild(pre).textContent = string;
-
-  //   // 要素を画面外へ
-  //   var s = tmp.style;
-  //   s.position = "fixed";
-  //   s.right = "200%";
-
-  //   // body に追加
-  //   document.body.appendChild(tmp);
-  //   // 要素を選択
-  //   document.getSelection().selectAllChildren(tmp);
-
-  //   // クリップボードにコピー
-  //   var result = document.execCommand("copy");
-
-  //   // 要素削除
-  //   document.body.removeChild(tmp);
-
-  //   return result;
-  // }
+  const url = new OperateURL(undefined, false);
 
   class timeline {
     constructor() {
@@ -292,14 +265,14 @@
 
   window.onload = () => {
     const input_elm = document.getElementById("input_txt");
-    const TLparam = url.getParam("TL")
+    const TLparam = url.getParam("TL");
     // console.log(typeof TLparam);
-    if(typeof TLparam !== null){
-      input_elm.textContent = TLparam
+    if (typeof TLparam !== null) {
+      input_elm.textContent = TLparam;
     }
     input_elm.oninput = main;
     document.getElementById("csvDownload").onclick = outputAsCSV;
-    document.getElementById("copyTL").onclick = copyDataAsURL
+    document.getElementById("copyTL").onclick = copyDataAsURL;
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
@@ -455,7 +428,7 @@
 
   function main() {
     let str = document.getElementById("input_txt").value;
-    url.setParam("TL",str);
+    url.setParam("TL", str);
     // let bak_str = str
     // .replaceAll("　"," ")
     // .split("\n")
@@ -495,9 +468,7 @@
 
     let str_splited = str
       .split("\n")
-      .map((x) =>
-        x.split(" ").map((x) => (/^\d+$/.test(x)) ? Number(x) : x)
-      );
+      .map((x) => x.split(" ").map((x) => (/^\d+$/.test(x) ? Number(x) : x)));
 
     const mode_list = {
       init: "init",
@@ -546,94 +517,12 @@
             }
             break;
           case mode_list.start:
-            switch (load_text_command) {
-              case "buffset":
-              case "b":
-                id = load_text_arg1.toString();
-                buff = load_text_arg2 || 0;
-                chara_list[id].SPD_buff = buff;
-                break;
-
-              case "buffadd":
-              case "b+":
-                id = load_text_arg1.toString();
-                buff = load_text_arg2 || 0;
-                chara_list[id].SPD_buff += buff;
-                break;
-
-              case "buffminus":
-              case "b-":
-                id = load_text_arg1.toString();
-                buff = load_text_arg2 || 0;
-                chara_list[id].SPD_buff -= buff;
-                break;
-
-              case "add":
-              case "a":
-                id = load_text_arg1.toString();
-                SPD = load_text_arg2;
-                buff = load_text_arg3 || 0;
-                chara_list[id] = new chara(id, SPD, buff);
-                TL.addChara(id, chara_list[id].initOrderValue());
-                break;
-
-              case "move":
-              case "m":
-                LoadFactor = load_text_arg1;
-                id = load_text_arg2.toString();
-                const canMoveWithout1stChara = load_text_arg3 === "true";
-                TL.move(
-                  chara_list[TL.ID_of_firstChara()].calculateOrderValue(
-                    LoadFactor
-                  ),
-                  id,
-                  canMoveWithout1stChara
-                );
-                break;
-
-              case "action":
-              case "ac":
-                id = load_text_arg1.toString();
-                LoadFactor = load_text_arg2;
-                const canMoveWithout1stChara_act = load_text_arg3 === "true";
-                TL.move(
-                  chara_list[TL.ID_of_firstChara()].calculateOrderValue(
-                    LoadFactor
-                  ),
-                  id,
-                  canMoveWithout1stChara_act
-                );
-                break;
-              case "switch":
-              case "sw":
-                to = load_text_arg1.toString();
-                from = load_text_arg2.toString();
-                SPD = load_text_arg3;
-                buff = load_text_arg4 || 0;
-                TL.switchChara(to, from);
-                chara_list[from] = new chara(from, SPD, buff);
-                break;
-
-              // case "switchSupport":
-              // case "swS":
-              //   to = load_text_arg1.toString();
-              //   from = load_text_arg2.toString();
-              //   SPD = load_text_arg3;
-              //   buff = load_text_arg4 || 0;
-              //   TL.switchSupportChara(to, from);
-              //   chara_list[from] = new chara(from, SPD, buff);
-              //   break;
-
-              case "end":
-                mode = mode_list.waiting_mode;
-                break;
-
-              case "":
-                break;
-
-              default:
-                throw Error("no command found");
-            }
+            mainMode(
+              load_text_command,
+              load_text_arg1,
+              load_text_arg2,
+              load_text_arg3
+            );
             break;
           case mode_list.start_sort:
             switch (load_text_command) {
@@ -645,21 +534,30 @@
                 LoadFactor_list = [
                   ...load_text_arg2
                     .replaceAll(/^\[|\]$/g, "")
-                    .matchAll(/\d+|\[[^,]+,\d+\]/g),
-                ]
-                  // alert(LoadFactor_list);
-                  .map((x) => {
-                    const tmp = x[0];
-                    if (/^\d+$/.test(tmp)) {
-                      return Number(tmp);
-                    } else {
-                      // console.log(x[0].split(","));
-                      return tmp
-                        .replaceAll(/^\[|\]$/g, "")
-                        .split(",")
-                        .map((x) => (/^\d+$/.test(x) ? Number(x) : x));
-                    }
-                  });
+                    // 122,[charaname,SPD,buff],{command,arg1,arg2,arg3?,arg4?}
+                    .matchAll(
+                      /\d+|\[[^,]+,\d+(,[\d.-]*)?\]|\{([^,]+)(,[^,]+){2,4}\}/g
+                    ),
+                ].map((x) => {
+                  const tmp = x[0];
+                  if (/^[\d.-]+$/.test(tmp)) {
+                    return Number(tmp);
+                  } else if (/^{[^}]+}$/.test(tmp)) {
+                    let output = {};
+                    output.mode = "command";
+                    output.value = [...tmp.matchAll(/[^,{}]+/g)].map((x) =>
+                      /^[\d-.]+$/.test(x[0]) ? Number(x[0]) : x[0]
+                    );
+                    console.log(output);
+                    return output;
+                  } else {
+                    return tmp
+                      .replaceAll(/^\[|\]$/g, "")
+                      .split(",")
+                      .map((x) => (/^[\d.-]+$/.test(x) ? Number(x) : x));
+                  }
+                });
+                console.dir(LoadFactor_list);
                 // alert(LoadFactor_list);
                 chara_move_list[id] = LoadFactor_list;
                 break;
@@ -702,9 +600,9 @@
               let output = new Object();
               Object.keys(chara_move_list).forEach(function (key) {
                 if (chara_move_list[key].length !== 0) {
-                  output[key] = chara_move_list[key]
+                  output[key] = chara_move_list[key];
                 }
-              })
+              });
               if (Object.keys(output).length !== 0) {
                 info.insertAdjacentText(
                   "beforeend",
@@ -720,8 +618,9 @@
             //LoadFactor
             const input = chara_move_list[id].shift();
             // console.log(chara_move_list[id]);
-            // console.log(input);
+            console.log(input);
 
+            //expected input
             if (/^\d+$/.test(input)) {
               const LoadFactor = input;
               // console.log(LoadFactor);
@@ -730,7 +629,7 @@
                 id,
                 false
               );
-            } else {
+            } else if (Array.isArray(input)) {
               // const convertedJSONed_input = input.replaceAll('"','""').replace("[",'["').replace(",",'",')
 
               const [switchedName, SPD, buff] = input;
@@ -747,7 +646,113 @@
               chara_move_list[switchedName] = chara_move_list[id];
               chara_move_list[id] = [];
               // console.log(chara_move_list[switchedName],chara_move_list[id]);
+            } else {
+              console.log(input);
+              try {
+                mainMode(...input.value);
+              } catch (e) {
+                throw Error(e + ": { " + input.value + " }");
+              }
             }
+          }
+        }
+
+        function mainMode(...arg) {
+          const [
+            load_text_command,
+            load_text_arg1,
+            load_text_arg2,
+            load_text_arg3,
+          ] = arg;
+
+          let id, buff;
+          switch (load_text_command) {
+            case "buffset":
+            case "b":
+              id = load_text_arg1.toString();
+              buff = load_text_arg2 || 0;
+              chara_list[id].SPD_buff = buff;
+              break;
+
+            case "buffadd":
+            case "b+":
+              id = load_text_arg1.toString();
+              buff = load_text_arg2 || 0;
+              chara_list[id].SPD_buff += buff;
+              break;
+
+            case "buffminus":
+            case "b-":
+              id = load_text_arg1.toString();
+              buff = load_text_arg2 || 0;
+              chara_list[id].SPD_buff -= buff;
+              break;
+
+            case "add":
+            case "a":
+              id = load_text_arg1.toString();
+              SPD = load_text_arg2;
+              buff = load_text_arg3 || 0;
+              chara_list[id] = new chara(id, SPD, buff);
+              TL.addChara(id, chara_list[id].initOrderValue());
+              break;
+
+            case "move":
+            case "m":
+              LoadFactor = load_text_arg1;
+              id = load_text_arg2.toString();
+              const canMoveWithout1stChara = load_text_arg3 === "true";
+              TL.move(
+                chara_list[TL.ID_of_firstChara()].calculateOrderValue(
+                  LoadFactor
+                ),
+                id,
+                canMoveWithout1stChara
+              );
+              break;
+
+            case "action":
+            case "ac":
+              id = load_text_arg1.toString();
+              LoadFactor = load_text_arg2;
+              const canMoveWithout1stChara_act = load_text_arg3 === "true";
+              TL.move(
+                chara_list[TL.ID_of_firstChara()].calculateOrderValue(
+                  LoadFactor
+                ),
+                id,
+                canMoveWithout1stChara_act
+              );
+              break;
+            case "switch":
+            case "sw":
+              to = load_text_arg1.toString();
+              from = load_text_arg2.toString();
+              SPD = load_text_arg3;
+              buff = load_text_arg4 || 0;
+              TL.switchChara(to, from);
+              chara_list[from] = new chara(from, SPD, buff);
+              break;
+
+            // case "switchSupport":
+            // case "swS":
+            //   to = load_text_arg1.toString();
+            //   from = load_text_arg2.toString();
+            //   SPD = load_text_arg3;
+            //   buff = load_text_arg4 || 0;
+            //   TL.switchSupportChara(to, from);
+            //   chara_list[from] = new chara(from, SPD, buff);
+            //   break;
+
+            case "end":
+              mode = mode_list.waiting_mode;
+              break;
+
+            case "":
+              break;
+
+            default:
+              throw Error("no command found");
           }
         }
       } catch (e) {
@@ -861,10 +866,12 @@
     URL.revokeObjectURL(blobUrl);
   }
 
-  function copyDataAsURL(){
-    textCopy(url.href)
+  function copyDataAsURL() {
+    textCopy(url.href);
     const copyed = document.getElementById("copyed");
-    copyed.style.display = "block"
-    setTimeout(()=>{copyed.style.display = "none"},1000)
+    copyed.style.display = "block";
+    setTimeout(() => {
+      copyed.style.display = "none";
+    }, 1000);
   }
 })();
