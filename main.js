@@ -677,7 +677,7 @@
           ] = arg;
 
           if(load_text_command !== "" && load_text_command !== "end"){
-           convertedTLdata.main.push(arg.filter(x => x))
+           convertedTLdata.main.push(arg.filter(x => x || x === 0))
 
           }
 
