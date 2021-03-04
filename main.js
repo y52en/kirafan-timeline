@@ -365,7 +365,7 @@
     });
 
     input_elm.addEventListener("keydown", (e) => {
-      if ((e.key === "[" || (e.key === "]") && e.ctrlKey)) {
+      if ((e.key === "[" || e.key === "]") && e.ctrlKey) {
         // debugger
         let cursorPlace_start = input_elm.selectionStart;
         let cursorPlace_end = input_elm.selectionEnd;
