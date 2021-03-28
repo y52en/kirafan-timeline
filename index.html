@@ -6,7 +6,7 @@
     <link rel="icon" href="./favicon.png" />
     <title>TL生成ツール</title>
     <script src="main.js"></script>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <div id="TL_table">
@@ -19,7 +19,12 @@
     <div id="info"></div>
 
     <div id="TL_datainput">
-      <textarea id="input_txt" cols="60" rows="25" spellcheck="false"></textarea>
+      <textarea
+        id="input_txt"
+        cols="60"
+        rows="25"
+        spellcheck="false"
+      ></textarea>
     </div>
 
     <div>
@@ -33,36 +38,35 @@
     <div>
       <button id="copyTL">タイムラインデータ付きのURLをコピー</button>
     </div>
-    <div id="copyed" style="display: none;">コピーしました</div>
+    <div id="copyed" style="display: none">コピーしました</div>
 
-    <div  style="display: none;">
+    <div style="display: none">
       <button id="log_convertedTL">タイムラインデータをコンバート</button>
     </div>
 
     <div class="popupModal1">
       <input type="radio" name="modalPop" id="pop11" />
       <!-- <button> -->
-        <label for="pop11"><button onclick="pop11.checked = true">move_listの展開</button></label>
+      <label for="pop11"
+        ><button onclick="pop11.checked = true">move_listの展開</button></label
+      >
       <!-- </button> -->
       <input type="radio" name="modalPop" id="pop12" />
       <label for="pop12">CLOSE</label>
       <input type="radio" name="modalPop" id="pop13" />
       <label for="pop13"></label>
       <div class="modalPopup2">
-       <div class="modalPopup3">
-        <h2 class="modalTitle">展開済みのTLデータ</h2>
-        <button id="copy_ConvertedTL">コピーする</button>
-        <div id="copyed_popup" style="display: none;">コピーしました</div>
+        <div class="modalPopup3">
+          <h2 class="modalTitle">展開済みのTLデータ</h2>
+          <button id="copy_ConvertedTL">コピーする</button>
+          <div id="copyed_popup" style="display: none">コピーしました</div>
 
-        <div class="modalMain" id="popup">
-          
+          <div class="modalMain" id="popup"></div>
         </div>
-       </div>
       </div>
-     </div>
-     
-     
-    <br>
+    </div>
+
+    <br />
     <div>
       <strong>使い方<br /></strong>
       コマンドは半角で、またスペース区切りで設定すること<br />
@@ -157,6 +161,16 @@
       switchのサポート/フレンド版 <br>
       from_nameに交代前のキャラ名、to_nameに交代後のキャラ名を記入<br />
       swSと省略可 <br /> -->
+      <br />
+
+      <strong>color [色]</strong> <br />
+      r red<br />
+      g green<br />
+      b blue<br />
+      p purple<br />
+      s silver<br />
+      y yellow<br />
+      o orange<br />
 
       <br />
       <br />
@@ -192,12 +206,6 @@ end_sort
       >
     </div>
 
-
-
-
-  <!-- https://qiita.com/dangoya/items/4176e8ef22e892570f4e -->
-
+    <!-- https://qiita.com/dangoya/items/4176e8ef22e892570f4e -->
   </body>
-
-
 </html>

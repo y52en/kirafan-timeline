@@ -1,8 +1,32 @@
 "use strict";
 
 (() => {
+  /**
+   * r red
+   * g green
+   * b blue
+   * p purple
+   * s silver
+   * y yellow
+   * o orange
+   */
+  const colorList = 
+    { r: "#EF9A9A" ,
+     g: "#A5D6A7" ,
+     b: "#90CAF9" ,
+     p: "#CE93D8" ,
+     s: "#BDBDBD" ,
+     y: "#FFF176" ,
+     o: "#FFCC80" }
+  ;
   function objectCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
+  }
+  function isObject(val) {
+    if (val !== null && typeof val === "object" && val.constructor === Object) {
+      return true;
+    }
+    return false;
   }
   function textCopy(textVal) {
     // テキストエリアを用意する
@@ -86,6 +110,8 @@
       this.current = new Array();
       this.output = new Array();
       this.switchData = new Array();
+      this.comment = new Array();
+      this.color = undefined;
 
       this.place_of_currentTimeline = 0;
     }
@@ -95,6 +121,8 @@
       id = this.ID_of_firstChara(),
       canMoveWithout1stChara = false
     ) {
+      this.setColor(id, this.place_of_currentTimeline);
+
       if (id !== this.ID_of_firstChara() && canMoveWithout1stChara === false) {
         throw new Error("最初のキャラ以外は操作できません");
       }
@@ -137,6 +165,13 @@
         this.current.splice(place_to_moved + 1, 0, tmp_movechara);
       }
       this.place_of_currentTimeline++;
+    }
+
+    setColor(chara, place) {
+      if (this.color) {
+        this.comment.push(["color", chara, place, this.color]);
+        this.color = undefined;
+      }
     }
 
     //古いコードのままになっている
@@ -184,6 +219,8 @@
         id_currentChara,
         id_switchToChara,
       ]);
+
+      this.setColor(id_currentChara, this.place_of_currentTimeline);
 
       if (id_currentChara === this.ID_of_firstChara()) {
         this.current[this.placeToChara(id_currentChara)].id = id_switchToChara;
@@ -273,9 +310,9 @@
     input_elm.oninput = main;
     document.getElementById("csvDownload").onclick = outputAsCSV;
     document.getElementById("copyTL").onclick = copyDataAsURL;
-    document.getElementById("log_convertedTL").onclick = printConvertedTL
-    
-    document.getElementById("copy_ConvertedTL").onclick = copyConvertedTL
+    document.getElementById("log_convertedTL").onclick = printConvertedTL;
+
+    document.getElementById("copy_ConvertedTL").onclick = copyConvertedTL;
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
@@ -429,13 +466,13 @@
 
   let tableData = [];
 
-  let convertedTLdata = {}
+  let convertedTLdata = {};
 
   function main() {
     let str = document.getElementById("input_txt").value;
     url.setParam("TL", str);
 
-    convertedTLdata = {"main":[],"set":[]}
+    convertedTLdata = { main: [], set: [] };
     // let bak_str = str
     // .replaceAll("　"," ")
     // .split("\n")
@@ -475,7 +512,9 @@
 
     let str_splited = str
       .split("\n")
-      .map((x) => x.split(" ").map((x) => (/^\d+$/.test(x) ? Number(x) : x)));
+      .map((x) =>
+        x.split(" ").map((x) => (/^-?\d+(\.\d+)?$/.test(x) ? Number(x) : x))
+      );
 
     const mode_list = {
       init: "init",
@@ -504,9 +543,8 @@
                 buff = load_text_arg3 || 0;
                 chara_list[id] = new chara(id, SPD, buff);
                 TL.setChara(id, chara_list[id].initOrderValue());
-                convertedTLdata.set.push(str_splited[i])
+                convertedTLdata.set.push(str_splited[i]);
                 break;
-
 
               case "start":
                 mode = mode_list.start;
@@ -526,9 +564,7 @@
             }
             break;
           case mode_list.start:
-            mainMode(
-              ...str_splited[i]
-            );
+            mainMode(...str_splited[i]);
             break;
           case mode_list.start_sort:
             switch (load_text_command) {
@@ -542,21 +578,23 @@
                     .replaceAll(/^\[|\]$/g, "")
                     // 122,[charaname,SPD,buff],{command,arg1,arg2,arg3?,arg4?}
                     .matchAll(
-                      /\d+|\[[^,]+,\d+(,[\d.-]*)?\]|\{([^,]+)(,[^,]+){2,4}\}/g
+                      /([a-zA-Z]+)?\d+|\[[^,]+,\d+(,[\d.-]*)?\]|\{([^,]+)(,[^,]+){2,4}\}/g
                     ),
                 ].map((x) => {
                   const tmp = x[0];
-                  if (/^[\d.-]+$/.test(tmp)) {
-                    return Number(tmp);
+                  if (/^([a-zA-Z]+)?[\d.-]+$/.test(tmp)) {
+                    return tmp;
                   } else if (/^{[^}]+}$/.test(tmp)) {
                     let output = {};
                     output.mode = "command";
-                    output.value = [...tmp.matchAll(/[^,{}]+/g)].map((x) =>
+                    output.value = [...tmp.matchAll(/[^,{}]+/g)]
+                    .map((x) =>
                       /^[\d-.]+$/.test(x[0]) ? Number(x[0]) : x[0]
                     );
                     // console.log(output);
                     return output;
                   } else {
+                    // console.log(tmp);
                     return tmp
                       .replaceAll(/^\[|\]$/g, "")
                       .split(",")
@@ -627,15 +665,26 @@
             // console.log(input);
 
             //expected input
-            if (/^\d+$/.test(input)) {
-              const LoadFactor = input;
+            if (/^([a-zA-Z]+?)?\d+$/.test(input)) {
+              
+              let LoadFactor;
+
+              let color = (input.match(/^[a-zA-Z]+/))?.[0]
+              // console.log(color);
+
+              if(color){
+                LoadFactor = Number(input.replaceAll(/[a-zA-Z]/g,""))
+                mainMode("color",color);
+              }else{
+                LoadFactor = Number(input);
+              }
               // console.log(LoadFactor);
               // TL.move(
               //   chara_list[id].calculateOrderValue(LoadFactor),
               //   id,
               //   false
               // );
-              mainMode("action",id,LoadFactor,false)
+              mainMode("action", id, LoadFactor, false);
             } else if (Array.isArray(input)) {
               // const convertedJSONed_input = input.replaceAll('"','""').replace("[",'["').replace(",",'",')
 
@@ -644,7 +693,7 @@
               // .split(",")
 
               // TL.switchChara(id, switchedName);
-              mainMode("switch",id,...input)
+              mainMode("switch", id, ...input);
               chara_list[switchedName] = new chara(
                 switchedName,
                 SPD,
@@ -671,12 +720,11 @@
             load_text_arg1,
             load_text_arg2,
             load_text_arg3,
-            load_text_arg4
+            load_text_arg4,
           ] = arg;
 
-          if(load_text_command !== "" && load_text_command !== "end"){
-           convertedTLdata.main.push(arg.filter(x => x || x === 0))
-
+          if (load_text_command !== "" && load_text_command !== "end") {
+            convertedTLdata.main.push(arg.filter((x) => x || x === 0));
           }
 
           let id, buff;
@@ -758,6 +806,13 @@
             //   chara_list[from] = new chara(from, SPD, buff);
             //   break;
 
+            case "color":
+            case "c":
+              var color = load_text_arg1.toString();
+              // console.log(color);
+              TL.color = color;
+              break;
+
             case "end":
               mode = mode_list.waiting_mode;
               break;
@@ -815,14 +870,23 @@
       TL.place_of_currentTimeline + 1;
 
     tableData = [outputTL, chara_array];
-    outputAsTable(outputTL, chara_array);
-    // console.log(TL.switchData);
+    outputAsTable(outputTL, chara_array,TL.comment);
+    // console.log(TL);
 
     // console.log(convertedTLdata);
-    printConvertedTL()
+    printConvertedTL();
   }
 
-  function outputAsTable(json, charalist) {
+  function outputAsTable(json, charalist,comment) {
+    // const colorList = [
+    //   { r: "#EF9A9A" },
+    //   { g: "#A5D6A7" },
+    //   { b: "#90CAF9" },
+    //   { p: "#CE93D8" },
+    //   { s: "#BDBDBD" },
+    //   { y: "#FFF176" },
+    //   { o: "#FFCC80" },
+    // ];
     let output = "";
     output += "<thead><tr>";
 
@@ -836,7 +900,15 @@
       output += "<tr>";
       output += htmltag("td", charalist[x]);
       for (let y = 0; y < json[0].length; y++) {
-        output += htmltag("td", json[x][y] || "");
+        // console.log(comment);
+        const find = comment.find(elm => (elm[0] === "color" && elm[1] === charalist[x] && elm[2] === y))
+        if(find){
+          // console.log(find);
+          output += `<td style="background-color:${colorList[find[3]]}">${json[x][y] || ""}</td>`
+        }else{
+         output += htmltag("td", json[x][y] || "");
+
+        }
       }
       output += "</tr>";
     }
@@ -892,12 +964,12 @@
     }, 1000);
   }
 
-  function printConvertedTL(){
-    document.getElementById("popup").innerText = joinedTLdata()  
+  function printConvertedTL() {
+    document.getElementById("popup").innerText = joinedTLdata();
   }
 
-  function copyConvertedTL(){
-    textCopy(joinedTLdata())
+  function copyConvertedTL() {
+    textCopy(joinedTLdata());
     const copyed = document.getElementById("copyed_popup");
     copyed.style.display = "block";
     setTimeout(() => {
@@ -905,15 +977,12 @@
     }, 1000);
   }
 
-  function joinedTLdata(){
-    return ( convertedTLdata.set.map(x => x.join(" ")) ).join("\n")
-      +
-      "\n\nstart\n"
-      +
-      ( convertedTLdata.main.map(x =>"  " + x.join(" ")) ).join("\n")
-      +
-      "\nend" 
+  function joinedTLdata() {
+    return (
+      convertedTLdata.set.map((x) => x.join(" ")).join("\n") +
+      "\n\nstart\n" +
+      convertedTLdata.main.map((x) => "  " + x.join(" ")).join("\n") +
+      "\nend"
+    );
   }
 })();
-
-
