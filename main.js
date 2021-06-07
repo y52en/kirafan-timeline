@@ -900,19 +900,19 @@
 
       outputTL[from_charaPlace][place] = arrow_str;
     });
+    const now_place = TL.place_of_currentTimeline + 1
     document.getElementById("firstchara").innerText = TL.ID_of_firstChara();
-    document.getElementById("now_place").innerText =
-      TL.place_of_currentTimeline + 1;
+    document.getElementById("now_place").innerText = now_place;
 
     tableData = [outputTL, chara_array];
-    outputAsTable(outputTL, chara_array,TL.comment);
+    outputAsTable(outputTL, chara_array,TL.comment,now_place);
     // console.log(TL);
 
     // console.log(convertedTLdata);
     printConvertedTL();
   }
 
-  function outputAsTable(json, charalist,comment) {
+  function outputAsTable(json, charalist,comment,now_place) {
     // const colorList = [
     //   { r: "#EF9A9A" },
     //   { g: "#A5D6A7" },
@@ -928,7 +928,12 @@
     output += htmltag("th", "");
 
     for (let i = 0; i < json[0].length; i++) {
-      output += htmltag("th", i + 1);
+      if(i + 1 === now_place){
+        output += "<th style='background-color:#444;color:#fff'>" + (i + 1)+"</th>"
+      }else{
+        output += htmltag("th", i + 1);
+
+      }
     }
 
     for (let x = 0; x < json.length; x++) {
