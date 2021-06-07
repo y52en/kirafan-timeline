@@ -532,7 +532,7 @@
         const load_text_arg3 = str_splited[i]?.[3];
         const load_text_arg4 = str_splited[i]?.[4];
 
-        let id, SPD, buff, LoadFactor, LoadFactor_list, to, from;
+        let id, SPD, buff, LoadFactor, LoadFactor_list, to, from, ordervalue;
 
         switch (mode) {
           case mode_list.init:
@@ -578,11 +578,12 @@
                     .replaceAll(/^\[|\]$/g, "")
                     // 122,[charaname,SPD,buff],{command,arg1,arg2,arg3?,arg4?}
                     .matchAll(
-                      /([a-zA-Z]+)?\d+|\[[^,]+,\d+(,[\d.-]*)?\]|\{([^,]+)(,[^,]+){2,4}\}/g
+                      /\<[^>]+\>|([a-zA-Z]+)?\d+|\[[^,]+,\d+(,[\d.-]*)?\]|\{([^,]+)(,[^,]+){2,4}\}/g
                     ),
-                ].map((x) => {
+                ]
+                .map((x) => {
                   const tmp = x[0];
-                  if (/^([a-zA-Z]+)?[\d.-]+$/.test(tmp)) {
+                  if (/^([a-zA-Z]+)?[\d.-]+$/.test(tmp) || /^\<[^>]+\>$/.test(tmp)) {
                     return tmp;
                   } else if (/^{[^}]+}$/.test(tmp)) {
                     let output = {};
@@ -601,7 +602,8 @@
                       .map((x) => (/^[\d.-]+$/.test(x) ? Number(x) : x));
                   }
                 });
-                // console.dir(LoadFactor_list);
+
+                console.log(objectCopy(LoadFactor_list));
                 // alert(LoadFactor_list);
                 chara_move_list[id] = LoadFactor_list;
                 break;
@@ -663,9 +665,11 @@
             const input = chara_move_list[id].shift();
             // console.log(chara_move_list[id]);
             // console.log(input);
+            // console.log(input);
+
 
             //expected input
-            if (/^([a-zA-Z]+?)?\d+$/.test(input)) {
+            if (/^([a-zA-Z]+?)?\d+$/.test(input) ) {
               
               let LoadFactor;
 
@@ -685,7 +689,21 @@
               //   false
               // );
               mainMode("action", id, LoadFactor, false);
-            } else if (Array.isArray(input)) {
+            } else if (/^\<[^>]+\>$/.test(input)){
+              console.log(2);
+              const inner_input = input.replaceAll(/\<|\>/g,"") 
+
+              let color = (inner_input.match(/^[a-zA-Z]+/))?.[0]
+
+              if(color){
+                LoadFactor = Number(inner_input.replaceAll(/[a-zA-Z]/g,""))
+                mainMode("color",color);
+              }else{
+                LoadFactor = Number(inner_input);
+              }
+              mainMode("order", id, LoadFactor, false);
+
+            }else if (Array.isArray(input)) {
               // const convertedJSONed_input = input.replaceAll('"','""').replace("[",'["').replace(",",'",')
 
               const [switchedName, SPD, buff] = input;
@@ -786,6 +804,21 @@
                 canMoveWithout1stChara_act
               );
               break;
+            
+            case "order":
+              id = load_text_arg1.toString();
+              ordervalue = load_text_arg2;
+              // const canMoveWithout1stChara_act = load_text_arg3 === "true";
+
+              TL.move(
+                ordervalue,
+                id,
+                false
+                
+              );
+              
+              break;
+
             case "switch":
             case "sw":
               to = load_text_arg1.toString();
@@ -812,6 +845,8 @@
               // console.log(color);
               TL.color = color;
               break;
+            
+            
 
             case "end":
               mode = mode_list.waiting_mode;
