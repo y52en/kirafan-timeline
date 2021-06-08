@@ -972,6 +972,15 @@
 
       outputTL[from_charaPlace][place] = arrow_str;
     });
+
+    console.log(outputTL);
+
+    TL.cardData.forEach(x => {
+      let charaPlace = chara_array.indexOf(x[1])
+      // console.log(x,charaPlace);
+      outputTL[charaPlace][x[0]] = "→";
+      
+    })
     const now_place = TL.place_of_currentTimeline + 1;
     document.getElementById("firstchara").innerText = TL.ID_of_firstChara();
     document.getElementById("now_place").innerText = now_place;
