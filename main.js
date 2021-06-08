@@ -10,15 +10,15 @@
    * y yellow
    * o orange
    */
-  const colorList = 
-    { r: "#EF9A9A" ,
-     g: "#A5D6A7" ,
-     b: "#90CAF9" ,
-     p: "#CE93D8" ,
-     s: "#BDBDBD" ,
-     y: "#FFF176" ,
-     o: "#FFCC80" }
-  ;
+  const colorList = {
+    r: "#EF9A9A",
+    g: "#A5D6A7",
+    b: "#90CAF9",
+    p: "#CE93D8",
+    s: "#BDBDBD",
+    y: "#FFF176",
+    o: "#FFCC80",
+  };
   function objectCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
@@ -110,6 +110,7 @@
       this.current = new Array();
       this.output = new Array();
       this.switchData = new Array();
+      this.cardData = new Array();
       this.comment = new Array();
       this.color = undefined;
 
@@ -127,8 +128,8 @@
         throw new Error("最初のキャラ以外は操作できません");
       }
       let movechara_nowPlace = this.placeToChara(id);
-      const moveChara_nowOrderValue = this.current[movechara_nowPlace]
-        .timeline_OrderValue;
+      const moveChara_nowOrderValue =
+        this.current[movechara_nowPlace].timeline_OrderValue;
 
       let OrderValue_diff_between_1stchara_and_movechara =
         moveChara_nowOrderValue - this.OrderValue_of_firstChara();
@@ -137,8 +138,8 @@
         OrderValue -
         OrderValue_diff_between_1stchara_and_movechara;
 
-      this.pushChara(id,calculated_moved_OrderValue)
-      this.nextturn()
+      this.pushChara(id, calculated_moved_OrderValue);
+      this.nextturn();
 
       console.log(this.current);
     }
@@ -190,10 +191,10 @@
 
     setChara(id, initOrderValue) {
       // this.current.push({ id: id, timeline_OrderValue: initOrderValue });
-      this.pushChara( id,  initOrderValue);
+      this.pushChara(id, initOrderValue);
     }
 
-    place_to_moved(id,calculated_moved_OrderValue){
+    place_to_moved(calculated_moved_OrderValue) {
       let place_to_moved = -1;
       for (
         let i = this.current.length - 1;
@@ -216,16 +217,20 @@
       } else {
         output = place_to_moved + 1;
       }
-
       return output;
-
     }
 
-    
-    pushChara(id,calculated_moved_OrderValue){
-      let tmp_movechara = {id,timeline_OrderValue:calculated_moved_OrderValue}
-      let place_to_moved = this.place_to_moved(id,calculated_moved_OrderValue)
+    pushChara(id, calculated_moved_OrderValue) {
+      let tmp_movechara;
+      try {
+        tmp_movechara = objectCopy(this.get_chara_by_ID(id));
+      } catch {
+        tmp_movechara = { id };
+      }
 
+      tmp_movechara.timeline_OrderValue = calculated_moved_OrderValue;
+
+      let place_to_moved = this.place_to_moved(calculated_moved_OrderValue);
       this.current.splice(place_to_moved, 0, tmp_movechara);
     }
 
@@ -236,13 +241,18 @@
       });
     }
 
-    addSkillCard(id,OrderValue,time){
-      this.current.splice(this.place_of_currentTimeline, 0, {
-        id: id,
-        timeline_OrderValue: initOrderValue,
+    addSkillCard(id, OrderValue, time) {
+      let target_ov = this.OrderValue_of_firstChara() + OrderValue;
+      let target_place = this.place_to_moved(target_ov);
+      this.current.splice(target_place, 0, {
+        type: "skillcard",
+        time,
+        id,
+        timeline_OrderValue: target_ov,
+        OrderValue,
       });
+      this.cardData.push([this.place_of_currentTimeline, id]);
     }
-
 
     switchChara(id_currentChara, id_switchToChara) {
       this.switchData.push([
@@ -255,9 +265,8 @@
 
       if (id_currentChara === this.ID_of_firstChara()) {
         this.current[this.placeToChara(id_currentChara)].id = id_switchToChara;
-        this.current[
-          this.placeToChara(id_switchToChara)
-        ].timeline_OrderValue = this.OrderValue_of_firstChara();
+        this.current[this.placeToChara(id_switchToChara)].timeline_OrderValue =
+          this.OrderValue_of_firstChara();
       } else {
         this.switchSupportChara(...arguments);
       }
@@ -279,16 +288,38 @@
       this.place_of_currentTimeline = 0;
     }
 
-    OrderValue_of_firstChara() {
-      return this.current[this.place_of_currentTimeline].timeline_OrderValue;
+    get firstChara() {
+      return this.current[this.place_of_currentTimeline];
     }
 
-    nextturn(){
-      this.place_of_currentTimeline++
+    set firstChara(_) {
+      throw Error("firstCharaにはセットできません");
+    }
+
+    OrderValue_of_firstChara() {
+      return this.firstChara.timeline_OrderValue;
     }
 
     ID_of_firstChara() {
-      return this.current[this.place_of_currentTimeline].id;
+      return this.firstChara.id;
+    }
+
+    nextturn() {
+      this.place_of_currentTimeline++;
+      if (this.firstChara?.type === "skillcard") {
+        this.firstChara.time--
+        if(this.firstChara.time === 0){
+          this.nextturn()
+        }else if(this.firstChara.time < 0){
+          throw Error("skillcardのtimeに0未満の数値")
+        }else{
+          this.move(this.firstChara.OrderValue, this.ID_of_firstChara(), false);
+        }
+      }
+    }
+
+    get_chara_by_ID(id) {
+      return this.current[this.placeToChara(id)];
     }
 
     placeToChara(id) {
@@ -615,16 +646,17 @@
                     .matchAll(
                       /\<[^>]+\>|([a-zA-Z]+)?\d+|\[[^,]+,\d+(,[\d.-]*)?\]|\{([^,]+)(,[^,]+){2,4}\}/g
                     ),
-                ]
-                .map((x) => {
+                ].map((x) => {
                   const tmp = x[0];
-                  if (/^([a-zA-Z]+)?[\d.-]+$/.test(tmp) || /^\<[^>]+\>$/.test(tmp)) {
+                  if (
+                    /^([a-zA-Z]+)?[\d.-]+$/.test(tmp) ||
+                    /^\<[^>]+\>$/.test(tmp)
+                  ) {
                     return tmp;
                   } else if (/^{[^}]+}$/.test(tmp)) {
                     let output = {};
                     output.mode = "command";
-                    output.value = [...tmp.matchAll(/[^,{}]+/g)]
-                    .map((x) =>
+                    output.value = [...tmp.matchAll(/[^,{}]+/g)].map((x) =>
                       /^[\d-.]+$/.test(x[0]) ? Number(x[0]) : x[0]
                     );
                     // console.log(output);
@@ -702,19 +734,17 @@
             // console.log(input);
             // console.log(input);
 
-
             //expected input
-            if (/^([a-zA-Z]+?)?\d+$/.test(input) ) {
-              
+            if (/^([a-zA-Z]+?)?\d+$/.test(input)) {
               let LoadFactor;
 
-              let color = (input.match(/^[a-zA-Z]+/))?.[0]
+              let color = input.match(/^[a-zA-Z]+/)?.[0];
               // console.log(color);
 
-              if(color){
-                LoadFactor = Number(input.replaceAll(/[a-zA-Z]/g,""))
-                mainMode("color",color);
-              }else{
+              if (color) {
+                LoadFactor = Number(input.replaceAll(/[a-zA-Z]/g, ""));
+                mainMode("color", color);
+              } else {
                 LoadFactor = Number(input);
               }
               // console.log(LoadFactor);
@@ -724,21 +754,20 @@
               //   false
               // );
               mainMode("action", id, LoadFactor, false);
-            } else if (/^\<[^>]+\>$/.test(input)){
+            } else if (/^\<[^>]+\>$/.test(input)) {
               console.log(2);
-              const inner_input = input.replaceAll(/\<|\>/g,"") 
+              const inner_input = input.replaceAll(/\<|\>/g, "");
 
-              let color = (inner_input.match(/^[a-zA-Z]+/))?.[0]
+              let color = inner_input.match(/^[a-zA-Z]+/)?.[0];
 
-              if(color){
-                LoadFactor = Number(inner_input.replaceAll(/[a-zA-Z]/g,""))
-                mainMode("color",color);
-              }else{
+              if (color) {
+                LoadFactor = Number(inner_input.replaceAll(/[a-zA-Z]/g, ""));
+                mainMode("color", color);
+              } else {
                 LoadFactor = Number(inner_input);
               }
               mainMode("order", id, LoadFactor, false);
-
-            }else if (Array.isArray(input)) {
+            } else if (Array.isArray(input)) {
               // const convertedJSONed_input = input.replaceAll('"','""').replace("[",'["').replace(",",'",')
 
               const [switchedName, SPD, buff] = input;
@@ -839,19 +868,14 @@
                 canMoveWithout1stChara_act
               );
               break;
-            
+
             case "order":
               id = load_text_arg1.toString();
               ordervalue = load_text_arg2;
               // const canMoveWithout1stChara_act = load_text_arg3 === "true";
 
-              TL.move(
-                ordervalue,
-                id,
-                false
-                
-              );
-              
+              TL.move(ordervalue, id, false);
+
               break;
 
             case "switch":
@@ -880,18 +904,21 @@
               // console.log(color);
               TL.color = color;
               break;
-            
-            
+
             case "skillcard":
             case "sc":
               var name = load_text_arg1.toString();
-              var spd = load_text_arg2.toString();
-              LoadFactor = load_text_arg3.toString();
-              var time = load_text_arg4.toString();
+              var spd = Number(load_text_arg2.toString());
+              LoadFactor = Number(load_text_arg3.toString());
+              var time = Number(load_text_arg4.toString());
 
-              var skillcard = new chara(name,spd)
-              TL.addSkillCard(name,skillcard.calculateOrderValue(LoadFactor),time)
-            
+              var skillcard = new chara(name, spd, 0);
+              chara_list[name] = skillcard;
+              TL.addSkillCard(
+                name,
+                skillcard.calculateOrderValue(LoadFactor),
+                time
+              );
 
             case "end":
               mode = mode_list.waiting_mode;
@@ -945,19 +972,19 @@
 
       outputTL[from_charaPlace][place] = arrow_str;
     });
-    const now_place = TL.place_of_currentTimeline + 1
+    const now_place = TL.place_of_currentTimeline + 1;
     document.getElementById("firstchara").innerText = TL.ID_of_firstChara();
     document.getElementById("now_place").innerText = now_place;
 
     tableData = [outputTL, chara_array];
-    outputAsTable(outputTL, chara_array,TL.comment,now_place);
+    outputAsTable(outputTL, chara_array, TL.comment, now_place);
     // console.log(TL);
 
     // console.log(convertedTLdata);
     printConvertedTL();
   }
 
-  function outputAsTable(json, charalist,comment,now_place) {
+  function outputAsTable(json, charalist, comment, now_place) {
     // const colorList = [
     //   { r: "#EF9A9A" },
     //   { g: "#A5D6A7" },
@@ -973,11 +1000,11 @@
     output += htmltag("th", "");
 
     for (let i = 0; i < json[0].length; i++) {
-      if(i + 1 === now_place){
-        output += "<th style='background-color:#444;color:#fff'>" + (i + 1)+"</th>"
-      }else{
+      if (i + 1 === now_place) {
+        output +=
+          "<th style='background-color:#444;color:#fff'>" + (i + 1) + "</th>";
+      } else {
         output += htmltag("th", i + 1);
-
       }
     }
 
@@ -986,13 +1013,16 @@
       output += htmltag("td", charalist[x]);
       for (let y = 0; y < json[0].length; y++) {
         // console.log(comment);
-        const find = comment.find(elm => (elm[0] === "color" && elm[1] === charalist[x] && elm[2] === y))
-        if(find){
+        const find = comment.find(
+          (elm) => elm[0] === "color" && elm[1] === charalist[x] && elm[2] === y
+        );
+        if (find) {
           // console.log(find);
-          output += `<td style="background-color:${colorList[find[3]]}">${json[x][y] || ""}</td>`
-        }else{
-         output += htmltag("td", json[x][y] || "");
-
+          output += `<td style="background-color:${colorList[find[3]]}">${
+            json[x][y] || ""
+          }</td>`;
+        } else {
+          output += htmltag("td", json[x][y] || "");
         }
       }
       output += "</tr>";
