@@ -137,34 +137,37 @@
         OrderValue -
         OrderValue_diff_between_1stchara_and_movechara;
 
-      let tmp_movechara = objectCopy(this.current[movechara_nowPlace]);
-      tmp_movechara.timeline_OrderValue = calculated_moved_OrderValue;
+      // let tmp_movechara = objectCopy(this.current[movechara_nowPlace]);
+      // tmp_movechara.timeline_OrderValue = calculated_moved_OrderValue;
 
-      let place_to_moved = -1;
-      for (
-        let i = this.current.length - 1;
-        i > this.place_of_currentTimeline;
-        i--
-      ) {
-        if (
-          calculated_moved_OrderValue >= this.current[i].timeline_OrderValue
-        ) {
-          place_to_moved = i;
-          break;
-        }
-      }
-      // splice 0 elm 1 elm 2
-      // iter      0     1
-      if (place_to_moved === -1) {
-        this.current.splice(
-          this.place_of_currentTimeline + 1,
-          0,
-          tmp_movechara
-        );
-      } else {
-        this.current.splice(place_to_moved + 1, 0, tmp_movechara);
-      }
-      this.place_of_currentTimeline++;
+      // let place_to_moved = -1;
+      // for (
+      //   let i = this.current.length - 1;
+      //   i > this.place_of_currentTimeline;
+      //   i--
+      // ) {
+      //   if (
+      //     calculated_moved_OrderValue >= this.current[i].timeline_OrderValue
+      //   ) {
+      //     place_to_moved = i;
+      //     break;
+      //   }
+      // }
+      // // splice 0 elm 1 elm 2
+      // // iter      0     1
+      // if (place_to_moved === -1) {
+      //   this.current.splice(
+      //     this.place_of_currentTimeline + 1,
+      //     0,
+      //     tmp_movechara
+      //   );
+      // } else {
+      //   this.current.splice(place_to_moved + 1, 0, tmp_movechara);
+      // }
+      this.pushChara(id,calculated_moved_OrderValue)
+      this.nextturn()
+
+      console.log(this.current);
     }
 
     setColor(chara, place) {
@@ -199,11 +202,55 @@
       );
       this.current.splice(movechara_nowPlace, 1);
 
-      this.place_of_currentTimeline++;
+      this.nextturn();
     }
 
+    // 逆走の実装方法が思いつかない
+    // move_ttk(ordervalue){
+    //   // this.setColor(this.ID_of_firstChara(), this.place_of_currentTimeline);
+    //   const first_OV = this.OrderValue_of_firstChara()
+
+    //   ordervalue.forEach(x => {
+    //     this.current[this.place_of_currentTimeline]
+    //   })
+    // }
+
     setChara(id, initOrderValue) {
-      this.current.push({ id: id, timeline_OrderValue: initOrderValue });
+      // this.current.push({ id: id, timeline_OrderValue: initOrderValue });
+      this.pushChara( id,  initOrderValue);
+    }
+
+    
+    pushChara(id,calculated_moved_OrderValue){
+      // let movechara_nowPlace = this.placeToChara(id);
+
+      let tmp_movechara = {id,timeline_OrderValue:calculated_moved_OrderValue}
+
+      let place_to_moved = -1;
+      for (
+        let i = this.current.length - 1;
+        i > this.place_of_currentTimeline;
+        i--
+      ) {
+        if (
+          calculated_moved_OrderValue >= this.current[i].timeline_OrderValue
+        ) {
+          place_to_moved = i;
+          break;
+        }
+      }
+      // splice 0 elm 1 elm 2
+      // iter      0     1
+      if (place_to_moved === -1) {
+        this.current.splice(
+          this.place_of_currentTimeline + 1,
+          0,
+          tmp_movechara
+        );
+      } else {
+        this.current.splice(place_to_moved + 1, 0, tmp_movechara);
+      }
+
     }
 
     addChara(id, initOrderValue) {
@@ -212,6 +259,14 @@
         timeline_OrderValue: initOrderValue,
       });
     }
+
+    addSkillCard(id,OrderValue,time){
+      this.current.splice(this.place_of_currentTimeline, 0, {
+        id: id,
+        timeline_OrderValue: initOrderValue,
+      });
+    }
+
 
     switchChara(id_currentChara, id_switchToChara) {
       this.switchData.push([
@@ -250,6 +305,10 @@
 
     OrderValue_of_firstChara() {
       return this.current[this.place_of_currentTimeline].timeline_OrderValue;
+    }
+
+    nextturn(){
+      this.place_of_currentTimeline++
     }
 
     ID_of_firstChara() {
@@ -846,6 +905,16 @@
               TL.color = color;
               break;
             
+            
+            case "skillcard":
+            case "sc":
+              var name = load_text_arg1.toString();
+              var spd = load_text_arg2.toString();
+              LoadFactor = load_text_arg3.toString();
+              var time = load_text_arg4.toString();
+
+              var skillcard = new chara(name,spd)
+              TL.addSkillCard(name,skillcard.calculateOrderValue(LoadFactor),time)
             
 
             case "end":
