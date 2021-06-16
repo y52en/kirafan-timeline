@@ -242,16 +242,24 @@
     }
 
     addSkillCard(id, OrderValue, time) {
-      let target_ov = this.OrderValue_of_firstChara() + OrderValue;
-      let target_place = this.place_to_moved(target_ov);
-      this.current.splice(target_place, 0, {
-        type: "skillcard",
-        time,
-        id,
-        timeline_OrderValue: target_ov,
-        OrderValue,
-      });
-      this.cardData.push([this.place_of_currentTimeline, id]);
+      try{
+          let current_card = this.get_chara_by_ID(id)
+          current_card.time = time
+          this.current[this.placeToChara(id)] = current_card
+      }catch{
+        let target_ov = this.OrderValue_of_firstChara() + OrderValue;
+        let target_place = this.place_to_moved(target_ov);
+        this.current.splice(target_place, 0, {
+          type: "skillcard",
+          time,
+          id,
+          timeline_OrderValue: target_ov,
+          OrderValue,
+        });
+        this.cardData.push([this.place_of_currentTimeline, id]);
+
+      }
+      
     }
 
     switchChara(id_currentChara, id_switchToChara) {
