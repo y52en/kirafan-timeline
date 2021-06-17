@@ -127,9 +127,8 @@
       if (id !== this.ID_of_firstChara() && canMoveWithout1stChara === false) {
         throw new Error("最初のキャラ以外は操作できません");
       }
-      let movechara_nowPlace = this.placeToChara(id);
       const moveChara_nowOrderValue =
-        this.current[movechara_nowPlace].timeline_OrderValue;
+        this.get_chara_by_ID(id).timeline_OrderValue;
 
       let OrderValue_diff_between_1stchara_and_movechara =
         moveChara_nowOrderValue - this.OrderValue_of_firstChara();
@@ -141,7 +140,7 @@
       this.pushChara(id, calculated_moved_OrderValue);
       this.nextturn();
 
-      console.log(this.current);
+      // console.log(this.current);
     }
 
     setColor(chara, place) {
@@ -242,11 +241,11 @@
     }
 
     addSkillCard(id, OrderValue, time) {
-      try{
-          let current_card = this.get_chara_by_ID(id)
-          current_card.time = time
-          this.current[this.placeToChara(id)] = current_card
-      }catch{
+      try {
+        let current_card = this.get_chara_by_ID(id);
+        current_card.time = time;
+        this.current[this.placeToChara(id)] = current_card;
+      } catch {
         let target_ov = this.OrderValue_of_firstChara() + OrderValue;
         let target_place = this.place_to_moved(target_ov);
         this.current.splice(target_place, 0, {
@@ -257,9 +256,7 @@
           OrderValue,
         });
         this.cardData.push([this.place_of_currentTimeline, id]);
-
       }
-      
     }
 
     switchChara(id_currentChara, id_switchToChara) {
@@ -315,12 +312,12 @@
     nextturn() {
       this.place_of_currentTimeline++;
       if (this.firstChara?.type === "skillcard") {
-        this.firstChara.time--
-        if(this.firstChara.time === 0){
-          this.nextturn()
-        }else if(this.firstChara.time < 0){
-          throw Error("skillcardのtimeに0未満の数値")
-        }else{
+        this.firstChara.time--;
+        if (this.firstChara.time === 0) {
+          this.nextturn();
+        } else if (this.firstChara.time < 0) {
+          throw Error("skillcardのtimeに0未満の数値");
+        } else {
           this.move(this.firstChara.OrderValue, this.ID_of_firstChara(), false);
         }
       }
@@ -983,12 +980,11 @@
 
     console.log(outputTL);
 
-    TL.cardData.forEach(x => {
-      let charaPlace = chara_array.indexOf(x[1])
+    TL.cardData.forEach((x) => {
+      let charaPlace = chara_array.indexOf(x[1]);
       // console.log(x,charaPlace);
       outputTL[charaPlace][x[0]] = "→";
-      
-    })
+    });
     const now_place = TL.place_of_currentTimeline + 1;
     document.getElementById("firstchara").innerText = TL.ID_of_firstChara();
     document.getElementById("now_place").innerText = now_place;
@@ -1020,6 +1016,8 @@
       if (i + 1 === now_place) {
         output +=
           "<th style='background-color:#444;color:#fff'>" + (i + 1) + "</th>";
+      } else if (i === 0) {
+        "<th style='white-space: nowrap;'" + (i + 1) + "</th>";
       } else {
         output += htmltag("th", i + 1);
       }
@@ -1027,7 +1025,8 @@
 
     for (let x = 0; x < json.length; x++) {
       output += "<tr>";
-      output += htmltag("td", charalist[x]);
+      // output += htmltag("td", charalist[x]);
+      output += "<td style='white-space: nowrap;'>" + charalist[x] + "</td>"
       for (let y = 0; y < json[0].length; y++) {
         // console.log(comment);
         const find = comment.find(
