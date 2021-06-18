@@ -1,24 +1,6 @@
 "use strict";
 
 (() => {
-  /**
-   * r red
-   * g green
-   * b blue
-   * p purple
-   * s silver
-   * y yellow
-   * o orange
-   */
-  const colorList = {
-    r: "#EF9A9A",
-    g: "#A5D6A7",
-    b: "#90CAF9",
-    p: "#CE93D8",
-    s: "#BDBDBD",
-    y: "#FFF176",
-    o: "#FFCC80",
-  };
   function objectCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
@@ -569,11 +551,15 @@
     str = str
       .replaceAll("　", " ")
 
+
       //delete space(半角)
       .replaceAll(/^( )+/gm, "")
 
       //delete comment
-      .replaceAll(/#.*$/gm, "")
+      .replaceAll(/#.*\n/g, "")
+
+      .replaceAll(/\\\n/g,"")
+
 
       //trim space
       .replaceAll(
@@ -998,15 +984,6 @@
   }
 
   function outputAsTable(json, charalist, comment, now_place) {
-    // const colorList = [
-    //   { r: "#EF9A9A" },
-    //   { g: "#A5D6A7" },
-    //   { b: "#90CAF9" },
-    //   { p: "#CE93D8" },
-    //   { s: "#BDBDBD" },
-    //   { y: "#FFF176" },
-    //   { o: "#FFCC80" },
-    // ];
     let output = "";
     output += "<thead><tr>";
 
@@ -1034,7 +1011,8 @@
         );
         if (find) {
           // console.log(find);
-          output += `<td style="background-color:${colorList[find[3]]}">${
+          // output += `<td style="background-color:${colorList[find[3]]}">${
+          output += `<td class="color-${find[3]}">${
             json[x][y] || ""
           }</td>`;
         } else {

@@ -129,4 +129,35 @@ max-width: 100%;
      line-height: 1.8em;
 }
 
+.color-r {
+    background-color: #EF9A9A;
+}
+.color-g {
+    background-color: #A5D6A7;
+}
+.color-b {
+    background-color: #90CAF9;
+}
+.color-p {
+    background-color: #CE93D8;
+}
+.color-s {
+    background-color: #BDBDBD;
+}
+.color-y {
+    background-color: #FFF176;
+}
+.color-o {
+    background-color: #FFCC80;
+}
+.color-c {
+    background-color: #92653a;
+    color: #FFF;
+}
+.color-d {
+    background-color: #424242;
+    color: #FFF;
+}
+
+
 

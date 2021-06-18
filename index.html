@@ -68,6 +68,17 @@
 
     <br />
     <div>
+      <button onclick="window.open('https:\/\/twitter.com/Y52en/status/1402239605978517505?s=20' , '_blank')" >
+        基本的な使い方の説明(twitterにジャンプします)
+      </button>
+
+      <br>
+      上記のツイートからの変更点<br>
+      1.color追加 {c:copper,d:dark} <br>
+      2.\を文末に置くことで改行できる(改行を無いものとしてみなす) <br>
+
+      <br /><br />
+
       <strong>使い方<br /></strong>
       コマンドは半角で、またスペース区切りで設定すること<br />
       []内が引数(かっこ自体は書かない) <br />
@@ -136,6 +147,7 @@
       スペースを空けるのは厳禁 <br />
       内側にある[]は途中で交代することを示す <br />
       {}でコマンドを使用可能 <br />
+      &lt;&gt;で硬直値を直接入力可能 <br />
       move_listの代わりにmv_lsでも可<br />
       <br />
 
@@ -181,36 +193,32 @@
       s silver<br />
       y yellow<br />
       o orange<br />
+      c copper<br />
+      d dark<br />
 
       <br />
       <br />
       <strong>例</strong><br />
       <textarea readonly cols="60" rows="30">
-set tsubaki 121
-set hanako 138
-set ren 141
+set enermy 224
 
-set fennel 155
-set maid 155
+set aikawa 126 
+set kurumi 123
+set yuzuko 131
 
+#set hiro 130
+#set hideri 135
 start_sort
 
-move_list tsubaki [40,40,125]
-move_list fennel [70,70,75]
-move_list maid [75,120]
-move_list ren [40,100]
-move_list hanako [40,40,100]
+mv_ls enermy [{skillcard,dmg3000,224,1100,1},400,400,400,g400,r500,400,p200]
 
-end_sort
+mv_ls aikawa [40,70,[hiro,130],70,70,40,40,[kurumi,123],35,40,b125]
 
-start
- switch ren syaro 144
- move 125 syaro 
-end
+mv_ls kurumi [[hideri,135],40,70,70,o40,[aikawa,123],70,[hideri,135],70,70,b125]
 
-start_sort
-  move_list maid [50000]
-  move_list fennel [50000]
+mv_ls yuzuko [{sc,heal,131,100,5},g40,s40,{b,yuzuko,22.4},100,70,70,{b,yuzuko,0},100,s40,{b,yuzuko,22.4},g40,b125]
+
+
 end_sort
 </textarea
       >
