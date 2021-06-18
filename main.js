@@ -1017,7 +1017,7 @@
         output +=
           "<th style='background-color:#444;color:#fff'>" + (i + 1) + "</th>";
       } else if (i === 0) {
-        output += "<th style='white-space: nowrap;'" + (i + 1) + "</th>";
+        output += "<th style='white-space: nowrap;'>" + (i + 1) + "</th>";
       } else {
         output += htmltag("th", i + 1);
       }
