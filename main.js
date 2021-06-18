@@ -22,27 +22,27 @@
   function objectCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
-  function isObject(val) {
-    if (val !== null && typeof val === "object" && val.constructor === Object) {
-      return true;
-    }
-    return false;
-  }
+  // function isObject(val) {
+  //   if (val !== null && typeof val === "object" && val.constructor === Object) {
+  //     return true;
+  //   }
+  //   return false;
+  // }
   function textCopy(textVal) {
     // テキストエリアを用意する
-    var copyFrom = document.createElement("textarea");
+    let copyFrom = document.createElement("textarea");
     // テキストエリアへ値をセット
     copyFrom.textContent = textVal;
 
     // bodyタグの要素を取得
-    var bodyElm = document.getElementsByTagName("body")[0];
+    let bodyElm = document.getElementsByTagName("body")[0];
     // 子要素にテキストエリアを配置
     bodyElm.appendChild(copyFrom);
 
     // テキストエリアの値を選択
     copyFrom.select();
     // コピーコマンド発行
-    var retVal = document.execCommand("copy");
+    let retVal = document.execCommand("copy");
     // 追加テキストエリアを削除
     bodyElm.removeChild(copyFrom);
     // 処理結果を返却
@@ -675,7 +675,7 @@
                   }
                 });
 
-                console.log(objectCopy(LoadFactor_list));
+                // console.log(objectCopy(LoadFactor_list));
                 // alert(LoadFactor_list);
                 chara_move_list[id] = LoadFactor_list;
                 break;
@@ -760,7 +760,7 @@
               // );
               mainMode("action", id, LoadFactor, false);
             } else if (/^\<[^>]+\>$/.test(input)) {
-              console.log(2);
+              // console.log(2);
               const inner_input = input.replaceAll(/\<|\>/g, "");
 
               let color = inner_input.match(/^[a-zA-Z]+/)?.[0];
@@ -978,7 +978,7 @@
       outputTL[from_charaPlace][place] = arrow_str;
     });
 
-    console.log(outputTL);
+    // console.log(outputTL);
 
     TL.cardData.forEach((x) => {
       let charaPlace = chara_array.indexOf(x[1]);
