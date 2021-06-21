@@ -382,7 +382,8 @@
           ].length;
           const beforeLines_regex = "^(.*\\n){" + numOfLines_start + "}";
 
-          let s = textCopy(
+          // let s = 
+          textCopy(
             textValue.replace(
               new RegExp(beforeLines_regex + "(.*)($|[\\s\\S]*$)"),
               "$2"
