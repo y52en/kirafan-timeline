@@ -23,9 +23,8 @@
 
   class parser {
     constructor(timeline_str) {
-      this.timeline_str = timeline_str
-        .replaceAll(/#.*(\n|$)/g, "")
-        .replaceAll(/\\(\n|$)/g, "");
+      this.timeline_str =
+        timeline_str.replaceAll(/#.*/g, "").replaceAll(/\\(\n|$)/g, "") + "\n";
       this._now_str = "";
       this.i_nowloadstr = 0;
     }
@@ -779,7 +778,6 @@
   };
 
   let tableData = [];
-
   let convertedTLdata = {};
 
   function main() {
@@ -789,7 +787,6 @@
     convertedTLdata = { main: [], set: [] };
     let chara_list = {};
     let TL = new timeline();
-
     let chara_move_list = {};
 
     const err = document.getElementById("error");
@@ -805,6 +802,8 @@
       err.innerHTML = e.value;
       throw e;
     }
+
+    console.log(parsed_tldata);
 
     const mode_list = {
       init: "init",
@@ -911,14 +910,17 @@
                   "beforeend",
                   "ⓘinfo :move_listに使われていないスキルがあります:" +
                     JSON.stringify(
-                      Object.entries(output).map(([key, value]) => ({
-                        [key]: value.map((x) => {
-                          if (x.value.length === 1) {
-                            x.value = x.value[0];
-                          }
-                          return x.value;
-                        }),
-                      }))
+                      Object.fromEntries(
+                        Object.entries(output).map(([key, value]) => [
+                          key,
+                          value.map((x) => {
+                            if (x.value.length === 1) {
+                              x.value = x.value[0];
+                            }
+                            return x.value;
+                          }),
+                        ])
+                      )
                     ).replaceAll('"', "")
                 );
               }
