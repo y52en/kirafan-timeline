@@ -11,23 +11,13 @@
   //   return false;
   // }
   function textCopy(textVal) {
-    // テキストエリアを用意する
-    let copyFrom = document.createElement("textarea");
-    // テキストエリアへ値をセット
+    const copyFrom = document.createElement("textarea");
     copyFrom.textContent = textVal;
-
-    // bodyタグの要素を取得
-    let bodyElm = document.getElementsByTagName("body")[0];
-    // 子要素にテキストエリアを配置
+    const bodyElm = document.getElementsByTagName("body")[0];
     bodyElm.appendChild(copyFrom);
-
-    // テキストエリアの値を選択
     copyFrom.select();
-    // コピーコマンド発行
-    let retVal = document.execCommand("copy");
-    // 追加テキストエリアを削除
+    const retVal = document.execCommand("copy");
     bodyElm.removeChild(copyFrom);
-    // 処理結果を返却
     return retVal;
   }
 
@@ -59,25 +49,34 @@
       try {
         this.skipSpaceAndNewLine();
         while (true) {
-          console.log("_p");
-
           const command_list = this.loadStatement();
           output.push(command_list);
 
           this.skipSpace();
           if (!this.isStrEqualNewLine()) {
-            this.error("error", "想定外の文字:" + this.now_str);
+            this.error(
+              "error",
+              "想定外の文字:「" +
+                this.now_str +
+                "」<br>(" +
+                JSON.stringify(output.slice(-1)) +
+                ")<br>(おそらくmove_listの内のかっこの対応が不正です)"
+            );
           }
           this.skipSpaceAndNewLine();
         }
       } catch (e) {
-        console.log(e);
-        return output;
+        if (e.reason === "loaded") {
+          return output;
+        } else {
+          throw e;
+        }
       }
     }
 
     loadStatement() {
       const output = [];
+
       this.skipSpace();
       const command = this.loadCommand();
       output.push(command);
@@ -87,84 +86,92 @@
         output.push(arg1);
         this.skipSpaceAndNewLine();
         if (this.now_str !== "[") {
-          this.error("move_listには [ が必要です");
+          this.error("error", "パースエラー：move_listには [ が必要です");
         }
         this.setNextStr();
 
-        while (true) {
-          this.skipSpaceAndNewLine();
-          console.log("mv_ls", this.now_str);
+        const arg2 = [];
 
-          if (this.now_str === "]") {
-            this.setNextStr();
-            break;
-          } else if (this.now_str === "{") {
-            // skip {
-            this.setNextStr();
-            const endChar = "}";
-            const val = { mode: "command", value: [] };
-            while (true) {
-              const arg = this.loadCommand("\n," + endChar);
-              val.value.push(arg);
-              this.skipSpaceAndNewLine();
-              if (this.now_str === endChar) {
+        try {
+          while (true) {
+            this.skipSpaceAndNewLine();
+
+            if (this.now_str === "]") {
+              this.setNextStr();
+              break;
+            } else if (this.now_str === "{") {
+              // skip {
+              this.setNextStr();
+              const endChar = "}";
+              const val = { mode: "command", value: [] };
+              while (true) {
+                const arg = this.loadCommand("\n," + endChar);
+                val.value.push(arg);
+                this.skipSpaceAndNewLine();
+                if (this.now_str === endChar) {
+                  this.setNextStr();
+                  break;
+                }
+                this.skipSpaceAndNewLine();
+                if (!this.isStrEqualComma()) {
+                  this.error("error", "not comma");
+                }
+                // skip commma
                 this.setNextStr();
-                break;
+                this.skipSpaceAndNewLine();
               }
-              this.skipSpaceAndNewLine();
-              if (!this.isStrEqualComma()) {
-                this.error("error", "not comma");
-              }
-              // skip commma
+              arg2.push(val);
+            } else if (this.now_str === "[") {
               this.setNextStr();
-              this.skipSpaceAndNewLine();
-            }
-            output.push(val);
-          } else if (this.now_str === "[") {
-            this.setNextStr();
 
-            const endChar = "]";
-            const val = { mode: "command", value: ["switch", arg1] };
-            while (true) {
-              const arg = this.loadCommand("\n," + endChar);
-              val.value.push(arg);
-              this.skipSpaceAndNewLine();
-              if (this.now_str === endChar) {
-                break;
+              const endChar = "]";
+              const val = { mode: "switch", value: [] };
+              while (true) {
+                const arg = this.loadCommand("\n," + endChar);
+                val.value.push(arg);
+                this.skipSpaceAndNewLine();
+                if (this.now_str === endChar) {
+                  break;
+                }
+                this.skipSpaceAndNewLine();
+                if (!this.isStrEqualComma()) {
+                  this.error("error", "not comma");
+                }
+                // skip commma
+                this.setNextStr();
+                this.skipSpaceAndNewLine();
               }
-              this.skipSpaceAndNewLine();
-              if (!this.isStrEqualComma()) {
-                this.error("error", "not comma");
-              }
-              // skip commma
+              // skip ]
               this.setNextStr();
-              this.skipSpaceAndNewLine();
+              arg2.push(val);
+            } else if (this.now_str === "<") {
+              this.setNextStr();
+              const endChar = ">";
+              const val = { mode: "order", value: [] };
+              const arg = this.loadCommand(endChar);
+              val.value.push(arg);
+              arg2.push(val);
+              // skip >
+              this.setNextStr();
+            } else {
+              const val = { mode: "action", value: [] };
+              const arg = this.loadCommand(
+                "\n" +
+                  " 　\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF" +
+                  ",]"
+              );
+              val.value.push(arg);
+              arg2.push(val);
             }
-            // skip ]
-            this.setNextStr();
-            output.push(val);
-          } else if (this.now_str === "<") {
-            this.setNextStr();
-            const endChar = ">";
-            const val = { mode: "command", value: ["order", arg1] };
-            const arg = this.loadCommand(endChar);
-            val.value.push(arg);
-            output.push(val);
-            // skip >
-            this.setNextStr();
-          } else {
-            const val = { mode: "command", value: ["action", arg1] };
-            const arg = this.loadCommand(
-              "\n" +
-                " 　\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF" +
-                ",]"
-            );
-            val.value.push(arg);
-            output.push(val);
+            this.skipSpaceAndNewLine();
+            this.skipComma();
           }
-          this.skipSpaceAndNewLine();
-          this.skipComma();
+        } catch (e) {
+          e.value +=
+            "<br>(" + command + " " + arg1 + " " + JSON.stringify(arg2) + ")";
         }
+
+        output.push(arg2);
       } else {
         while (true) {
           if (this.isStrEqualNewLine()) {
@@ -195,11 +202,16 @@
         if (endChar.split("").includes(this.now_str)) {
           break;
         }
-        this.checkNotReservedStr();
+        try {
+          this.checkNotReservedStr();
+        } catch (e) {
+          e.value += "( " + output + this.now_str + " ←ここでエラー)";
+          throw e;
+        }
         if (this.isNotReservedStr()) {
           output += this.now_str;
         } else {
-          this.error("error", "未到達コードなはず");
+          this.error("error", "内部エラー:未到達コードなはず");
         }
         this.setNextStr();
       }
@@ -228,7 +240,6 @@
 
     skipSpaceAndNewLine() {
       while (true) {
-        // debugger
         if (this.isStrEqualText()) {
           break;
         }
@@ -257,7 +268,6 @@
         };
       }
       this._now_str = returnVal.value;
-      // console.log("str:" + this._now_str );
     }
 
     isStrEqualNewLine() {
@@ -293,13 +303,13 @@
       if (!this.isNotReservedStr()) {
         this.error(
           "error",
-          "想定されていない文字'" + this.now_str + "'が見つかりました"
+          "パースエラー：想定されていない文字「" +
+            this.now_str +
+            "」が見つかりました"
         );
       }
     }
   }
-
-  window.x = parser;
 
   class OperateURL {
     constructor(URL = location.href, autochange = true) {
@@ -328,7 +338,6 @@
     }
 
     get href() {
-      // console.log(this);
       return (
         this._urlAPI.protocol +
         "//" +
@@ -391,8 +400,6 @@
 
       this.pushChara(id, calculated_moved_OrderValue);
       this.nextturn();
-
-      // console.log(this.current);
     }
 
     setColor(chara, place) {
@@ -626,7 +633,6 @@
   window.onload = () => {
     const input_elm = document.getElementById("input_txt");
     const TLparam = url.getParam("TL");
-    // console.log(typeof TLparam);
     if (typeof TLparam !== null) {
       input_elm.textContent = TLparam;
     }
@@ -639,7 +645,6 @@
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
-        // debugger
         let cursorPlace_start = input_elm.selectionStart;
         let cursorPlace_end = input_elm.selectionEnd;
         if (cursorPlace_start === cursorPlace_end) {
@@ -652,14 +657,12 @@
           ].length;
           const beforeLines_regex = "^(.*\\n){" + numOfLines_start + "}";
 
-          // let s =
           textCopy(
             textValue.replace(
               new RegExp(beforeLines_regex + "(.*)($|[\\s\\S]*$)"),
               "$2"
             )
           );
-          // console.log(s);
 
           return false;
         } else {
@@ -671,12 +674,9 @@
     //comment ctrl + /
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "/" && e.ctrlKey) {
-        // debugger
         let cursorPlace_start = input_elm.selectionStart;
         let cursorPlace_end = input_elm.selectionEnd;
         let textValue = input_elm.value;
-        // const cursorBeforeText = ;
-
         const numOfLines_start = [
           ...textValue
             .slice(0, cursorPlace_start)
@@ -690,7 +690,6 @@
             .matchAll(/\n/g),
         ].length;
 
-        // console.log(numOfLines);
         for (let i = numOfLines_start; i <= numOfLines_end; i++) {
           const beforeLines_regex = "^(.*\n){" + i + "}";
 
@@ -709,13 +708,10 @@
               new RegExp("(" + beforeLines_regex + ")"),
               "$1#"
             );
-            // console.log(1);
             if (i === numOfLines_start) {
               cursorPlace_start++;
             }
-            // else {
             cursorPlace_end++;
-            // }
           }
         }
 
@@ -727,11 +723,9 @@
 
     input_elm.addEventListener("keydown", (e) => {
       if ((e.key === "[" || e.key === "]") && e.ctrlKey) {
-        // debugger
         let cursorPlace_start = input_elm.selectionStart;
         let cursorPlace_end = input_elm.selectionEnd;
         let textValue = input_elm.value;
-        // const cursorBeforeText = ;
 
         const numOfLines_start = [
           ...textValue
@@ -746,7 +740,6 @@
             .matchAll(/\n/g),
         ].length;
 
-        // console.log(numOfLines);
         for (let i = numOfLines_start; i <= numOfLines_end; i++) {
           const beforeLines_regex = "^(.*\n){" + i + "}";
           const beforeReplace_textValue = textValue;
@@ -768,15 +761,12 @@
               new RegExp("(" + beforeLines_regex + ")"),
               "$1 "
             );
-            // console.log(1);
             if (beforeReplace_textValue !== textValue) {
               if (i === numOfLines_start) {
                 cursorPlace_start++;
               }
-              // else {
               cursorPlace_end++;
             }
-            // }
           }
         }
 
@@ -797,13 +787,6 @@
     url.setParam("TL", str);
 
     convertedTLdata = { main: [], set: [] };
-    // let bak_str = str
-    // .replaceAll("　"," ")
-    // .split("\n")
-    // .map((x) =>
-    //   x.split(/^[^ ]+| +|(?=#)/)
-    // );
-    // console.log(bak_str);
     let chara_list = {};
     let TL = new timeline();
 
@@ -814,33 +797,14 @@
     err.innerHTML = "";
     info.innerHTML = "";
 
-    // debugger
-
-    // 長い[]は[\s&&[^\n]]と同じ(jsではその記法が使えなかった)
-
-    //全角スペース => 半角
-    str = str
-      .replaceAll("　", " ")
-
-      //delete space(半角)
-      .replaceAll(/^( )+/gm, "")
-
-      //delete comment
-      .replaceAll(/#.*\n/g, "")
-
-      .replaceAll(/\\\n/g, "")
-
-      //trim space
-      .replaceAll(
-        /[\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]{2,}/gm,
-        " "
-      );
-
-    let str_splited = str
-      .split("\n")
-      .map((x) =>
-        x.split(" ").map((x) => (/^-?\d+(\.\d+)?$/.test(x) ? Number(x) : x))
-      );
+    const tl_parser = new parser(str);
+    let parsed_tldata;
+    try {
+      parsed_tldata = tl_parser.parse();
+    } catch (e) {
+      err.innerHTML = e.value;
+      throw e;
+    }
 
     const mode_list = {
       init: "init",
@@ -850,13 +814,13 @@
       waiting_mode: "waiting_mode",
     };
     let mode = mode_list.init;
-    for (let i = 0; i < str_splited.length; i++) {
+    for (let i = 0; i < parsed_tldata.length; i++) {
       try {
-        const load_text_command = str_splited[i]?.[0];
-        const load_text_arg1 = str_splited[i]?.[1];
-        const load_text_arg2 = str_splited[i]?.[2];
-        const load_text_arg3 = str_splited[i]?.[3];
-        const load_text_arg4 = str_splited[i]?.[4];
+        const load_text_command = parsed_tldata[i]?.[0];
+        const load_text_arg1 = parsed_tldata[i]?.[1];
+        const load_text_arg2 = parsed_tldata[i]?.[2];
+        const load_text_arg3 = parsed_tldata[i]?.[3];
+        const load_text_arg4 = parsed_tldata[i]?.[4];
 
         let id, SPD, buff, LoadFactor, LoadFactor_list, to, from, ordervalue;
 
@@ -865,11 +829,11 @@
             switch (load_text_command) {
               case "set":
                 id = load_text_arg1.toString();
-                SPD = load_text_arg2;
-                buff = load_text_arg3 || 0;
+                SPD = Number(load_text_arg2);
+                buff = Number(load_text_arg3) || 0;
                 chara_list[id] = new chara(id, SPD, buff);
                 TL.setChara(id, chara_list[id].initOrderValue());
-                convertedTLdata.set.push(str_splited[i]);
+                convertedTLdata.set.push(parsed_tldata[i]);
                 break;
 
               case "start":
@@ -890,48 +854,14 @@
             }
             break;
           case mode_list.start:
-            mainMode(...str_splited[i]);
+            mainMode(...parsed_tldata[i]);
             break;
           case mode_list.start_sort:
             switch (load_text_command) {
               case "move_list":
               case "mv_ls":
-                id = load_text_arg1.toString();
-                // debugger
-                // console.log(load_text_arg2);
-                LoadFactor_list = [
-                  ...load_text_arg2
-                    .replaceAll(/^\[|\]$/g, "")
-                    // 122,[charaname,SPD,buff],{command,arg1,arg2,arg3?,arg4?}
-                    .matchAll(
-                      /\<[^>]+\>|([a-zA-Z]+)?\d+|\[[^,]+,\d+(,[\d.-]*)?\]|\{([^,]+)(,[^,]+){2,4}\}/g
-                    ),
-                ].map((x) => {
-                  const tmp = x[0];
-                  if (
-                    /^([a-zA-Z]+)?[\d.-]+$/.test(tmp) ||
-                    /^\<[^>]+\>$/.test(tmp)
-                  ) {
-                    return tmp;
-                  } else if (/^{[^}]+}$/.test(tmp)) {
-                    let output = {};
-                    output.mode = "command";
-                    output.value = [...tmp.matchAll(/[^,{}]+/g)].map((x) =>
-                      /^[\d-.]+$/.test(x[0]) ? Number(x[0]) : x[0]
-                    );
-                    // console.log(output);
-                    return output;
-                  } else {
-                    // console.log(tmp);
-                    return tmp
-                      .replaceAll(/^\[|\]$/g, "")
-                      .split(",")
-                      .map((x) => (/^[\d.-]+$/.test(x) ? Number(x) : x));
-                  }
-                });
-
-                // console.log(objectCopy(LoadFactor_list));
-                // alert(LoadFactor_list);
+                id = load_text_arg1;
+                LoadFactor_list = load_text_arg2;
                 chara_move_list[id] = LoadFactor_list;
                 break;
 
@@ -980,78 +910,51 @@
                 info.insertAdjacentText(
                   "beforeend",
                   "ⓘinfo :move_listに使われていないスキルがあります:" +
-                    JSON.stringify(output)
+                    JSON.stringify(
+                      Object.entries(output).map(([key, value]) => ({
+                        [key]: value.map((x) => {
+                          if (x.value.length === 1) {
+                            x.value = x.value[0];
+                          }
+                          return x.value;
+                        }),
+                      }))
+                    ).replaceAll('"', "")
                 );
-
-                // chara_move_list = {};
               }
               break;
             }
 
-            //LoadFactor
             const input = chara_move_list[id].shift();
-            // console.log(chara_move_list[id]);
-            // console.log(input);
-            // console.log(input);
 
-            //expected input
-            if (/^([a-zA-Z]+?)?\d+$/.test(input)) {
-              let LoadFactor;
+            try {
+              if (input.mode === "order") {
+                const [Color_OrderValue] = input.value;
+                const Color = Color_OrderValue.match(/^[a-zA-Z]/g);
+                const OrderValue = Color_OrderValue.match(/\d+/g);
 
-              let color = input.match(/^[a-zA-Z]+/)?.[0];
-              // console.log(color);
+                mainMode("color", Color);
+                mainMode("order", id, OrderValue);
+              } else if (input.mode === "action") {
+                const [Color_LoadFactor] = input.value;
 
-              if (color) {
-                LoadFactor = Number(input.replaceAll(/[a-zA-Z]/g, ""));
-                mainMode("color", color);
-              } else {
-                LoadFactor = Number(input);
-              }
-              // console.log(LoadFactor);
-              // TL.move(
-              //   chara_list[id].calculateOrderValue(LoadFactor),
-              //   id,
-              //   false
-              // );
-              mainMode("action", id, LoadFactor, false);
-            } else if (/^\<[^>]+\>$/.test(input)) {
-              // console.log(2);
-              const inner_input = input.replaceAll(/\<|\>/g, "");
+                const Color = Color_LoadFactor.match(/^[a-zA-Z]/g);
+                const LoadFactor = Color_LoadFactor.match(/\d+/g);
 
-              let color = inner_input.match(/^[a-zA-Z]+/)?.[0];
-
-              if (color) {
-                LoadFactor = Number(inner_input.replaceAll(/[a-zA-Z]/g, ""));
-                mainMode("color", color);
-              } else {
-                LoadFactor = Number(inner_input);
-              }
-              mainMode("order", id, LoadFactor, false);
-            } else if (Array.isArray(input)) {
-              // const convertedJSONed_input = input.replaceAll('"','""').replace("[",'["').replace(",",'",')
-
-              const [switchedName, SPD, buff] = input;
-              // .replaceAll(/^\[|\]$/g, "")
-              // .split(",")
-
-              // TL.switchChara(id, switchedName);
-              mainMode("switch", id, ...input);
-              chara_list[switchedName] = new chara(
-                switchedName,
-                SPD,
-                buff || 0
-              );
-
-              chara_move_list[switchedName] = chara_move_list[id];
-              chara_move_list[id] = [];
-              // console.log(chara_move_list[switchedName],chara_move_list[id]);
-            } else {
-              // console.log(input);
-              try {
+                mainMode("color", Color);
+                mainMode("action", id, LoadFactor);
+              } else if (input.mode === "switch") {
+                const [to_name, SPD, buff] = input.value;
+                mainMode("switch", id, to_name, SPD, buff || 0);
+                chara_move_list[to_name] = chara_move_list[id];
+                chara_move_list[id] = [];
+              } else if (input.mode === "command") {
                 mainMode(...input.value);
-              } catch (e) {
-                throw Error(e + ": { " + input.value + " }");
+              } else {
+                throw Error("テキストのパースエラー");
               }
+            } catch (e) {
+              throw Error(e + ":  " + JSON.stringify(input.value) + " ");
             }
           }
         }
@@ -1073,38 +976,38 @@
           switch (load_text_command) {
             case "buffset":
             case "b":
-              id = load_text_arg1.toString();
-              buff = load_text_arg2 || 0;
+              id = load_text_arg1;
+              buff = Number(load_text_arg2) || 0;
               chara_list[id].SPD_buff = buff;
               break;
 
             case "buffadd":
             case "b+":
-              id = load_text_arg1.toString();
-              buff = load_text_arg2 || 0;
+              id = load_text_arg1;
+              buff = Number(load_text_arg2) || 0;
               chara_list[id].SPD_buff += buff;
               break;
 
             case "buffminus":
             case "b-":
-              id = load_text_arg1.toString();
-              buff = load_text_arg2 || 0;
+              id = load_text_arg1;
+              buff = Number(load_text_arg2) || 0;
               chara_list[id].SPD_buff -= buff;
               break;
 
             case "add":
             case "a":
-              id = load_text_arg1.toString();
-              SPD = load_text_arg2;
-              buff = load_text_arg3 || 0;
+              id = load_text_arg1;
+              SPD = Number(load_text_arg2);
+              buff = Number(load_text_arg3) || 0;
               chara_list[id] = new chara(id, SPD, buff);
               TL.addChara(id, chara_list[id].initOrderValue());
               break;
 
             case "move":
             case "m":
-              LoadFactor = load_text_arg1;
-              id = load_text_arg2.toString();
+              LoadFactor = Number(load_text_arg1);
+              id = load_text_arg2;
               const canMoveWithout1stChara = load_text_arg3 === "true";
               TL.move(
                 chara_list[TL.ID_of_firstChara()].calculateOrderValue(
@@ -1117,8 +1020,8 @@
 
             case "action":
             case "ac":
-              id = load_text_arg1.toString();
-              LoadFactor = load_text_arg2;
+              id = load_text_arg1;
+              LoadFactor = Number(load_text_arg2);
               const canMoveWithout1stChara_act = load_text_arg3 === "true";
               TL.move(
                 chara_list[TL.ID_of_firstChara()].calculateOrderValue(
@@ -1130,8 +1033,8 @@
               break;
 
             case "order":
-              id = load_text_arg1.toString();
-              ordervalue = load_text_arg2;
+              id = load_text_arg1;
+              ordervalue = Number(load_text_arg2);
               // const canMoveWithout1stChara_act = load_text_arg3 === "true";
 
               TL.move(ordervalue, id, false);
@@ -1140,10 +1043,10 @@
 
             case "switch":
             case "sw":
-              to = load_text_arg1.toString();
-              from = load_text_arg2.toString();
-              SPD = load_text_arg3;
-              buff = load_text_arg4 || 0;
+              to = load_text_arg1;
+              from = load_text_arg2;
+              SPD = Number(load_text_arg3);
+              buff = Number(load_text_arg4) || 0;
               TL.switchChara(to, from);
               chara_list[from] = new chara(from, SPD, buff);
               break;
@@ -1160,17 +1063,16 @@
 
             case "color":
             case "c":
-              var color = load_text_arg1.toString();
-              // console.log(color);
+              var color = load_text_arg1;
               TL.color = color;
               break;
 
             case "skillcard":
             case "sc":
-              var name = load_text_arg1.toString();
-              var spd = Number(load_text_arg2.toString());
-              LoadFactor = Number(load_text_arg3.toString());
-              var time = Number(load_text_arg4.toString());
+              var name = load_text_arg1;
+              var spd = Number(load_text_arg2);
+              LoadFactor = Number(load_text_arg3);
+              var time = Number(load_text_arg4);
 
               var skillcard = new chara(name, spd, 0);
               chara_list[name] = skillcard;
@@ -1194,8 +1096,8 @@
       } catch (e) {
         console.error(i + 1 + "行目にエラー", e);
 
-        err.innerText =
-          i + 1 + "行目にエラー(" + str_splited[i].join(" ") + ")";
+        // err.innerText =
+        //   i + 1 + "行目にエラー(" + str_splited[i].join(" ") + ")";
         err.innerHTML += "<br>";
         err.insertAdjacentText("beforeend", e);
         break;
@@ -1218,7 +1120,6 @@
 
       outputTL[charaPlace][index] = OrderValue;
     });
-    // console.log(TL.switchData);
     TL.switchData.forEach((x) => {
       const [place, from_id, to_id] = x;
       let from_charaPlace = chara_array.indexOf(from_id);
@@ -1233,11 +1134,8 @@
       outputTL[from_charaPlace][place] = arrow_str;
     });
 
-    // console.log(outputTL);
-
     TL.cardData.forEach((x) => {
       let charaPlace = chara_array.indexOf(x[1]);
-      // console.log(x,charaPlace);
       outputTL[charaPlace][x[0]] = "→";
     });
     const now_place = TL.place_of_currentTimeline + 1;
@@ -1246,9 +1144,6 @@
 
     tableData = [outputTL, chara_array];
     outputAsTable(outputTL, chara_array, TL.comment, now_place);
-    // console.log(TL);
-
-    // console.log(convertedTLdata);
     printConvertedTL();
   }
 
@@ -1279,7 +1174,6 @@
           (elm) => elm[0] === "color" && elm[1] === charalist[x] && elm[2] === y
         );
         if (find) {
-          // console.log(find);
           // output += `<td style="background-color:${colorList[find[3]]}">${
           output += `<td class="color-${find[3]}">${json[x][y] || ""}</td>`;
         } else {
