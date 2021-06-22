@@ -31,6 +31,296 @@
     return retVal;
   }
 
+  class parser {
+    constructor(timeline_str) {
+      this.timeline_str = timeline_str;
+      this._now_str = "";
+      this.stack_command_list = [];
+      this.stack_str = "";
+      this.stack_mvls = {}
+      this.closure = ""
+      this.initStackMoveList()
+
+      this.output = [];
+
+      this.isComment = false;
+
+      this.mode = undefined;
+      this.mode_list = {
+        waiting_command: "waiting_command",
+        waiting_arg: "waiting_arg",
+        waiting_arg_mvls: "loading_arg_mvls",
+        loading_command: "loading_command",
+        loading_arg_mvls: "loading_arg_mvls",
+        loading_arg_mvls_action: "loading_arg_action",
+        loading_arg_mvls_brackets: "loading_arg_brackets",
+        
+        end: "end",
+      };
+    }
+
+    get now_str() {
+      return this._now_str;
+    }
+
+    set now_str(_) {
+      throw Error("上書き禁止！");
+    }
+
+    parse() {
+      this.mode = this.mode_list.waiting_mode;
+      EndLoop: while (true) {
+        const next_val = this.getNextStr();
+        if (next_val.done) {
+          this.stack2Output();
+          break EndLoop;
+        }
+        this._now_str = next_val.value;
+
+        if (this.now_str === "#") {
+          this.isComment = true;
+          continue;
+        } else if (this.isComment) {
+          if (this.now_str === "\n") {
+            this.isComment = false;
+          }
+          continue;
+        }
+
+        if (this.now_str === "\n" && this.stack_str.slice(-1) === "\\") {
+          this.stack_str = this.stack_str.slice(0, -1);
+          continue;
+        }
+
+        switch (this.mode) {
+          case this.mode_list.waiting_command:
+            this.waitCommand();
+            break;
+
+          case this.mode_list.end:
+        }
+      }
+      return this.output;
+    }
+
+    *_getNextStr() {
+      for (let i = 0; i < this.timeline_str.length; i++) {
+        yield this.timeline_str[i];
+      }
+      // Array.prototype.forEach.call(this.timeline_str, function(s) {
+      //   yield s;
+      // });
+    }
+
+    getNextStr() {
+      return this._getNextStr().next();
+    }
+
+    waitCommand() {
+      // this.mode = this.mode_list.waiting_command
+      if (this.isStrEqualText()) {
+        this.loadCommand();
+      }
+    }
+
+    waitArgument() {
+      // this.mode = this.mode_list.loading_arg_mvls
+      if (this.isStrEqualText()) {
+        this.loadCommand();
+      } else if (this.isStrEqualNewLine()) {
+        this.stack2Output();
+        this.mode = this.mode_list.waiting_command;
+      }
+    }
+
+    loadCommand() {
+      this.mode = this.mode_list.loading_command;
+      if (this.isStrEqualText()) {
+        this.addStackStr();
+      } else if (this.isStrEqualSpace()) {
+        this.pushStack2StackList();
+        if (
+          (this.stack_command_list[0] === "move_list" ||
+            this.stack_command_list[0] === "mv_ls") &&
+          this.stack_command_list.length === 2
+        ) {
+          this.stack_command_list.push([])
+          this.mode = this.mode_list.waiting_arg_mvls;
+        } else {
+          this.mode = this.mode.waiting_command;
+        }
+      } else if (this.isStrEqualNewLine()) {
+        this.stack2Output();
+        this.mode = this.mode.waiting_command;
+      } else {
+        throw Error("おそらく未到達");
+      }
+    }
+
+    loadMoveList() {
+      // (str+)num,<num>,{x,y,z...},[x,y,z...]
+      const brackets = [
+        ["[","]","switch"],
+        ["{","}","command"],
+        ["<",">","order"],
+        // ["",""],
+      ]
+      this.mode = this.mode_list.loading_arg_mvls;
+      if (this.stack_str.length === 0) {
+        if(this.now_str !== "["){
+          throw Error("move_listの2つ目の引数は[から始まる必要があります")
+        }
+      }else if(this.isStrEqualText()){
+        if(this.now_str === "]"){
+          this.endLoadMoveList()
+          this.mode 
+        }else if(this.isStrEqualComma()){
+
+        }else{
+          const found_brackets = brackets.find(x => x[0] === this.now_str)
+          if(found_brackets){
+            this.stack_mvls.type = found_brackets[2]
+            this.closure = found_brackets[1]
+            // todo::::
+            this.mode = this.mode_list.loading_arg_mvls_brackets
+          }else{
+            this.
+          }
+
+
+        }
+        
+
+      }
+    }
+
+    loadMoveListAction(){
+      this.mode = this.mode_list.loading_arg_mvls_action
+      if(this.isStrEqualComma()){
+        this.endLoadMoveList_action()
+        this.mode = this.mode_list.loading_arg_mvls
+      }else if(this.now_str === "]"){
+        this.endLoadMoveList_action()
+        this.endLoadMoveList()
+        this.mode = this.mode_list.waiting_command
+      }else if(this.isStrEqualText()){
+        this.addStackStr()
+      }
+    }
+
+    loadMoveListBrackets(){
+      if(this.isStrEqualComma()){
+        this.endLoadMoveList_action()
+        this.mode = this.mode_list.loading_arg_mvls
+      }else if(this.now_str === this.closureki){
+        this.endLoadMoveList_action()
+        this.endLoadMoveList()
+        this.mode = this.mode_list.waiting_command
+      }else if(this.isStrEqualText()){
+        this.addStackStr()
+      }
+    }
+
+    loadMoveListBrackets_arg(){
+      // this.mode = this.mode_list.loading_arg_mvls_action
+      if(this.isStrEqualComma()){
+        this.endLoadMoveList_action()
+        this.mode = this.mode_list.loading_arg_mvls
+      }else if(this.now_str === this.closure){
+        // this.endLoadMoveList_action()
+        // this.endLoadMoveList()
+        // this.mode = this.mode_list.waiting_command
+      }else if(this.isStrEqualText()){
+        this.addStackStr()
+      }
+    }
+
+    endLoadMoveList(){
+      this.output.push(
+        this.stack_mvls
+      )
+      this.stack_mvls = []
+    }
+
+    endLoadMoveList_action(){
+      this.stack_mvls.push(
+        this.stack_str
+        )
+        this.initStackStr()
+    }
+
+
+    stack2Output() {
+      this.pushStack2StackList();
+      this.pushStackList2Output();
+    }
+
+    pushStackList2Output() {
+      const list = this.stack_command_list;
+      if (list.length !== 0) {
+        this.output.push(this.list);
+        this.initStackCommandList();
+      }
+    }
+
+    pushStack2StackList() {
+      const str = this.stack_str;
+      if (str.length !== 0) {
+        this.stack_command_list.push(str);
+        this.initStackStr();
+      }
+    }
+
+    pushMoveList2Stack(){
+      this.stack_command_list[2].push(this.stack_mvls)
+      this.initStackMoveList()
+    }
+
+    pushArg2StackMoveList(){
+      const str = this.stack_str;
+      if (str.length !== 0) {
+        this.stack_mvls.value.push(str);
+        this.initStackStr();
+      }
+    }
+
+    initStackCommandList() {
+      this.stack_command_list = [];
+    }
+
+    initStackStr() {
+      this.stack_str = "";
+    }
+
+    initStackMoveList(){
+      this.stack_mvls = {type:undefined,value:[]}
+    }
+
+    isStrEqualNewLine() {
+      return this.now_str === "\n";
+    }
+
+    isStrEqualComma() {
+      return this.now_str === ",";
+    }
+
+    addStackStr() {
+      this.stack_str += this.now_str;
+    }
+
+    isStrEqualSpace() {
+      const spaceRegex = new RegExp(
+        /^[\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/
+      );
+      return this.now_str.match(spaceRegex);
+    }
+
+    isStrEqualText() {
+      // return !(this.isStrEqualNewLine() || this.isStrEqualSpace())
+      return !this.isStrEqualNewLine() && !this.isStrEqualSpace();
+    }
+  }
+
   class OperateURL {
     constructor(URL = location.href, autochange = true) {
       this._href = URL;
@@ -382,7 +672,7 @@
           ].length;
           const beforeLines_regex = "^(.*\\n){" + numOfLines_start + "}";
 
-          // let s = 
+          // let s =
           textCopy(
             textValue.replace(
               new RegExp(beforeLines_regex + "(.*)($|[\\s\\S]*$)"),
@@ -552,15 +842,13 @@
     str = str
       .replaceAll("　", " ")
 
-
       //delete space(半角)
       .replaceAll(/^( )+/gm, "")
 
       //delete comment
       .replaceAll(/#.*\n/g, "")
 
-      .replaceAll(/\\\n/g,"")
-
+      .replaceAll(/\\\n/g, "")
 
       //trim space
       .replaceAll(
@@ -1004,7 +1292,7 @@
     for (let x = 0; x < json.length; x++) {
       output += "<tr>";
       // output += htmltag("td", charalist[x]);
-      output += "<td style='white-space: nowrap;'>" + charalist[x] + "</td>"
+      output += "<td style='white-space: nowrap;'>" + charalist[x] + "</td>";
       for (let y = 0; y < json[0].length; y++) {
         // console.log(comment);
         const find = comment.find(
@@ -1013,9 +1301,7 @@
         if (find) {
           // console.log(find);
           // output += `<td style="background-color:${colorList[find[3]]}">${
-          output += `<td class="color-${find[3]}">${
-            json[x][y] || ""
-          }</td>`;
+          output += `<td class="color-${find[3]}">${json[x][y] || ""}</td>`;
         } else {
           output += htmltag("td", json[x][y] || "");
         }
