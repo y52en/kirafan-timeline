@@ -1,3 +1,4 @@
+//@ts-check
 "use strict";
 
 ((window) => {
@@ -107,6 +108,7 @@
                 const arg = this.loadCommand("\n," + endChar);
                 val.value.push(arg);
                 this.skipSpaceAndNewLine();
+                // @ts-ignore
                 if (this.now_str === endChar) {
                   this.setNextStr();
                   break;
@@ -129,6 +131,7 @@
                 const arg = this.loadCommand("\n," + endChar);
                 val.value.push(arg);
                 this.skipSpaceAndNewLine();
+                // @ts-ignore
                 if (this.now_str === endChar) {
                   break;
                 }
@@ -275,10 +278,6 @@
 
     isStrEqualComma() {
       return this.now_str === ",";
-    }
-
-    addStackStr() {
-      this.stack_str += this.now_str;
     }
 
     isStrEqualSpace() {
@@ -644,9 +643,12 @@
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
+        // @ts-ignore
         let cursorPlace_start = input_elm.selectionStart;
+        // @ts-ignore
         let cursorPlace_end = input_elm.selectionEnd;
         if (cursorPlace_start === cursorPlace_end) {
+          // @ts-ignore
           let textValue = input_elm.value;
           const numOfLines_start = [
             ...textValue
@@ -673,8 +675,11 @@
     //comment ctrl + /
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "/" && e.ctrlKey) {
+        // @ts-ignore
         let cursorPlace_start = input_elm.selectionStart;
+        // @ts-ignore
         let cursorPlace_end = input_elm.selectionEnd;
+        // @ts-ignore
         let textValue = input_elm.value;
         const numOfLines_start = [
           ...textValue
@@ -714,7 +719,9 @@
           }
         }
 
+        // @ts-ignore
         input_elm.value = textValue;
+        // @ts-ignore
         input_elm.setSelectionRange(cursorPlace_start, cursorPlace_end);
         main();
       }
@@ -722,8 +729,11 @@
 
     input_elm.addEventListener("keydown", (e) => {
       if ((e.key === "[" || e.key === "]") && e.ctrlKey) {
+        // @ts-ignore
         let cursorPlace_start = input_elm.selectionStart;
+        // @ts-ignore
         let cursorPlace_end = input_elm.selectionEnd;
+        // @ts-ignore
         let textValue = input_elm.value;
 
         const numOfLines_start = [
@@ -769,7 +779,9 @@
           }
         }
 
+        // @ts-ignore
         input_elm.value = textValue;
+        // @ts-ignore
         input_elm.setSelectionRange(cursorPlace_start, cursorPlace_end);
         main();
       }
@@ -781,6 +793,7 @@
   let convertedTLdata = {};
 
   function main() {
+    // @ts-ignore
     let str = document.getElementById("input_txt").value;
     url.setParam("TL", str);
 
@@ -803,8 +816,6 @@
       throw e;
     }
 
-    console.log(parsed_tldata);
-
     const mode_list = {
       init: "init",
       start: "start",
@@ -819,6 +830,7 @@
         const load_text_arg1 = parsed_tldata[i]?.[1];
         const load_text_arg2 = parsed_tldata[i]?.[2];
         const load_text_arg3 = parsed_tldata[i]?.[3];
+        // @ts-ignore
         const load_text_arg4 = parsed_tldata[i]?.[4];
 
         let id, SPD, buff, LoadFactor, LoadFactor_list, to, from, ordervalue;
@@ -873,7 +885,7 @@
                 break;
 
               default:
-                throw Error("no command found");
+                throw Error("no command found:「" + load_text_command + "」");
             }
 
             break;
@@ -921,6 +933,7 @@
                           }),
                         ])
                       )
+                    // @ts-ignore
                     ).replaceAll('"', "")
                 );
               }
@@ -1142,7 +1155,7 @@
     });
     const now_place = TL.place_of_currentTimeline + 1;
     document.getElementById("firstchara").innerText = TL.ID_of_firstChara();
-    document.getElementById("now_place").innerText = now_place;
+    document.getElementById("now_place").innerText = String(now_place);
 
     tableData = [outputTL, chara_array];
     outputAsTable(outputTL, chara_array, TL.comment, now_place);

@@ -45,12 +45,11 @@
     </div>
 
     <div class="popupModal1">
+      <!-- https://qiita.com/dangoya/items/4176e8ef22e892570f4e -->
       <input type="radio" name="modalPop" id="pop11" />
-      <!-- <button> -->
       <label for="pop11"
         ><button onclick="pop11.checked = true">move_listの展開</button></label
       >
-      <!-- </button> -->
       <input type="radio" name="modalPop" id="pop12" />
       <label for="pop12">CLOSE</label>
       <input type="radio" name="modalPop" id="pop13" />
@@ -76,6 +75,13 @@
       上記のツイートからの変更点<br>
       1.color追加 {c:copper,d:dark} <br>
       2.\を文末に置くことで改行できる(改行を無いものとしてみなす) <br>
+      <br>
+      2021/06/23<br>
+      テキストのパース処理を変更 <br>
+      これにより、色々変わりましたが重要なものだけ記載 <br>
+      1.あいまいな記載が許されなくなった<br>
+      2. move_list内でコマンドとコンマの間に改行できるようになった<br>
+      もし正しい書き方であるのにパースエラーが出るときは@y52enに@ツイートなどでお知らせください<br>
 
       <br /><br />
 
@@ -223,7 +229,5 @@ end_sort
 </textarea
       >
     </div>
-
-    <!-- https://qiita.com/dangoya/items/4176e8ef22e892570f4e -->
   </body>
 </html>
