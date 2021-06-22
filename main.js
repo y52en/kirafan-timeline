@@ -1,7 +1,6 @@
 "use strict";
 
 ((window) => {
-
   function objectCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
@@ -35,33 +34,10 @@
   class parser {
     constructor(timeline_str) {
       this.timeline_str = timeline_str
-      .replaceAll(/#.*(\n|$)/g, "")
-      ;
+        .replaceAll(/#.*(\n|$)/g, "")
+        .replaceAll(/\\(\n|$)/g, "");
       this._now_str = "";
-
       this.i_nowloadstr = 0;
-      // this.stack_command_list = [];
-      // this.stack_str = "";
-      // this.stack_mvls = {}
-      // this.closure = ""
-      // this.initStackMoveList()
-
-      // this.output = [];
-
-      // this.isComment = false;
-
-      // this.mode = undefined;
-      // this.mode_list = {
-      //   waiting_command: "waiting_command",
-      //   waiting_arg: "waiting_arg",
-      //   waiting_arg_mvls: "loading_arg_mvls",
-      //   loading_command: "loading_command",
-      //   loading_arg_mvls: "loading_arg_mvls",
-      //   loading_arg_mvls_action: "loading_arg_action",
-      //   loading_arg_mvls_brackets: "loading_arg_brackets",
-        
-      //   end: "end",
-      // };
     }
 
     get now_str() {
@@ -73,353 +49,216 @@
     }
 
     parse() {
-      this.setNextStr()
-      const output = this._parse()
+      this.setNextStr();
+      const output = this._parse();
       return output;
     }
 
-    _parse(){
-      const output = []
+    _parse() {
+      const output = [];
       try {
-        this.skipSpaceAndNewLine()
-        while (true){
-          const command_list = this.loadStatement()
-          output.push(command_list)
+        this.skipSpaceAndNewLine();
+        while (true) {
+          console.log("_p");
 
-          this.skipSpace()
-          if(this.isStrEqualNewLine()){
-            this.error("error","想定外の文字")
+          const command_list = this.loadStatement();
+          output.push(command_list);
+
+          this.skipSpace();
+          if (!this.isStrEqualNewLine()) {
+            this.error("error", "想定外の文字:" + this.now_str);
           }
-          this.skipSpaceAndNewLine()
+          this.skipSpaceAndNewLine();
         }
-      } catch (e){
-
+      } catch (e) {
+        console.log(e);
         return output;
       }
-      
     }
 
     loadStatement() {
-      const output = []
-      const command = this.loadCommand()
-      output.push(command)
-      this.skipSpace()
-      if(command === "move_list" || command === "mv_ls"){
-        const arg1 = this.loadCommand()
-        output.push(arg1)
-        this.skipSpaceAndNewLine()
-        if(this.now_str !== "["){
-          this.error("move_listには [ が必要です")
+      const output = [];
+      this.skipSpace();
+      const command = this.loadCommand();
+      output.push(command);
+      this.skipSpace();
+      if (command === "move_list" || command === "mv_ls") {
+        const arg1 = this.loadCommand();
+        output.push(arg1);
+        this.skipSpaceAndNewLine();
+        if (this.now_str !== "[") {
+          this.error("move_listには [ が必要です");
         }
-        this.setNextStr()
+        this.setNextStr();
 
-        const mvls_arg2 = []
-        while (true){
-          this.skipSpaceAndNewLine()
-          if(this.now_str === "]"){
+        while (true) {
+          this.skipSpaceAndNewLine();
+          console.log("mv_ls", this.now_str);
+
+          if (this.now_str === "]") {
+            this.setNextStr();
             break;
-          }else if(this.now_str === "{"){
-            const endChar = "}"
-            const val = {mode:command,value:[]}
-            while (true){
-              const arg = this.loadCommand("\n," + endChar)
-              val.value.push(arg)
-              this.skipSpaceAndNewLine()
-              if(this.now_str === endChar){
+          } else if (this.now_str === "{") {
+            // skip {
+            this.setNextStr();
+            const endChar = "}";
+            const val = { mode: "command", value: [] };
+            while (true) {
+              const arg = this.loadCommand("\n," + endChar);
+              val.value.push(arg);
+              this.skipSpaceAndNewLine();
+              if (this.now_str === endChar) {
+                this.setNextStr();
                 break;
               }
-              this.skipSpaceAndNewLine()
-              if(!this.isStrEqualComma()){
-                this.error("error","not comma")
+              this.skipSpaceAndNewLine();
+              if (!this.isStrEqualComma()) {
+                this.error("error", "not comma");
               }
               // skip commma
-              this.setNextStr()
-              this.skipSpaceAndNewLine()
+              this.setNextStr();
+              this.skipSpaceAndNewLine();
             }
-            output.push(val)
-          }else if(this.now_str === "["){
-            const endChar = "]"
-            const val = {mode:command,value:["switch",arg1]}
-            while (true){
-              const arg = this.loadCommand("\n," + endChar)
-              val.value.push(arg)
-              this.skipSpaceAndNewLine()
-              if(this.now_str === endChar){
+            output.push(val);
+          } else if (this.now_str === "[") {
+            this.setNextStr();
+
+            const endChar = "]";
+            const val = { mode: "command", value: ["switch", arg1] };
+            while (true) {
+              const arg = this.loadCommand("\n," + endChar);
+              val.value.push(arg);
+              this.skipSpaceAndNewLine();
+              if (this.now_str === endChar) {
                 break;
               }
-              this.skipSpaceAndNewLine()
-              if(!this.isStrEqualComma()){
-                this.error("error","not comma")
+              this.skipSpaceAndNewLine();
+              if (!this.isStrEqualComma()) {
+                this.error("error", "not comma");
               }
               // skip commma
-              this.setNextStr()
-              this.skipSpaceAndNewLine()
+              this.setNextStr();
+              this.skipSpaceAndNewLine();
             }
-
-            output.push(val)
-          }else if(this.now_str === "<"){
-            const endChar = ">"
-            const val = {mode:command,value:["order"]}
-            const arg = this.loadCommand(endChar)
-            val.value.push(arg)
-            output.push(val)
-          }else{
-
+            // skip ]
+            this.setNextStr();
+            output.push(val);
+          } else if (this.now_str === "<") {
+            this.setNextStr();
+            const endChar = ">";
+            const val = { mode: "command", value: ["order", arg1] };
+            const arg = this.loadCommand(endChar);
+            val.value.push(arg);
+            output.push(val);
+            // skip >
+            this.setNextStr();
+          } else {
+            const val = { mode: "command", value: ["action", arg1] };
+            const arg = this.loadCommand(
+              "\n" +
+                " 　\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF" +
+                ",]"
+            );
+            val.value.push(arg);
+            output.push(val);
           }
-          this.skipSpaceAndNewLine()
-      //  this.skipcommma()
+          this.skipSpaceAndNewLine();
+          this.skipComma();
         }
-        output.push(mvls_arg2)
-      }else{
-        while(true){
-          if(this.isStrEqualNewLine()){
+      } else {
+        while (true) {
+          if (this.isStrEqualNewLine()) {
             break;
           }
-          const arg = this.loadCommand()
-          output.push(arg)
-          this.skipSpace()
+          const arg = this.loadCommand();
+          output.push(arg);
+          this.skipSpace();
         }
       }
       return output;
     }
 
-    error(reason,value){
+    error(reason, value) {
       throw {
         reason,
-        value
-      }
+        value,
+      };
     }
 
-    loadCommand(endChar = "\n" + "\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF"){
-
-      let output = ""
-      while (true){
-        this.checkNotReservedStr()
-        if(endChar.match(this.now_str)){
-             break;
-        }else if(this.isNotReservedStr()){
-          output += this.now_str
-        }else{
-          this.error("error","未到達コードなはず")
+    loadCommand(
+      // "\s"
+      endChar = "\n" +
+        " 　\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF"
+    ) {
+      let output = "";
+      while (true) {
+        if (endChar.split("").includes(this.now_str)) {
+          break;
         }
-        this.setNextStr()
-      } 
+        this.checkNotReservedStr();
+        if (this.isNotReservedStr()) {
+          output += this.now_str;
+        } else {
+          this.error("error", "未到達コードなはず");
+        }
+        this.setNextStr();
+      }
       return output;
     }
 
-    // loadMoveListArg(endChar = "\n" + "\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF"){
-
-    //   let output = ""
-    //   while (true){
-    //     this.checkNotReservedStr()
-    //     if(endChar.match(this.now_str)){
-    //          break;
-    //     }else if(this.isNotReservedStr()){
-    //       output += this.now_str
-    //     }else{
-    //       this.error("error","未到達コードなはず")
-    //     }
-    //     this.setNextStr()
-    //   } 
-    //   return output;
-    // }
-
-
-
-    skipSpace(){
-      while (true){
-        if(!this.isStrEqualSpace()){
-           break;   
+    skipSpace() {
+      while (true) {
+        if (this.isStrEqualSpace()) {
+          this.setNextStr();
+        } else {
+          break;
         }
-        this.setNextStr()
-      } 
-    }
-
-    skipSpaceAndNewLine(){
-      while (true){
-        if(!this.isStrEqualText()){
-           break;   
-        }
-        this.setNextStr()
-      }    
-    }
-
-    *_setNextStr() {
-      for (this.i_nowloadstr = 0; this.i_nowloadstr < this.timeline_str.length; this.i_nowloadstr++) {
-        yield this.timeline_str[this.i_nowloadstr];
       }
-      // Array.prototype.forEach.call(this.timeline_str, function(s) {
-      //   yield s;
-      // });
+    }
+
+    skipComma() {
+      while (true) {
+        if (this.isStrEqualSpace() || this.isStrEqualComma()) {
+          this.setNextStr();
+        } else {
+          break;
+        }
+      }
+    }
+
+    skipSpaceAndNewLine() {
+      while (true) {
+        // debugger
+        if (this.isStrEqualText()) {
+          break;
+        }
+        this.setNextStr();
+      }
+    }
+
+    _setNextStr() {
+      if (this.i_nowloadstr + 1 > this.timeline_str.length) {
+        return { done: true, value: undefined };
+      } else {
+        let output = {
+          done: false,
+          value: this.timeline_str[this.i_nowloadstr],
+        };
+        this.i_nowloadstr++;
+        return output;
+      }
     }
 
     setNextStr() {
-      let returnVal = this._setNextStr().next()
-      if(returnval.done){
+      let returnVal = this._setNextStr();
+      if (returnVal.done) {
         throw {
-          reason:"loaded"
-        }
+          reason: "loaded",
+        };
       }
-      this._now_str = returnVal
+      this._now_str = returnVal.value;
+      // console.log("str:" + this._now_str );
     }
-
-    // waitCommand() {
-    //   // this.mode = this.mode_list.waiting_command
-    //   if (this.isStrEqualText()) {
-    //     this.loadCommand();
-    //   }
-    // }
-
-    // waitArgument() {
-    //   // this.mode = this.mode_list.loading_arg_mvls
-    //   if (this.isStrEqualText()) {
-    //     this.loadCommand();
-    //   } else if (this.isStrEqualNewLine()) {
-    //     this.stack2Output();
-    //     this.mode = this.mode_list.waiting_command;
-    //   }
-    // }
-
-    
-
-    // loadMoveList() {
-    //   // (str+)num,<num>,{x,y,z...},[x,y,z...]
-    //   const brackets = [
-    //     ["[","]","switch"],
-    //     ["{","}","command"],
-    //     ["<",">","order"],
-    //     // ["",""],
-    //   ]
-    //   this.mode = this.mode_list.loading_arg_mvls;
-    //   if (this.stack_str.length === 0) {
-    //     if(this.now_str !== "["){
-    //       throw Error("move_listの2つ目の引数は[から始まる必要があります")
-    //     }
-    //   }else if(this.isStrEqualText()){
-    //     if(this.now_str === "]"){
-    //       this.endLoadMoveList()
-    //       this.mode 
-    //     }else if(this.isStrEqualComma()){
-
-    //     }else{
-    //       const found_brackets = brackets.find(x => x[0] === this.now_str)
-    //       if(found_brackets){
-    //         this.stack_mvls.type = found_brackets[2]
-    //         this.closure = found_brackets[1]
-    //         // todo::::
-    //         this.mode = this.mode_list.loading_arg_mvls_brackets
-    //       }else{
-    //         // this.
-    //       }
-
-
-    //     }
-        
-
-    //   }
-    // }
-
-    // loadMoveListAction(){
-    //   this.mode = this.mode_list.loading_arg_mvls_action
-    //   if(this.isStrEqualComma()){
-    //     this.endLoadMoveList_action()
-    //     this.mode = this.mode_list.loading_arg_mvls
-    //   }else if(this.now_str === "]"){
-    //     this.endLoadMoveList_action()
-    //     this.endLoadMoveList()
-    //     this.mode = this.mode_list.waiting_command
-    //   }else if(this.isStrEqualText()){
-    //     this.addStackStr()
-    //   }
-    // }
-
-    // loadMoveListBrackets(){
-    //   if(this.isStrEqualComma()){
-    //     this.endLoadMoveList_action()
-    //     this.mode = this.mode_list.loading_arg_mvls
-    //   }else if(this.now_str === this.closureki){
-    //     this.endLoadMoveList_action()
-    //     this.endLoadMoveList()
-    //     this.mode = this.mode_list.waiting_command
-    //   }else if(this.isStrEqualText()){
-    //     this.addStackStr()
-    //   }
-    // }
-
-    // loadMoveListBrackets_arg(){
-    //   // this.mode = this.mode_list.loading_arg_mvls_action
-    //   if(this.isStrEqualComma()){
-    //     this.endLoadMoveList_action()
-    //     this.mode = this.mode_list.loading_arg_mvls
-    //   }else if(this.now_str === this.closure){
-    //     // this.endLoadMoveList_action()
-    //     // this.endLoadMoveList()
-    //     // this.mode = this.mode_list.waiting_command
-    //   }else if(this.isStrEqualText()){
-    //     this.addStackStr()
-    //   }
-    // }
-
-    // endLoadMoveList(){
-    //   this.output.push(
-    //     this.stack_mvls
-    //   )
-    //   this.stack_mvls = []
-    // }
-
-    // endLoadMoveList_action(){
-    //   this.stack_mvls.push(
-    //     this.stack_str
-    //     )
-    //     this.initStackStr()
-    // }
-
-
-    // stack2Output() {
-    //   this.pushStack2StackList();
-    //   this.pushStackList2Output();
-    // }
-
-    // pushStackList2Output() {
-    //   const list = this.stack_command_list;
-    //   if (list.length !== 0) {
-    //     this.output.push(this.list);
-    //     this.initStackCommandList();
-    //   }
-    // }
-
-    // pushStack2StackList() {
-    //   const str = this.stack_str;
-    //   if (str.length !== 0) {
-    //     this.stack_command_list.push(str);
-    //     this.initStackStr();
-    //   }
-    // }
-
-    // pushMoveList2Stack(){
-    //   this.stack_command_list[2].push(this.stack_mvls)
-    //   this.initStackMoveList()
-    // }
-
-    // pushArg2StackMoveList(){
-    //   const str = this.stack_str;
-    //   if (str.length !== 0) {
-    //     this.stack_mvls.value.push(str);
-    //     this.initStackStr();
-    //   }
-    // }
-
-    // initStackCommandList() {
-    //   this.stack_command_list = [];
-    // }
-
-    // initStackStr() {
-    //   this.stack_str = "";
-    // }
-
-    // initStackMoveList(){
-    //   this.stack_mvls = {type:undefined,value:[]}
-    // }
 
     isStrEqualNewLine() {
       return this.now_str === "\n";
@@ -435,9 +274,9 @@
 
     isStrEqualSpace() {
       const spaceRegex = new RegExp(
-        /^[\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/
+        /^[ 　\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/
       );
-      return this.now_str.match(spaceRegex);
+      return spaceRegex.test(this.now_str);
     }
 
     isStrEqualText() {
@@ -445,19 +284,22 @@
       return !this.isStrEqualNewLine() && !this.isStrEqualSpace();
     }
 
-    isNotReservedStr(){
+    isNotReservedStr() {
       // {}[]()<>,"'
-      return !this.now_str.match(/[\{\}\[\]\(\)\<\>,"']/)
+      return !/[\{\}\[\]\(\)\<\>,"']/.test(this.now_str);
     }
 
-    checkNotReservedStr(){
-      if(!this.isNotReservedStr()){
-          this.error("error","想定されていない文字'" + this.now_str + "'が見つかりました")
+    checkNotReservedStr() {
+      if (!this.isNotReservedStr()) {
+        this.error(
+          "error",
+          "想定されていない文字'" + this.now_str + "'が見つかりました"
+        );
       }
     }
   }
 
-  window.x = parser
+  window.x = parser;
 
   class OperateURL {
     constructor(URL = location.href, autochange = true) {
