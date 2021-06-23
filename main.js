@@ -22,12 +22,212 @@
     return retVal;
   }
 
+  /*
+  a = `set enermy 224
+
+set aikawa 126 
+set kurumi 123
+set yuzuko 131
+
+#set hiro 130
+#set hideri 135
+start_sort
+
+mv_ls enermy [{skillcard,dmg3000,224,1100,1},<400>,400,400,g400,r500,400,p200]
+
+mv_ls aikawa [40,70,[hiro,130],70,70,40,<400>,[kurumi,123],35,40,b125]
+
+mv_ls kurumi [[hideri,135],40,70,70,o40,[aikawa,123],70,[hideri,135],70,70,b125]
+
+mv_ls yuzuko [{sc,heal,131,100,5},g40,s40,{b,yuzuko,22.4},100,70,70,{b,yuzuko,0},100,s40,{b,yuzuko,22.4},g40,b125]
+
+
+end_sort
+`
+let output = []
+let tmp = ""
+const space = "\u{20}"
+a = a.replaceAll(/ |　|\t/g,space)
+
+const parsed = (type,value) => ({type:type,value:value})
+loop: for (let i = 0;i < a.length ; i++){
+	let char = a[i]
+
+  let val = parsed(undefined,char)
+  const changeType = (type) => {val.type = type}
+
+  switch(char){
+    case ",":
+			changeType("commma")
+			break;
+		case "\n":
+			changeType("new_line")
+			break;
+		case space:
+			changeType("space")
+			break;
+		case "#":
+			changeType("comment")
+			break;
+		case "{":
+			changeType("braceL")
+			break;
+		case "}":
+			changeType("braceR")
+			break;
+		case "[":
+			changeType("bracketL")
+			break;
+		case "]":
+			changeType("bracketR")
+			break;
+		case "<":
+			changeType("angle_bracketL")
+			break;
+		case ">":
+			changeType("angle_bracketR")
+			break;
+
+		case "(":
+		case "(":
+		case ")":
+		case "\"":
+		case "'":
+    case "!":
+    case "$":
+    case "%":
+    case "&":
+    case "=":
+    case "^":
+    case "~":
+    case "*":
+    case "?":
+    case ";":
+    // not @ _ 
+			changeType("reserved")
+			break;
+
+    default:
+			tmp += char
+			continue loop;
+			
+  }
+ push()
+	output.push(val)
+
+}
+
+push()
+
+function push(){
+	if(tmp.length !== 0){
+		output.push(parsed("command",tmp))
+ 		tmp = ""
+	}
+}
+output.filter(x => x.type !== "space")
+   * 
+   * 
+   * 
+   */
   class parser {
     constructor(timeline_str) {
       this.timeline_str =
         timeline_str.replaceAll(/#.*/g, "").replaceAll(/\\(\n|$)/g, "") + "\n";
       this._now_str = "";
       this.i_nowloadstr = 0;
+    }
+
+    lexicalAnalysis(string) {
+      let output = [];
+      let tmp = "";
+      const space = "\u{20}";
+      string = string.replaceAll(/\\(\n|$)/g, "");
+
+      const parsed = (type, value) => ({ type: type, value: value });
+      loop: for (let i = 0; i < string.length; i++) {
+        let char = string[i];
+
+        let val = parsed(undefined, char);
+        const changeType = (type) => {
+          val.type = type;
+        };
+
+        switch (char) {
+          case ",":
+            changeType("commma");
+            break;
+          case "\n":
+            changeType("new_line");
+            break;
+          case space:
+            // skip
+            // changeType("space");
+            break;
+          case "#":
+            for (; i < string.length; i++) {
+              if (string[i] === "\n") {
+                break;
+              }
+            }
+            // changeType("comment");
+            break;
+          case "{":
+            changeType("braceL");
+            break;
+          case "}":
+            changeType("braceR");
+            break;
+          case "[":
+            changeType("bracketL");
+            break;
+          case "]":
+            changeType("bracketR");
+            break;
+          case "<":
+            changeType("angle_bracketL");
+            break;
+          case ">":
+            changeType("angle_bracketR");
+            break;
+
+          case "(":
+          case "(":
+          case ")":
+          case '"':
+          case "'":
+          case "!":
+          case "$":
+          case "%":
+          case "&":
+          case "=":
+          case "^":
+          case "~":
+          case "*":
+          case "?":
+          case ";":
+            // not @ _
+            changeType("reserved");
+            break;
+
+          default:
+            tmp += char;
+            continue loop;
+        }
+        push();
+        output.push(val);
+      }
+
+      push();
+
+      function push() {
+        if (tmp.length !== 0) {
+          output.push(parsed("command", tmp));
+          tmp = "";
+        }
+      }
+
+      return output;
     }
 
     get now_str() {
@@ -933,7 +1133,7 @@
                           }),
                         ])
                       )
-                    // @ts-ignore
+                      // @ts-ignore
                     ).replaceAll('"', "")
                 );
               }
