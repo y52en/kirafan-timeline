@@ -304,7 +304,7 @@
           case "#":
             for (; i < string.length; i++) {
               if (string[i] === "\n") {
-                // i++
+                i--
                 continue loop;
               }
             }
