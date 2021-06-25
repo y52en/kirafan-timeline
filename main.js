@@ -26,123 +26,15 @@
     return retVal;
   }
 
-  /*
-  a = `set enermy 224
-
-set aikawa 126 
-set kurumi 123
-set yuzuko 131
-
-#set hiro 130
-#set hideri 135
-start_sort
-
-mv_ls enermy [{skillcard,dmg3000,224,1100,1},<400>,400,400,g400,r500,400,p200]
-
-mv_ls aikawa [40,70,[hiro,130],70,70,40,<400>,[kurumi,123],35,40,b125]
-
-mv_ls kurumi [[hideri,135],40,70,70,o40,[aikawa,123],70,[hideri,135],70,70,b125]
-
-mv_ls yuzuko [{sc,heal,131,100,5},g40,s40,{b,yuzuko,22.4},100,70,70,{b,yuzuko,0},100,s40,{b,yuzuko,22.4},g40,b125]
-
-
-end_sort
-`
-let output = []
-let tmp = ""
-const space = "\u{20}"
-a = a.replaceAll(/ |　|\t/g,space)
-
-const parsed = (type,value) => ({type:type,value:value})
-loop: for (let i = 0;i < a.length ; i++){
-	let char = a[i]
-
-  let val = parsed(undefined,char)
-  const changeType = (type) => {val.type = type}
-
-  switch(char){
-    case ",":
-			changeType("commma")
-			break;
-		case "\n":
-			changeType("new_line")
-			break;
-		case space:
-			changeType("space")
-			break;
-		case "#":
-			changeType("comment")
-			break;
-		case "{":
-			changeType("braceL")
-			break;
-		case "}":
-			changeType("braceR")
-			break;
-		case "[":
-			changeType("bracketL")
-			break;
-		case "]":
-			changeType("bracketR")
-			break;
-		case "<":
-			changeType("angle_bracketL")
-			break;
-		case ">":
-			changeType("angle_bracketR")
-			break;
-
-		case "(":
-		case "(":
-		case ")":
-		case "\"":
-		case "'":
-    case "!":
-    case "$":
-    case "%":
-    case "&":
-    case "=":
-    case "^":
-    case "~":
-    case "*":
-    case "?":
-    case ";":
-    // not @ _ 
-			changeType("reserved")
-			break;
-
-    default:
-			tmp += char
-			continue loop;
-			
-  }
- push()
-	output.push(val)
-
-}
-
-push()
-
-function push(){
-	if(tmp.length !== 0){
-		output.push(parsed("command",tmp))
- 		tmp = ""
-	}
-}
-output.filter(x => x.type !== "space")
-   * 
-   * 
-   * 
-   */
-
   class parser_lexicallyAnalyze2AST {
     constructor(lexically_analyzed) {
       this.timeline_parsed = lexically_analyzed;
-      this.i = 0;
+      this.timeline_parsed.push({type:"new_line",value:"\n"})
+      this.i_loading = 0;
     }
 
     get now_val() {
-      return this.timeline_parsed[this.i];
+      return this.timeline_parsed[this.i_loading];
     }
 
     set now_val(_) {
@@ -163,74 +55,199 @@ output.filter(x => x.type !== "space")
       for (
         this.i_loading = 0;
         this.i_loading < this.timeline_parsed.length;
+        // skip newline
         this.i_loading++
       ) {
-        let data = this.loadStatement();
+        const data = this.loadStatement();
         output.push(data);
+
+        if(this.now_val_type !== "new_line"){
+          this.error_unexpectedToken("内部エラーの可能性があります。このメッセージが出たらお知らせお願いします。")
+        }
       }
       return output;
     }
 
     loadStatement() {
-      // }
-
-      // loads() {
-      // this.skipLine();
       let statementList = [];
 
-      if (this.now_val_type === "word") {
-        statementList.push(this.now_val);
-        this.i++;
-      } else {
-        throw Error("unexpected token:" + this.now_val);
-      }
+      const push = () => {
+        statementList.push(this.now_val.value);
+        this.nextVal()
+      };
 
-      if (
-        statementList[0].value === "move_list" ||
-        statementList[0].value === "mv_ls"
-      ) {
-        let name;
-        if (this.now_val_type === "word") {
-          statementList.push(this.now_val);
-          name = this.now_val;
-          this.i++;
-        } else {
-          throw Error("unexpected token:" + this.now_val);
+      this.checkIsWord();
+      push();
+
+      if (statementList[0] === "move_list" || statementList[0] === "mv_ls") {
+        this.checkIsWord();
+        push();
+
+        if (this.now_val_type !== "bracketL") {
+          this.error_unexpectedToken("move_listの第二引数は [ から始まる必要があります");
         }
-        statementList.push(this.now_val);
+        this.nextVal();
+
+        const arg2 = [] ;
+        if(this.now_val_type !== "bracketR"){
+          loop: while (true) {
+            let list;
+            switch (this.now_val_type) {
+              // [
+              case "bracketL":
+                this.nextVal()
+                list = this.getMoveListInList("bracketR")
+                arg2.push(
+                  { mode: "switch", value: list }
+                )
+                break;
+  
+              // <
+              case "angle_bracketL":
+                this.nextVal()
+                list = this.getMoveListInList("angle_bracketR")
+                arg2.push(
+                  { mode: "order", value: list }
+                )
+                break;
+  
+              // {
+              case "braceL":
+                this.nextVal()
+                list = this.getMoveListInList("braceR")
+                arg2.push(
+                  { mode: "command", value: list }
+                )
+                break;
+  
+              case "word":
+                const val = { mode: "action", value: [] };
+                val.value.push(this.now_val.value)
+                arg2.push(val)
+                this.nextVal()
+                break;
+  
+              default:
+                this.error_unexpectedToken("move_list内のパースエラー　正しい値が入力されているか確認してください");
+            }
+
+            if(this.now_val_type === "bracketR"){
+              break loop;
+            }else if(this.now_val_type === "commma"){
+              this.nextVal()
+            }else{
+              this.error_unexpectedToken("コンマかmove_list終了の]が不足しています")
+            }
+          }
+        }
+        statementList.push(arg2);
+        this.nextVal();
+        
       } else {
         while (true) {
           if (this.now_val_type === "word") {
-            statementList.push(this.now_val);
-            this.i++;
+            push();
           } else if (this.now_val_type === "new_line") {
             break;
           } else {
-            throw Error("unexpected token:" + this.now_val);
+            this.error_unexpectedToken("この文字は入力できません");
           }
         }
       }
+
+      return statementList;
     }
 
-    // skipLine() {
-    //   for (; this.i < this.timeline_parsed.length; this.i++) {
-    //     if (this.now_val_type === "new_line") {
-    //       this.i++;
-    //     } else {
-    //       break;
-    //     }
-    //   }
-    // }
+    isLastValue() {
+      return this.i_loading + 1 >= this.timeline_parsed.length;
+    }
 
-    push() {}
+    getMoveListInList(endType){
+      let output = []
+      if(this.now_val_type === endType){
+        return output
+      }
 
-    isWord() {
+      loop: while (true){
+        switch (this.now_val_type) {
+          case "word":
+            output.push(this.now_val.value)
+            this.nextVal()
+            break;
+
+          default:
+            this.error_unexpectedToken("move_list内のかっこが閉じれていないか引数が不正です");
+        }
+
+        switch (this.now_val_type) {
+          case endType:
+            this.nextVal()
+            break loop;
+
+          case "commma":
+            this.nextVal()
+            break;
+
+          default:
+            this.error_unexpectedToken("move_list内のかっこが閉じれていないか引数が不正、もしくはコンマが不足しています");
+        }
+      }
+      return output;
+    }
+
+    nextVal(){
+      if(this.isLastValue()){
+        this.error_unexpectedToken("内部エラーの可能性があります。このメッセージが出たらお知らせお願いします。")
+      }
+      this.i_loading++
+    }
+
+    nextVal_noerror(){
+      if(!this.isLastValue()){
+        this.i_loading++
+      }
+      
+    }
+
+    checkIsWord() {
       if (this.now_val_type !== "word") {
+        this.error_unexpectedToken();
       }
     }
 
-    error_unexpectedToken() {
-      throw Error("想定外の値:" + this.now_val + "");
+    checkIsCommma() {
+      if (this.now_val_type !== "commma") {
+        this.error_unexpectedToken();
+      }
+    }
+
+    error_unexpectedToken( errMsg = "") {
+      const statement_list = ["<span class='errMsg'>→→" , this.now_val.value , "←←</span>"]
+      // ....... \n <-
+      //\n ........
+      if(this.now_val.type !== "new_line"){
+        for(let i = this.i_loading + 1;i<this.timeline_parsed.length;i++){
+          if(this.timeline_parsed[i].type === "new_line"){
+            break
+          }else{
+            statement_list.push(this.timeline_parsed[i].value)
+          }
+        }
+      }
+      for(let i = this.i_loading - 1;i<this.timeline_parsed.length;i--){
+        if(this.timeline_parsed[i].type === "new_line"){
+          break
+        }else{
+          statement_list.unshift(this.timeline_parsed[i].value)
+        }
+      }
+
+      if(this.now_val.type === "reserved"){
+        errMsg = "予約文字です"
+      }
+      throw Error("想定外の値: 「" + JSON.stringify( this.now_val.value ) + "」" + 
+      "<br>" + statement_list.join("") +
+      "<br>" +errMsg);
     }
   }
 
@@ -287,10 +304,11 @@ output.filter(x => x.type !== "space")
           case "#":
             for (; i < string.length; i++) {
               if (string[i] === "\n") {
-                break;
+                // i++
+                continue loop;
               }
             }
-            push();
+            // push();
             // changeType("comment");
             continue;
           case "{":
@@ -327,6 +345,7 @@ output.filter(x => x.type !== "space")
           case "*":
           case "?":
           case ";":
+          case "`":
             // not @ _
             changeType("reserved");
             break;
@@ -379,12 +398,9 @@ output.filter(x => x.type !== "space")
         }
       }
 
-      // debugger;
       for (let i = 0, isBeforeNewLine = true; i < output.length; i++) {
         if (output[i].type === "new_line") {
           if (isBeforeNewLine) {
-            // console.log(output[i], i);
-            // console.log(output[i+1], i+1);
             output.splice(i, 1);
             i--;
           }
@@ -413,8 +429,6 @@ output.filter(x => x.type !== "space")
       this.timeline_parsed = output;
     }
   }
-
-  window.q = [parser_lexicallyAnalyze, parser_lexicallyAnalyze2AST];
 
   class OperateURL {
     constructor(URL = location.href, autochange = true) {
@@ -914,12 +928,17 @@ output.filter(x => x.type !== "space")
     err.innerHTML = "";
     info.innerHTML = "";
 
-    const tl_parser = new parser_lexicallyAnalyze(str);
     let parsed_tldata;
     try {
-      parsed_tldata = tl_parser.parse();
+      // parsed_tldata = tl_parser.parse();
+      const tl_parser_lexicallyAnalyze = new parser_lexicallyAnalyze(str);
+      const lexicallyAnalyzed = tl_parser_lexicallyAnalyze.parse()
+
+      const tl_parser_AST = new parser_lexicallyAnalyze2AST(lexicallyAnalyzed)
+      parsed_tldata = tl_parser_AST.parse()
     } catch (e) {
-      err.innerHTML = e.value;
+      console.log(12);
+      err.innerHTML = e;
       throw e;
     }
 
@@ -1291,7 +1310,6 @@ output.filter(x => x.type !== "space")
       // output += htmltag("td", charalist[x]);
       output += "<td style='white-space: nowrap;'>" + charalist[x] + "</td>";
       for (let y = 0; y < json[0].length; y++) {
-        // console.log(comment);
         const find = comment.find(
           (elm) => elm[0] === "color" && elm[1] === charalist[x] && elm[2] === y
         );

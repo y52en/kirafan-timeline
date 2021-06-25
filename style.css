@@ -159,5 +159,11 @@ max-width: 100%;
     color: #FFF;
 }
 
+.errMsg {
+    background-color: black;
+    color: #FFF;
+
+}
+
 
 
