@@ -952,6 +952,7 @@
       // console.log(12);
       err.innerHTML = e;
       // throw e;
+      return
     }
 
     const mode_list = {
