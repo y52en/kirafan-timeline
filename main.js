@@ -2,6 +2,10 @@
 "use strict";
 
 ((window) => {
+  // @ts-ignore
+  window.j = JSON.parse(
+    '[{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"word","value":"set"},{"type":"word","value":"enermy"},{"type":"word","value":"224"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"word","value":"set"},{"type":"word","value":"aikawa"},{"type":"word","value":"126"},{"type":"new_line","value":"\\n"},{"type":"word","value":"set"},{"type":"word","value":"kurumi"},{"type":"word","value":"123"},{"type":"new_line","value":"\\n"},{"type":"word","value":"set"},{"type":"word","value":"yuzuko"},{"type":"word","value":"131"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"word","value":"start_sort"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"word","value":"mv_ls"},{"type":"word","value":"enermy"},{"type":"bracketL","value":"["},{"type":"braceL","value":"{"},{"type":"word","value":"skillcard"},{"type":"commma","value":","},{"type":"word","value":"dmg3000"},{"type":"commma","value":","},{"type":"word","value":"224"},{"type":"commma","value":","},{"type":"word","value":"1100"},{"type":"commma","value":","},{"type":"word","value":"1"},{"type":"braceR","value":"}"},{"type":"commma","value":","},{"type":"word","value":"400"},{"type":"commma","value":","},{"type":"word","value":"400"},{"type":"commma","value":","},{"type":"word","value":"400"},{"type":"commma","value":","},{"type":"word","value":"g400"},{"type":"commma","value":","},{"type":"word","value":"r500"},{"type":"commma","value":","},{"type":"word","value":"400"},{"type":"commma","value":","},{"type":"word","value":"p200"},{"type":"bracketR","value":"]"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"word","value":"mv_ls"},{"type":"word","value":"aikawa"},{"type":"bracketL","value":"["},{"type":"word","value":"40"},{"type":"commma","value":","},{"type":"word","value":"70"},{"type":"commma","value":","},{"type":"bracketL","value":"["},{"type":"word","value":"hiro"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"commma","value":","},{"type":"word","value":"130"},{"type":"bracketR","value":"]"},{"type":"commma","value":","},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"word","value":"70"},{"type":"commma","value":","},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"word","value":"70"},{"type":"commma","value":","},{"type":"word","value":"40"},{"type":"commma","value":","},{"type":"word","value":"40"},{"type":"commma","value":","},{"type":"bracketL","value":"["},{"type":"word","value":"kurumi"},{"type":"commma","value":","},{"type":"word","value":"123"},{"type":"bracketR","value":"]"},{"type":"commma","value":","},{"type":"word","value":"35"},{"type":"commma","value":","},{"type":"word","value":"40"},{"type":"commma","value":","},{"type":"word","value":"b125"},{"type":"bracketR","value":"]"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"word","value":"mv_ls"},{"type":"word","value":"kurumi"},{"type":"bracketL","value":"["},{"type":"bracketL","value":"["},{"type":"word","value":"hideri"},{"type":"commma","value":","},{"type":"word","value":"135"},{"type":"bracketR","value":"]"},{"type":"commma","value":","},{"type":"word","value":"40"},{"type":"commma","value":","},{"type":"word","value":"70"},{"type":"commma","value":","},{"type":"word","value":"70"},{"type":"commma","value":","},{"type":"word","value":"o40"},{"type":"commma","value":","},{"type":"bracketL","value":"["},{"type":"word","value":"aikawa"},{"type":"commma","value":","},{"type":"word","value":"123"},{"type":"bracketR","value":"]"},{"type":"commma","value":","},{"type":"word","value":"70"},{"type":"commma","value":","},{"type":"bracketL","value":"["},{"type":"word","value":"hideri"},{"type":"commma","value":","},{"type":"word","value":"135"},{"type":"bracketR","value":"]"},{"type":"commma","value":","},{"type":"word","value":"70"},{"type":"commma","value":","},{"type":"word","value":"70"},{"type":"commma","value":","},{"type":"word","value":"b125"},{"type":"bracketR","value":"]"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"word","value":"mv_ls"},{"type":"word","value":"yuzuko"},{"type":"bracketL","value":"["},{"type":"braceL","value":"{"},{"type":"word","value":"sc"},{"type":"commma","value":","},{"type":"word","value":"heal"},{"type":"commma","value":","},{"type":"word","value":"131"},{"type":"commma","value":","},{"type":"word","value":"100"},{"type":"commma","value":","},{"type":"word","value":"5"},{"type":"braceR","value":"}"},{"type":"commma","value":","},{"type":"word","value":"g40"},{"type":"commma","value":","},{"type":"word","value":"s40"},{"type":"commma","value":","},{"type":"braceL","value":"{"},{"type":"word","value":"b"},{"type":"commma","value":","},{"type":"word","value":"yuzuko"},{"type":"commma","value":","},{"type":"word","value":"22.4"},{"type":"braceR","value":"}"},{"type":"commma","value":","},{"type":"word","value":"100"},{"type":"commma","value":","},{"type":"word","value":"70"},{"type":"commma","value":","},{"type":"word","value":"70"},{"type":"commma","value":","},{"type":"braceL","value":"{"},{"type":"word","value":"b"},{"type":"commma","value":","},{"type":"word","value":"yuzuko"},{"type":"commma","value":","},{"type":"word","value":"0"},{"type":"braceR","value":"}"},{"type":"commma","value":","},{"type":"word","value":"100"},{"type":"commma","value":","},{"type":"word","value":"s40"},{"type":"commma","value":","},{"type":"braceL","value":"{"},{"type":"word","value":"b"},{"type":"commma","value":","},{"type":"word","value":"yuzuko"},{"type":"commma","value":","},{"type":"word","value":"22.4"},{"type":"braceR","value":"}"},{"type":"commma","value":","},{"type":"word","value":"g40"},{"type":"commma","value":","},{"type":"word","value":"b125"},{"type":"bracketR","value":"]"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"},{"type":"word","value":"end_sort"},{"type":"new_line","value":"\\n"},{"type":"new_line","value":"\\n"}]'
+  );
   function objectCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
@@ -130,15 +134,122 @@ output.filter(x => x.type !== "space")
    * 
    * 
    */
-  class parser {
+
+  class parser_lexicallyAnalyze2AST {
+    constructor(lexically_analyzed) {
+      this.timeline_parsed = lexically_analyzed;
+      this.i = 0;
+    }
+
+    get now_val() {
+      return this.timeline_parsed[this.i];
+    }
+
+    set now_val(_) {
+      throw Error("now_valにはセットできません");
+    }
+
+    get now_val_type() {
+      return this.now_val.type;
+    }
+
+    set now_val_type(_) {
+      throw Error("now_valにはセットできません");
+    }
+
+    parse() {
+      let output = [];
+
+      for (
+        this.i_loading = 0;
+        this.i_loading < this.timeline_parsed.length;
+        this.i_loading++
+      ) {
+        let data = this.loadStatement();
+        output.push(data);
+      }
+      return output;
+    }
+
+    loadStatement() {
+      // }
+
+      // loads() {
+      // this.skipLine();
+      let statementList = [];
+
+      if (this.now_val_type === "word") {
+        statementList.push(this.now_val);
+        this.i++;
+      } else {
+        throw Error("unexpected token:" + this.now_val);
+      }
+
+      if (
+        statementList[0].value === "move_list" ||
+        statementList[0].value === "mv_ls"
+      ) {
+        let name;
+        if (this.now_val_type === "word") {
+          statementList.push(this.now_val);
+          name = this.now_val;
+          this.i++;
+        } else {
+          throw Error("unexpected token:" + this.now_val);
+        }
+        statementList.push(this.now_val);
+      } else {
+        while (true) {
+          if (this.now_val_type === "word") {
+            statementList.push(this.now_val);
+            this.i++;
+          } else if (this.now_val_type === "new_line") {
+            break;
+          } else {
+            throw Error("unexpected token:" + this.now_val);
+          }
+        }
+      }
+    }
+
+    // skipLine() {
+    //   for (; this.i < this.timeline_parsed.length; this.i++) {
+    //     if (this.now_val_type === "new_line") {
+    //       this.i++;
+    //     } else {
+    //       break;
+    //     }
+    //   }
+    // }
+
+    push() {}
+
+    isWord() {
+      if (this.now_val_type !== "word") {
+      }
+    }
+
+    error_unexpectedToken() {
+      throw Error("想定外の値:" + this.now_val + "");
+    }
+  }
+
+  class parser_lexicallyAnalyze {
     constructor(timeline_str) {
-      this.timeline_str =
-        timeline_str.replaceAll(/#.*/g, "").replaceAll(/\\(\n|$)/g, "") + "\n";
+      this.timeline_str = timeline_str;
+      this.timeline_parsed = [];
+      // .replaceAll(/#.*/g, "").replaceAll(/\\(\n|$)/g, "") + "\n";
       this._now_str = "";
       this.i_nowloadstr = 0;
     }
 
-    lexicalAnalysis(string) {
+    parse() {
+      this.timeline_parsed = this.lexicalAnalysis();
+      this.Normalize();
+      return this.timeline_parsed;
+    }
+
+    lexicalAnalysis(string = this.timeline_str) {
       let output = [];
       let tmp = "";
       const space = "\u{20}";
@@ -158,20 +269,30 @@ output.filter(x => x.type !== "space")
             changeType("commma");
             break;
           case "\n":
+            // for (let m = i + 1; m < string.length; m++) {
+            //   if (string[m] !== "\n") {
+            //     break;
+            //   }
+            //   i++;
+            // }
             changeType("new_line");
             break;
           case space:
+          case "　":
+          case "\t":
             // skip
             // changeType("space");
-            break;
+            push();
+            continue;
           case "#":
             for (; i < string.length; i++) {
               if (string[i] === "\n") {
                 break;
               }
             }
+            push();
             // changeType("comment");
-            break;
+            continue;
           case "{":
             changeType("braceL");
             break;
@@ -222,7 +343,7 @@ output.filter(x => x.type !== "space")
 
       function push() {
         if (tmp.length !== 0) {
-          output.push(parsed("command", tmp));
+          output.push(parsed("word", tmp));
           tmp = "";
         }
       }
@@ -230,284 +351,70 @@ output.filter(x => x.type !== "space")
       return output;
     }
 
-    get now_str() {
-      return this._now_str;
-    }
-
-    set now_str(_) {
-      throw Error("上書き禁止！");
-    }
-
-    parse() {
-      this.setNextStr();
-      const output = this._parse();
-      return output;
-    }
-
-    _parse() {
-      const output = [];
-      try {
-        this.skipSpaceAndNewLine();
-        while (true) {
-          const command_list = this.loadStatement();
-          output.push(command_list);
-
-          this.skipSpace();
-          if (!this.isStrEqualNewLine()) {
-            this.error(
-              "error",
-              "想定外の文字:「" +
-                this.now_str +
-                "」<br>(" +
-                JSON.stringify(output.slice(-1)) +
-                ")<br>(おそらくmove_listの内のかっこの対応が不正です)"
-            );
-          }
-          this.skipSpaceAndNewLine();
+    Normalize() {
+      let output = [];
+      let i;
+      const t = this;
+      const type = () => this.timeline_parsed[i].type;
+      for (i = 0; i < this.timeline_parsed.length; i++) {
+        if (type() === "bracketL") {
+          removeMeaninglessNewLine();
         }
-      } catch (e) {
-        if (e.reason === "loaded") {
-          return output;
-        } else {
-          throw e;
-        }
+        output.push(this.timeline_parsed[i]);
       }
-    }
-
-    loadStatement() {
-      const output = [];
-
-      this.skipSpace();
-      const command = this.loadCommand();
-      output.push(command);
-      this.skipSpace();
-      if (command === "move_list" || command === "mv_ls") {
-        const arg1 = this.loadCommand();
-        output.push(arg1);
-        this.skipSpaceAndNewLine();
-        if (this.now_str !== "[") {
-          this.error("error", "パースエラー：move_listには [ が必要です");
-        }
-        this.setNextStr();
-
-        const arg2 = [];
-
-        try {
-          while (true) {
-            this.skipSpaceAndNewLine();
-
-            if (this.now_str === "]") {
-              this.setNextStr();
-              break;
-            } else if (this.now_str === "{") {
-              // skip {
-              this.setNextStr();
-              const endChar = "}";
-              const val = { mode: "command", value: [] };
-              while (true) {
-                const arg = this.loadCommand("\n," + endChar);
-                val.value.push(arg);
-                this.skipSpaceAndNewLine();
-                // @ts-ignore
-                if (this.now_str === endChar) {
-                  this.setNextStr();
-                  break;
-                }
-                this.skipSpaceAndNewLine();
-                if (!this.isStrEqualComma()) {
-                  this.error("error", "not comma");
-                }
-                // skip commma
-                this.setNextStr();
-                this.skipSpaceAndNewLine();
-              }
-              arg2.push(val);
-            } else if (this.now_str === "[") {
-              this.setNextStr();
-
-              const endChar = "]";
-              const val = { mode: "switch", value: [] };
-              while (true) {
-                const arg = this.loadCommand("\n," + endChar);
-                val.value.push(arg);
-                this.skipSpaceAndNewLine();
-                // @ts-ignore
-                if (this.now_str === endChar) {
-                  break;
-                }
-                this.skipSpaceAndNewLine();
-                if (!this.isStrEqualComma()) {
-                  this.error("error", "not comma");
-                }
-                // skip commma
-                this.setNextStr();
-                this.skipSpaceAndNewLine();
-              }
-              // skip ]
-              this.setNextStr();
-              arg2.push(val);
-            } else if (this.now_str === "<") {
-              this.setNextStr();
-              const endChar = ">";
-              const val = { mode: "order", value: [] };
-              const arg = this.loadCommand(endChar);
-              val.value.push(arg);
-              arg2.push(val);
-              // skip >
-              this.setNextStr();
-            } else {
-              const val = { mode: "action", value: [] };
-              const arg = this.loadCommand(
-                "\n" +
-                  " 　\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF" +
-                  ",]"
-              );
-              val.value.push(arg);
-              arg2.push(val);
-            }
-            this.skipSpaceAndNewLine();
-            this.skipComma();
-          }
-        } catch (e) {
-          e.value +=
-            "<br>(" + command + " " + arg1 + " " + JSON.stringify(arg2) + ")";
-        }
-
-        output.push(arg2);
-      } else {
-        while (true) {
-          if (this.isStrEqualNewLine()) {
+      function removeMeaninglessNewLine() {
+        output.push(t.timeline_parsed[i]);
+        i++;
+        for (; i < t.timeline_parsed.length; i++) {
+          if (type() === "bracketL") {
+            removeMeaninglessNewLine();
+          } else if (type() === "new_line") {
+            continue;
+          } else if (type() === "bracketR") {
+            break;
+          } else if (i + 1 === t.timeline_parsed.length) {
             break;
           }
-          const arg = this.loadCommand();
-          output.push(arg);
-          this.skipSpace();
+          output.push(t.timeline_parsed[i]);
         }
       }
-      return output;
-    }
 
-    error(reason, value) {
-      throw {
-        reason,
-        value,
-      };
-    }
-
-    loadCommand(
-      // "\s"
-      endChar = "\n" +
-        " 　\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF"
-    ) {
-      let output = "";
-      while (true) {
-        if (endChar.split("").includes(this.now_str)) {
-          break;
-        }
-        try {
-          this.checkNotReservedStr();
-        } catch (e) {
-          e.value += "( " + output + this.now_str + " ←ここでエラー)";
-          throw e;
-        }
-        if (this.isNotReservedStr()) {
-          output += this.now_str;
+      // debugger;
+      for (let i = 0, isBeforeNewLine = true; i < output.length; i++) {
+        if (output[i].type === "new_line") {
+          if (isBeforeNewLine) {
+            // console.log(output[i], i);
+            // console.log(output[i+1], i+1);
+            output.splice(i, 1);
+            i--;
+          }
+          isBeforeNewLine = true;
         } else {
-          this.error("error", "内部エラー:未到達コードなはず");
+          isBeforeNewLine = false;
         }
-        this.setNextStr();
       }
-      return output;
-    }
 
-    skipSpace() {
-      while (true) {
-        if (this.isStrEqualSpace()) {
-          this.setNextStr();
+      // 上で同じことが行える(初期値isBeforeNewLineがtrueのため)
+      // for (let i = 0; i < output.length; i++) {
+      //   if (this.timeline_parsed[i] === "new_line") {
+      //     output.shift()
+      //   }else{
+      //     break;
+      //   }
+      // }
+
+      for (let i = output.length - 1; i >= 0; i--) {
+        if (output[i].type === "new_line") {
+          output.pop();
         } else {
           break;
         }
       }
-    }
-
-    skipComma() {
-      while (true) {
-        if (this.isStrEqualSpace() || this.isStrEqualComma()) {
-          this.setNextStr();
-        } else {
-          break;
-        }
-      }
-    }
-
-    skipSpaceAndNewLine() {
-      while (true) {
-        if (this.isStrEqualText()) {
-          break;
-        }
-        this.setNextStr();
-      }
-    }
-
-    _setNextStr() {
-      if (this.i_nowloadstr + 1 > this.timeline_str.length) {
-        return { done: true, value: undefined };
-      } else {
-        let output = {
-          done: false,
-          value: this.timeline_str[this.i_nowloadstr],
-        };
-        this.i_nowloadstr++;
-        return output;
-      }
-    }
-
-    setNextStr() {
-      let returnVal = this._setNextStr();
-      if (returnVal.done) {
-        throw {
-          reason: "loaded",
-        };
-      }
-      this._now_str = returnVal.value;
-    }
-
-    isStrEqualNewLine() {
-      return this.now_str === "\n";
-    }
-
-    isStrEqualComma() {
-      return this.now_str === ",";
-    }
-
-    isStrEqualSpace() {
-      const spaceRegex = new RegExp(
-        /^[ 　\f\r\t\v\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/
-      );
-      return spaceRegex.test(this.now_str);
-    }
-
-    isStrEqualText() {
-      // return !(this.isStrEqualNewLine() || this.isStrEqualSpace())
-      return !this.isStrEqualNewLine() && !this.isStrEqualSpace();
-    }
-
-    isNotReservedStr() {
-      // {}[]()<>,"'
-      return !/[\{\}\[\]\(\)\<\>,"']/.test(this.now_str);
-    }
-
-    checkNotReservedStr() {
-      if (!this.isNotReservedStr()) {
-        this.error(
-          "error",
-          "パースエラー：想定されていない文字「" +
-            this.now_str +
-            "」が見つかりました"
-        );
-      }
+      this.timeline_parsed = output;
     }
   }
+
+  window.q = [parser_lexicallyAnalyze, parser_lexicallyAnalyze2AST];
 
   class OperateURL {
     constructor(URL = location.href, autochange = true) {
@@ -1007,7 +914,7 @@ output.filter(x => x.type !== "space")
     err.innerHTML = "";
     info.innerHTML = "";
 
-    const tl_parser = new parser(str);
+    const tl_parser = new parser_lexicallyAnalyze(str);
     let parsed_tldata;
     try {
       parsed_tldata = tl_parser.parse();
