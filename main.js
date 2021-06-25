@@ -933,9 +933,9 @@
       const tl_parser_AST = new parser_lexicallyAnalyze2AST(lexicallyAnalyzed)
       parsed_tldata = tl_parser_AST.parse()
     } catch (e) {
-      console.log(12);
+      // console.log(12);
       err.innerHTML = e;
-      throw e;
+      // throw e;
     }
 
     const mode_list = {
