@@ -773,6 +773,10 @@
     document.getElementById("log_convertedTL").onclick = printConvertedTL;
 
     document.getElementById("copy_ConvertedTL").onclick = copyConvertedTL;
+
+    document.getElementById("jumpTwitter").onclick = ()=>{
+      window.open('https:\/\/twitter.com/Y52en/status/1402239605978517505?s=20' , '_blank')
+    }
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
