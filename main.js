@@ -25,7 +25,6 @@
   class parser_lexicallyAnalyze2AST {
     constructor(lexically_analyzed) {
       this.timeline_parsed = lexically_analyzed;
-      this.timeline_parsed.push({ type: "new_line", value: "\n" });
       this.i_loading = 0;
     }
 
@@ -45,8 +44,84 @@
       throw Error("now_valにはセットできません");
     }
 
-    parse() {
+    Normalize() {
       let output = [];
+      let i;
+      const t = this;
+      const type = () => this.timeline_parsed[i].type;
+      for (i = 0; i < this.timeline_parsed.length; i++) {
+        if (type() === "bracketL") {
+          removeMeaninglessNewLine();
+        }
+        output.push(this.timeline_parsed[i]);
+      }
+      function removeMeaninglessNewLine() {
+        let i_toErrMsg = [i]
+        output.push(t.timeline_parsed[i]);
+        i++;
+        for (; i < t.timeline_parsed.length; i++) {
+          if(i + 1 === t.timeline_parsed.length){
+            t.i_loading = i_toErrMsg?.[1] || i_toErrMsg[0] 
+            t.error_unexpectedToken("]が不足しています")
+          }
+
+          if (type() === "bracketL") {
+            i_toErrMsg.push(i)
+            removeMeaninglessNewLine();
+          } else if (type() === "new_line") {
+            continue;
+          } else if (type() === "bracketR") {
+            i_toErrMsg.pop()
+            break;
+          } 
+          // else if (i + 1 === t.timeline_parsed.length) {
+          //   throw Error("[]")
+
+          //   break;
+          // }
+          output.push(t.timeline_parsed[i]);
+        }
+      }
+
+      for (let i = 0, isBeforeNewLine = true; i < output.length; i++) {
+        if (output[i].type === "new_line") {
+          if (isBeforeNewLine) {
+            output.splice(i, 1);
+            i--;
+          }
+          isBeforeNewLine = true;
+        } else {
+          isBeforeNewLine = false;
+        }
+      }
+
+      // 上で同じことが行える(初期値isBeforeNewLineがtrueのため)
+      // for (let i = 0; i < output.length; i++) {
+      //   if (this.timeline_parsed[i] === "new_line") {
+      //     output.shift()
+      //   }else{
+      //     break;
+      //   }
+      // }
+
+      for (let i = output.length - 1; i >= 0; i--) {
+        if (output[i].type === "new_line") {
+          output.pop();
+        } else {
+          break;
+        }
+      }
+      this.timeline_parsed = output;
+    }
+
+    parse() {
+      this.Normalize()
+      let output = [];
+      if(this.timeline_parsed.length === 0 ){
+        return output
+      }
+      this.timeline_parsed.push({ type: "new_line", value: "\n" });
+
 
       for (
         this.i_loading = 0;
@@ -232,7 +307,7 @@
       // ....... \n <-
       //\n ........
       if (this.now_val.type !== "new_line") {
-        for (let i = this.i_loading + 1; i < this.timeline_parsed.length; i++) {
+        for (let i = this.i_loading + 1; i < this.timeline_parsed.length ; i++) {
           if (this.timeline_parsed[i].type === "new_line") {
             break;
           } else {
@@ -240,7 +315,7 @@
           }
         }
       }
-      for (let i = this.i_loading - 1; i < this.timeline_parsed.length; i--) {
+      for (let i = this.i_loading - 1; i >= 0; i--) {
         if (this.timeline_parsed[i].type === "new_line") {
           break;
         } else {
@@ -274,7 +349,7 @@
 
     parse() {
       this.timeline_parsed = this.lexicalAnalysis();
-      this.Normalize();
+      // this.Normalize();
       return this.timeline_parsed;
     }
 
@@ -382,64 +457,7 @@
       return output;
     }
 
-    Normalize() {
-      let output = [];
-      let i;
-      const t = this;
-      const type = () => this.timeline_parsed[i].type;
-      for (i = 0; i < this.timeline_parsed.length; i++) {
-        if (type() === "bracketL") {
-          removeMeaninglessNewLine();
-        }
-        output.push(this.timeline_parsed[i]);
-      }
-      function removeMeaninglessNewLine() {
-        output.push(t.timeline_parsed[i]);
-        i++;
-        for (; i < t.timeline_parsed.length; i++) {
-          if (type() === "bracketL") {
-            removeMeaninglessNewLine();
-          } else if (type() === "new_line") {
-            continue;
-          } else if (type() === "bracketR") {
-            break;
-          } else if (i + 1 === t.timeline_parsed.length) {
-            break;
-          }
-          output.push(t.timeline_parsed[i]);
-        }
-      }
-
-      for (let i = 0, isBeforeNewLine = true; i < output.length; i++) {
-        if (output[i].type === "new_line") {
-          if (isBeforeNewLine) {
-            output.splice(i, 1);
-            i--;
-          }
-          isBeforeNewLine = true;
-        } else {
-          isBeforeNewLine = false;
-        }
-      }
-
-      // 上で同じことが行える(初期値isBeforeNewLineがtrueのため)
-      // for (let i = 0; i < output.length; i++) {
-      //   if (this.timeline_parsed[i] === "new_line") {
-      //     output.shift()
-      //   }else{
-      //     break;
-      //   }
-      // }
-
-      for (let i = output.length - 1; i >= 0; i--) {
-        if (output[i].type === "new_line") {
-          output.pop();
-        } else {
-          break;
-        }
-      }
-      this.timeline_parsed = output;
-    }
+    
   }
 
   class OperateURL {
@@ -959,7 +977,7 @@
     } catch (e) {
       // console.log(12);
       err.innerHTML = e;
-      // throw e;
+      throw e;
       return
     }
 
