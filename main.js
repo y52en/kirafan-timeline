@@ -777,6 +777,10 @@
     document.getElementById("jumpTwitter").onclick = ()=>{
       window.open('https:\/\/twitter.com/Y52en/status/1402239605978517505?s=20' , '_blank')
     }
+    document.getElementById("unzipMoveList").onclick = () => {
+     // @ts-ignore
+     document.getElementById("pop11").checked = true
+    }
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
