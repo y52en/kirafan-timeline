@@ -56,24 +56,24 @@
         output.push(this.timeline_parsed[i]);
       }
       function removeMeaninglessNewLine() {
-        let i_toErrMsg = [i]
+        let i_toErrMsg = [i];
         output.push(t.timeline_parsed[i]);
         i++;
         for (; i < t.timeline_parsed.length; i++) {
-          if(i + 1 === t.timeline_parsed.length){
-            t.i_loading = i_toErrMsg?.[1] || i_toErrMsg[0] 
-            t.error_unexpectedToken("]が不足しています")
+          if (i + 1 === t.timeline_parsed.length) {
+            t.i_loading = i_toErrMsg?.[1] || i_toErrMsg[0];
+            t.error_unexpectedToken("]が不足しています");
           }
 
           if (type() === "bracketL") {
-            i_toErrMsg.push(i)
+            i_toErrMsg.push(i);
             removeMeaninglessNewLine();
           } else if (type() === "new_line") {
             continue;
           } else if (type() === "bracketR") {
-            i_toErrMsg.pop()
+            i_toErrMsg.pop();
             break;
-          } 
+          }
           // else if (i + 1 === t.timeline_parsed.length) {
           //   throw Error("[]")
 
@@ -115,13 +115,12 @@
     }
 
     parse() {
-      this.Normalize()
+      this.Normalize();
       let output = [];
-      if(this.timeline_parsed.length === 0 ){
-        return output
+      if (this.timeline_parsed.length === 0) {
+        return output;
       }
       this.timeline_parsed.push({ type: "new_line", value: "\n" });
-
 
       for (
         this.i_loading = 0;
@@ -307,7 +306,7 @@
       // ....... \n <-
       //\n ........
       if (this.now_val.type !== "new_line") {
-        for (let i = this.i_loading + 1; i < this.timeline_parsed.length ; i++) {
+        for (let i = this.i_loading + 1; i < this.timeline_parsed.length; i++) {
           if (this.timeline_parsed[i].type === "new_line") {
             break;
           } else {
@@ -456,8 +455,6 @@
 
       return output;
     }
-
-    
   }
 
   class OperateURL {
@@ -792,13 +789,41 @@
 
     document.getElementById("copy_ConvertedTL").onclick = copyConvertedTL;
 
-    document.getElementById("jumpTwitter").onclick = ()=>{
-      window.open('https:\/\/twitter.com/Y52en/status/1402239605978517505?s=20' , '_blank')
-    }
+    document.getElementById("jumpTwitter").onclick = () => {
+      window.open(
+        "https://twitter.com/Y52en/status/1402239605978517505?s=20",
+        "_blank"
+      );
+    };
     document.getElementById("unzipMoveList").onclick = () => {
-     // @ts-ignore
-     document.getElementById("pop11").checked = true
+      // @ts-ignore
+      document.getElementById("pop11").checked = true;
+    };
+
+    const elm_Set_onbeforeunload = document.getElementById(
+      "isSet_onbeforeunload"
+    );
+    function Set_onbeforeunload(e) {
+      // @ts-ignore
+      if (e.target.checked) {
+        window.onbeforeunload = function (e) {
+          if (input_elm.value.length !== 0) {
+            e.preventDefault();
+            e.returnValue = "ページから離れますか？";
+          }
+        };
+      } else {
+        // if(confirm("変更してもよろしいですか？")){
+        window.onbeforeunload = () => {};
+        // }else{
+        // @ts-ignore
+        // e.target.checked = true
+        // }
+      }
     }
+    elm_Set_onbeforeunload.onchange = (e) => Set_onbeforeunload(e);
+    Set_onbeforeunload({ target: elm_Set_onbeforeunload });
+
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
@@ -978,7 +1003,8 @@
       // console.log(12);
       err.innerHTML = e;
       throw e;
-      return
+      // @ts-ignore
+      return;
     }
 
     const mode_list = {
@@ -995,6 +1021,7 @@
         const load_text_arg1 = parsed_tldata[i]?.[1];
         const load_text_arg2 = parsed_tldata[i]?.[2];
         const load_text_arg3 = parsed_tldata[i]?.[3];
+        // @ts-ignore
         // @ts-ignore
         const load_text_arg4 = parsed_tldata[i]?.[4];
 
