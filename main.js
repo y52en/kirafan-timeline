@@ -807,6 +807,7 @@
       // @ts-ignore
       if (e.target.checked) {
         window.onbeforeunload = function (e) {
+          // @ts-ignore
           if (input_elm.value.length !== 0) {
             e.preventDefault();
             e.returnValue = "ページから離れますか？";
