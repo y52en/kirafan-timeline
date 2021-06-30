@@ -1,6 +1,6 @@
 //@ts-check
 "use strict";
-
+  
 ((window) => {
   function objectCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -1001,7 +1001,6 @@
       const tl_parser_AST = new parser_lexicallyAnalyze2AST(lexicallyAnalyzed);
       parsed_tldata = tl_parser_AST.parse();
     } catch (e) {
-      // console.log(12);
       err.innerHTML = e;
       throw e;
       // @ts-ignore
@@ -1022,7 +1021,6 @@
         const load_text_arg1 = parsed_tldata[i]?.[1];
         const load_text_arg2 = parsed_tldata[i]?.[2];
         const load_text_arg3 = parsed_tldata[i]?.[3];
-        // @ts-ignore
         // @ts-ignore
         const load_text_arg4 = parsed_tldata[i]?.[4];
 
@@ -1372,10 +1370,23 @@
       }
     }
 
+    // for(let x = 0; json.length;x++){
+    //   const output = htmltag("td")
+    //   for(let y = 0; y < json[0].length; y++){
+
+    //   }
+    //   function htmltag(name, inner = "", Class = undefined) {
+    //     const output = document.createElement(name)
+    //     output.innerText = inner
+    //     if(Class) output.classList.add(Class)
+    //     return output
+    //   }
+    // }
+
     for (let x = 0; x < json.length; x++) {
       output += "<tr>";
       // output += htmltag("td", charalist[x]);
-      output += "<td style='white-space: nowrap;'>" + charalist[x] + "</td>";
+      output += "<td class='nowrap'>" + charalist[x] + "</td>";
       for (let y = 0; y < json[0].length; y++) {
         const find = comment.find(
           (elm) => elm[0] === "color" && elm[1] === charalist[x] && elm[2] === y
@@ -1393,6 +1404,11 @@
 
     function htmltag(name, inner) {
       return "<" + name + ">" + inner + "</" + name + ">";
+      // // return
+      // const output = document.createElement(name)
+      // output.innerText = inner
+      // if(Class) output.classList.add(Class)
+      // return output
     }
     document.querySelector("table").innerHTML = output;
   }
@@ -1463,3 +1479,8 @@
     );
   }
 })(window);
+
+
+
+
+

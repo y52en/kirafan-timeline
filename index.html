@@ -7,6 +7,17 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE=';">
     <link rel="icon" href="./favicon.png" />
     <title>TL生成ツール</title>
+    <!-- IEで表示した際にアラート
+    IEではCSPは(ほとんど)未対応なので設定する必要性なし -->
+    <script>
+      function isIE(){
+        const userAgent = window.navigator.userAgent.toUpperCase();
+        return !(userAgent.indexOf('MSIE') === -1 && userAgent.indexOf('TRIDENT') === -1) 
+      }
+      if(isIE()){
+        alert("IE未対応です。Chromeなどのブラウザを使用してください。\n対応ブラウザ:Chrome,Firefox,Safari")
+      }
+    </script>
     <script src="main.js" ></script>
     <link rel="stylesheet" href="./style.css" />
   </head>
