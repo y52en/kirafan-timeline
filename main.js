@@ -1,7 +1,14 @@
 //@ts-check
 "use strict";
-  
+
 ((window) => {
+  function htmltag(name, inner = undefined, Class = undefined) {
+    const output = document.createElement(name);
+    if (inner) output.innerText = inner;
+    if (Class) output.classList.add(Class);
+    return output;
+  }
+
   function objectCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
@@ -298,11 +305,15 @@
     }
 
     error_unexpectedToken(errMsg = "") {
-      const statement_list = [
-        "<span class='errMsg'>→→",
-        this.now_val.value,
-        "←←</span>",
-      ];
+      const output_err_where = htmltag("span");
+      output_err_where.appendChild(
+        htmltag("span", "→→" + this.now_val.value + "←←", "errMsg")
+      );
+      // const statement_list = [
+      //   "<span class='errMsg'>→→",
+      //   this.now_val.value,
+      //   "←←</span>",
+      // ];
       // ....... \n <-
       //\n ........
       if (this.now_val.type !== "new_line") {
@@ -310,7 +321,11 @@
           if (this.timeline_parsed[i].type === "new_line") {
             break;
           } else {
-            statement_list.push(this.timeline_parsed[i].value);
+            output_err_where.insertAdjacentText(
+              "beforeend",
+              this.timeline_parsed[i].value
+            );
+            // statement_list.push(this.timeline_parsed[i].value);
           }
         }
       }
@@ -318,22 +333,30 @@
         if (this.timeline_parsed[i].type === "new_line") {
           break;
         } else {
-          statement_list.unshift(this.timeline_parsed[i].value);
+          output_err_where.insertAdjacentText(
+            "afterbegin",
+            this.timeline_parsed[i].value
+          );
+
+          // statement_list.unshift(this.timeline_parsed[i].value);
         }
       }
 
       if (this.now_val.type === "reserved") {
         errMsg = "予約文字です";
       }
-      throw Error(
-        "想定外の値: 「" +
-          JSON.stringify(this.now_val.value) +
-          "」" +
-          "<br>" +
-          statement_list.join("") +
-          "<br>" +
-          errMsg
+      const output = htmltag("span");
+
+      output.insertAdjacentText(
+        "beforeend",
+        "想定外の値: 「" + JSON.stringify(this.now_val.value) + "」"
       );
+      output.appendChild(htmltag("br"));
+      output.appendChild(output_err_where);
+      output.appendChild(htmltag("br"));
+      output.insertAdjacentText("beforeend", errMsg);
+
+      throw Error(output.outerHTML);
     }
   }
 
@@ -1353,58 +1376,45 @@
     printConvertedTL();
   }
 
-
-  function outputAsTable(json, charalist, comment, now_place){
-    let output = htmltag("thead")
-
-    function htmltag(name, inner = "", Class = undefined) {
-      const output = document.createElement(name)
-      output.innerText = inner
-      if(Class) output.classList.add(Class)
-      return output
-    }
-
+  function outputAsTable(json, charalist, comment, now_place) {
+    let output = htmltag("thead");
     let inner_tr = htmltag("tr");
-    
 
     for (let i = 0; i <= json[0].length; i++) {
       let tmp;
       if (i + 1 === now_place) {
-        tmp = htmltag("th",i.toString(),"now_place")
+        tmp = htmltag("th", i.toString(), "now_place");
       } else if (i === 0) {
-        tmp = htmltag("th","","nowrap")
+        tmp = htmltag("th", "", "nowrap");
       } else {
-        tmp = htmltag("th",i.toString())
+        tmp = htmltag("th", i.toString());
       }
-      inner_tr.appendChild(tmp)
+      inner_tr.appendChild(tmp);
     }
-    
-    output.appendChild(inner_tr)
 
+    output.appendChild(inner_tr);
 
     for (let x = 0; x < json.length; x++) {
       let main_tl = htmltag("tr");
-      let output_inner =  main_tl.appendChild(htmltag("td",charalist[x],"nowrap"))
+      main_tl.appendChild(htmltag("td", charalist[x], "nowrap"));
       for (let y = 0; y < json[0].length; y++) {
         let tmp;
         const find = comment.find(
           (elm) => elm[0] === "color" && elm[1] === charalist[x] && elm[2] === y
         );
         if (find) {
-          tmp = htmltag("td",json[x][y] || "" , "color-" + find[3])
+          tmp = htmltag("td", json[x][y] || "", "color-" + find[3]);
         } else {
           tmp = htmltag("td", json[x][y] || "");
         }
-        main_tl.appendChild(tmp)
+        main_tl.appendChild(tmp);
       }
-      output.appendChild(main_tl)
+      output.appendChild(main_tl);
     }
 
     const target_elm = document.querySelector("table");
-    target_elm.innerHTML = ""
-    target_elm.appendChild(output)
-
-
+    target_elm.innerHTML = "";
+    target_elm.appendChild(output);
   }
 
   function outputAsCSV() {
@@ -1473,8 +1483,3 @@
     );
   }
 })(window);
-
-
-
-
-
