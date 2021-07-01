@@ -169,5 +169,10 @@ max-width: 100%;
     white-space: nowrap;
 }
 
+.now_place {
+    background-color:#444;
+    color:#fff;
+}
+
 
 

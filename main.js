@@ -1353,64 +1353,58 @@
     printConvertedTL();
   }
 
-  function outputAsTable(json, charalist, comment, now_place) {
-    let output = "";
-    output += "<thead><tr>";
 
-    output += htmltag("th", "");
+  function outputAsTable(json, charalist, comment, now_place){
+    let output = htmltag("thead")
 
-    for (let i = 0; i < json[0].length; i++) {
-      if (i + 1 === now_place) {
-        output +=
-          "<th style='background-color:#444;color:#fff'>" + (i + 1) + "</th>";
-      } else if (i === 0) {
-        output += "<th style='white-space: nowrap;'>" + (i + 1) + "</th>";
-      } else {
-        output += htmltag("th", i + 1);
-      }
+    function htmltag(name, inner = "", Class = undefined) {
+      const output = document.createElement(name)
+      output.innerText = inner
+      if(Class) output.classList.add(Class)
+      return output
     }
 
-    // for(let x = 0; json.length;x++){
-    //   const output = htmltag("td")
-    //   for(let y = 0; y < json[0].length; y++){
+    let inner_tr = htmltag("tr");
+    
 
-    //   }
-    //   function htmltag(name, inner = "", Class = undefined) {
-    //     const output = document.createElement(name)
-    //     output.innerText = inner
-    //     if(Class) output.classList.add(Class)
-    //     return output
-    //   }
-    // }
+    for (let i = 0; i <= json[0].length; i++) {
+      let tmp;
+      if (i + 1 === now_place) {
+        tmp = htmltag("th",i.toString(),"now_place")
+      } else if (i === 0) {
+        tmp = htmltag("th","","nowrap")
+      } else {
+        tmp = htmltag("th",i.toString())
+      }
+      inner_tr.appendChild(tmp)
+    }
+    
+    output.appendChild(inner_tr)
+
 
     for (let x = 0; x < json.length; x++) {
-      output += "<tr>";
-      // output += htmltag("td", charalist[x]);
-      output += "<td class='nowrap'>" + charalist[x] + "</td>";
+      let main_tl = htmltag("tr");
+      let output_inner =  main_tl.appendChild(htmltag("td",charalist[x],"nowrap"))
       for (let y = 0; y < json[0].length; y++) {
+        let tmp;
         const find = comment.find(
           (elm) => elm[0] === "color" && elm[1] === charalist[x] && elm[2] === y
         );
         if (find) {
-          // output += `<td style="background-color:${colorList[find[3]]}">${
-          output += `<td class="color-${find[3]}">${json[x][y] || ""}</td>`;
+          tmp = htmltag("td",json[x][y] || "" , "color-" + find[3])
         } else {
-          output += htmltag("td", json[x][y] || "");
+          tmp = htmltag("td", json[x][y] || "");
         }
+        main_tl.appendChild(tmp)
       }
-      output += "</tr>";
+      output.appendChild(main_tl)
     }
-    output += "</tr></thead>";
 
-    function htmltag(name, inner) {
-      return "<" + name + ">" + inner + "</" + name + ">";
-      // // return
-      // const output = document.createElement(name)
-      // output.innerText = inner
-      // if(Class) output.classList.add(Class)
-      // return output
-    }
-    document.querySelector("table").innerHTML = output;
+    const target_elm = document.querySelector("table");
+    target_elm.innerHTML = ""
+    target_elm.appendChild(output)
+
+
   }
 
   function outputAsCSV() {
