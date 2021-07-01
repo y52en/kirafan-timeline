@@ -817,27 +817,13 @@
     const elm_Set_onbeforeunload = document.getElementById(
       "isSet_onbeforeunload"
     );
-    function Set_onbeforeunload(e) {
+    window.onbeforeunload = function (e) {
       // @ts-ignore
-      if (e.target.checked) {
-        window.onbeforeunload = function (e) {
-          // @ts-ignore
-          if (input_elm.value.length !== 0) {
-            e.preventDefault();
-            e.returnValue = "ページから離れますか？";
-          }
-        };
-      } else {
-        // if(confirm("変更してもよろしいですか？")){
-        window.onbeforeunload = () => {};
-        // }else{
-        // @ts-ignore
-        // e.target.checked = true
-        // }
+      if (input_elm.value.length !== 0 && elm_Set_onbeforeunload.checked) {
+        e.preventDefault();
+        e.returnValue = "ページから離れますか？";
       }
-    }
-    elm_Set_onbeforeunload.onchange = (e) => Set_onbeforeunload(e);
-    Set_onbeforeunload({ target: elm_Set_onbeforeunload });
+    };
 
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
@@ -1317,11 +1303,11 @@
           }
         }
       } catch (e) {
-        console.error(i + 1 + "行目にエラー", e);
+        // console.error(i + 1 + "行目にエラー", e);
 
         // err.innerText =
         //   i + 1 + "行目にエラー(" + str_splited[i].join(" ") + ")";
-        err.innerHTML += "<br>";
+        err.appendChild(htmltag("br"));
         err.insertAdjacentText("beforeend", e);
         break;
       }
@@ -1376,7 +1362,7 @@
 
     for (let i = 0; i <= json[0].length; i++) {
       let tmp;
-      if (i + 1 === now_place) {
+      if (i === now_place) {
         tmp = htmltag("th", i.toString(), "now_place");
       } else if (i === 0) {
         tmp = htmltag("th", "", "nowrap");
