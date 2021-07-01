@@ -309,13 +309,7 @@
       output_err_where.appendChild(
         htmltag("span", "→→" + this.now_val.value + "←←", "errMsg")
       );
-      // const statement_list = [
-      //   "<span class='errMsg'>→→",
-      //   this.now_val.value,
-      //   "←←</span>",
-      // ];
-      // ....... \n <-
-      //\n ........
+      // ....... \n 
       if (this.now_val.type !== "new_line") {
         for (let i = this.i_loading + 1; i < this.timeline_parsed.length; i++) {
           if (this.timeline_parsed[i].type === "new_line") {
@@ -325,7 +319,6 @@
               "beforeend",
               this.timeline_parsed[i].value
             );
-            // statement_list.push(this.timeline_parsed[i].value);
           }
         }
       }
@@ -337,8 +330,6 @@
             "afterbegin",
             this.timeline_parsed[i].value
           );
-
-          // statement_list.unshift(this.timeline_parsed[i].value);
         }
       }
 
@@ -1026,8 +1017,6 @@
     } catch (e) {
       err.innerHTML = e;
       throw e;
-      // @ts-ignore
-      return;
     }
 
     const mode_list = {
@@ -1119,6 +1108,10 @@
               default:
                 throw Error("need 'start'");
             }
+            break;
+          
+            default:
+              throw Error("内部エラー")
         }
 
         function sorting() {
@@ -1310,6 +1303,7 @@
                 skillcard.calculateOrderValue(LoadFactor),
                 time
               );
+              break;
 
             case "end":
               mode = mode_list.waiting_mode;
