@@ -8,21 +8,29 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE=' 'sha256-d/yERybm6Vg1oK5uXfPNUtFdLqpjo+RlG7iGStOnXLg=';">
     <link rel="icon" href="./favicon.png" />
     <title>TL生成ツール</title>
+
     <!-- IEで表示した際にアラート
     IEではCSPは(ほとんど)未対応なので設定する必要性なし -->
     <script>
       function isIE(){
-        const userAgent = window.navigator.userAgent.toUpperCase();
+        var userAgent = window.navigator.userAgent.toUpperCase();
         return !(userAgent.indexOf('MSIE') === -1 && userAgent.indexOf('TRIDENT') === -1) 
       }
       if(isIE()){
-        alert("IE未対応です。Chromeなどのブラウザを使用してください。\n対応ブラウザ:Chrome,Firefox,Safari,Edge")
+        // alert("IE未対応です。Chromeなどのブラウザを使用してください。\n対応ブラウザ:Chrome,Firefox,Safari,Edge")
+        document.write('<script src="https://polyfill.io/v3/polyfill.min.js?features=String.prototype.replaceAll%2CURL%2CURLSearchParams%2CArray.from%2CArray.prototype.fill%2CArray.prototype.find"><\/script>')
+        document.write('<script src="./js/ie11.js"/><\/script>')
       }
     </script>
     <script src="./js/bundle.js" ></script>
     <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
+    <script>
+      if(isIE()){
+        document.write('<p style="color:red">IEの使用はやめてください。セキュリティ上大きなリスクがあります。またIEで起きたバグは一切対処しません。</p>')
+      }
+    </script>
     <div id="TL_table">
       <table width="100" height="200" border="1"></table>
     </div>

@@ -12,6 +12,7 @@
       "ES2021",
       "DOM"
     ],
+    "sourceMap": true,
     "removeComments": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
