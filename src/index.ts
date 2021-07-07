@@ -14,7 +14,7 @@
     }
   }
 
-  function objectCopy(obj: object | any[]) {
+  function objectCopy(obj: object | any[]): object | any[] {
     return JSON.parse(JSON.stringify(obj));
   }
   // function isObject(val) {
@@ -141,7 +141,7 @@
       this.timeline_parsed = output;
     }
 
-    parse() {
+    parse(): (string[] | ["mv_ls" | "move_list", string, move_list[]])[] {
       this.Normalize();
       /*  [
             [set,syaro,144],
@@ -277,11 +277,11 @@
       return statementList;
     }
 
-    isLastValue() {
+    isLastValue(): boolean {
       return this.i_loading + 1 >= this.timeline_parsed.length;
     }
 
-    getMoveListInList(endType: string) {
+    getMoveListInList(endType: string): string[] {
       let output: string[] = [];
       if (this.now_val_type === endType) {
         return output;
@@ -406,13 +406,13 @@
       this.i_nowloadstr = 0;
     }
 
-    parse() {
+    parse(): lexicallyAnalyzed[] {
       this.timeline_parsed = this.lexicalAnalysis();
       // this.Normalize();
       return this.timeline_parsed;
     }
 
-    lexicalAnalysis() {
+    lexicalAnalysis(): lexicallyAnalyzed[] {
       let string = this.timeline_str;
       let output = [];
       let tmp = "";
@@ -531,7 +531,7 @@
       this.autochange = autochange;
     }
 
-    getParam(param: string) {
+    getParam(param: string):string {
       return decodeURIComponent(this._urlAPI.searchParams.get(param) || "");
     }
 
@@ -542,7 +542,7 @@
       }
     }
 
-    get hash() {
+    get hash():string {
       return this._urlAPI.hash;
     }
 
@@ -550,7 +550,7 @@
       this._setURL(`#${val}`);
     }
 
-    get href() {
+    get href():string {
       return (
         this._urlAPI.protocol +
         "//" +
@@ -686,7 +686,7 @@
       this.pushChara(id, initOrderValue);
     }
 
-    place_to_moved(calculated_moved_OrderValue: number) {
+    place_to_moved(calculated_moved_OrderValue: number):number {
       let place_to_moved = -1;
       for (
         let i = this.current.length - 1;
@@ -715,9 +715,11 @@
     pushChara(id: string, calculated_moved_OrderValue: number) {
       let tmp_movechara;
       try {
-        tmp_movechara = objectCopy(this.get_chara_by_ID(id));
+        tmp_movechara = objectCopy(this.get_chara_by_ID(id)) as
+          | TL_chara
+          | TL_skillcard;
       } catch {
-        tmp_movechara = { id };
+        tmp_movechara = { id } as TL_chara;
       }
 
       tmp_movechara.timeline_OrderValue = calculated_moved_OrderValue;
@@ -801,7 +803,7 @@
       this.place_of_currentTimeline = 0;
     }
 
-    get firstChara() {
+    get firstChara(): TL_chara | TL_skillcard {
       return this.current[this.place_of_currentTimeline];
     }
 
@@ -809,11 +811,11 @@
       throw Error("firstCharaにはセットできません");
     }
 
-    OrderValue_of_firstChara() {
+    OrderValue_of_firstChara(): number {
       return this.firstChara.timeline_OrderValue;
     }
 
-    ID_of_firstChara() {
+    ID_of_firstChara(): string {
       return this.firstChara.id;
     }
 
@@ -831,11 +833,11 @@
       }
     }
 
-    get_chara_by_ID(id: string) {
+    get_chara_by_ID(id: string): TL_chara | TL_skillcard {
       return this.current[this.placeToChara(id)];
     }
 
-    placeToChara(id: string) {
+    placeToChara(id: string): number {
       for (
         let i = this.place_of_currentTimeline;
         i < this.current.length;
@@ -867,7 +869,7 @@
       this.LoadFactorReduce = LoadFactorReduce;
     }
 
-    calculateOrderValue(LoadFactor: number, LoadFactorReduce = 0) {
+    calculateOrderValue(LoadFactor: number, LoadFactorReduce = 0):number {
       const SPD = this.SPD;
       const SPD_buff = this.SPD_buff / 100;
       let OrderValueRadix = Math.min(
@@ -884,7 +886,7 @@
       return Math.max(Math.min(OrderValue, 500), 15);
     }
 
-    initOrderValue() {
+    initOrderValue() :number{
       return this.calculateOrderValue(100, 0);
     }
   }
@@ -1629,7 +1631,7 @@
     }
   }
 
-  function joinedTLdata() {
+  function joinedTLdata():string {
     return (
       convertedTLdata.set.map((x) => x.join(" ")).join("\n") +
       "\n\nstart\n" +
