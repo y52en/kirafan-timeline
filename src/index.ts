@@ -1,4 +1,5 @@
 /* eslint-disable no-constant-condition */
+import clonedeep from "lodash/cloneDeep";
 "use strict";
 
 ((window) => {
@@ -15,8 +16,11 @@
     }
   }
 
+  // function objectCopy(obj: object | any[]): object | any[] {
+  //   return JSON.parse(JSON.stringify(obj));
+  // }
   function objectCopy(obj: object | any[]): object | any[] {
-    return JSON.parse(JSON.stringify(obj));
+    return clonedeep(obj)
   }
   // function isObject(val) {
   //   if (val !== null && typeof val === "object" && val.constructor === Object) {
