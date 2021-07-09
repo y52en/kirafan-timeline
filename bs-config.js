@@ -6,4 +6,5 @@ module.exports = {
     baseDir: "./public/",
     // middleware: [[Function(anonymous)], [Function(anonymous)]],
   },
+  "open": false,
 };

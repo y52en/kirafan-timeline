@@ -12,6 +12,7 @@
       "ES2021",
       "DOM"
     ],
+    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "removeComments": true,
     "noImplicitAny": true,

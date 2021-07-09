@@ -1,6 +1,6 @@
 /* eslint-disable no-constant-condition */
-import clonedeep from "lodash/cloneDeep";
 "use strict";
+import clonedeep from "lodash/cloneDeep";
 
 ((window) => {
   const undefinedErr = Error("undefined");
@@ -16,11 +16,9 @@ import clonedeep from "lodash/cloneDeep";
     }
   }
 
-  // function objectCopy(obj: object | any[]): object | any[] {
-  //   return JSON.parse(JSON.stringify(obj));
-  // }
+  // eslint-disable-next-line
   function objectCopy(obj: object | any[]): object | any[] {
-    return clonedeep(obj)
+    return clonedeep(obj);
   }
   // function isObject(val) {
   //   if (val !== null && typeof val === "object" && val.constructor === Object) {
@@ -49,7 +47,17 @@ import clonedeep from "lodash/cloneDeep";
     value: string[];
   }
 
-  // interface statement {}
+  type AST = string[] | ["mv_ls" | "move_list", string, move_list[]];
+  /*  [
+            [set,syaro,144],
+            [mv_ls,syaro, 
+              [
+                {mode: "command",value:[b,syaro,14]}
+              ] 
+            ]
+          ]
+          
+       */
 
   class parser_lexicallyAnalyze2AST {
     timeline_parsed: lexicallyAnalyzed[];
@@ -79,6 +87,7 @@ import clonedeep from "lodash/cloneDeep";
     Normalize() {
       const output = [];
       let i: number;
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       const t = this;
       const type = () => this.timeline_parsed[i].type;
       for (i = 0; i < this.timeline_parsed.length; i++) {
@@ -146,21 +155,9 @@ import clonedeep from "lodash/cloneDeep";
       this.timeline_parsed = output;
     }
 
-    parse(): (string[] | ["mv_ls" | "move_list", string, move_list[]])[] {
+    parse(): AST[] {
       this.Normalize();
-      /*  [
-            [set,syaro,144],
-            [mv_ls,syaro, 
-              [
-                {mode: "command",value:[b,syaro,14]}
-              ] 
-            ]
-          ]
-          
-       */
-      const output: Array<
-        string[] | ["mv_ls" | "move_list", string, move_list[]]
-      > = [];
+      const output: Array<AST> = [];
       if (this.timeline_parsed.length === 0) {
         return output;
       }
@@ -172,8 +169,7 @@ import clonedeep from "lodash/cloneDeep";
         // skip newline
         this.i_loading++
       ) {
-        const data: string[] | ["mv_ls" | "move_list", string, move_list[]] =
-          this.loadStatement();
+        const data: AST = this.loadStatement();
         output.push(data);
 
         if (this.now_val_type !== "new_line") {
@@ -185,7 +181,7 @@ import clonedeep from "lodash/cloneDeep";
       return output;
     }
 
-    loadStatement(): string[] | ["mv_ls" | "move_list", string, move_list[]] {
+    loadStatement(): AST {
       let statementList = [];
       // = [];
 
@@ -213,7 +209,7 @@ import clonedeep from "lodash/cloneDeep";
         const arg2: move_list[] = [];
         if (this.now_val_type !== "bracketR") {
           loop: while (true) {
-            let list;
+            let list, val: move_list;
             switch (this.now_val_type) {
               // [
               case "bracketL":
@@ -237,7 +233,7 @@ import clonedeep from "lodash/cloneDeep";
                 break;
 
               case "word":
-                const val: move_list = { mode: "action", value: [] };
+                val = { mode: "action", value: [] };
                 val.value.push(this.now_val.value);
                 arg2.push(val);
                 this.nextVal();
@@ -535,7 +531,7 @@ import clonedeep from "lodash/cloneDeep";
       this.autochange = autochange;
     }
 
-    getParam(param: string):string {
+    getParam(param: string): string {
       return decodeURIComponent(this._urlAPI.searchParams.get(param) || "");
     }
 
@@ -546,7 +542,7 @@ import clonedeep from "lodash/cloneDeep";
       }
     }
 
-    get hash():string {
+    get hash(): string {
       return this._urlAPI.hash;
     }
 
@@ -554,7 +550,7 @@ import clonedeep from "lodash/cloneDeep";
       this._setURL(`#${val}`);
     }
 
-    get href():string {
+    get href(): string {
       return (
         this._urlAPI.protocol +
         "//" +
@@ -597,8 +593,9 @@ import clonedeep from "lodash/cloneDeep";
     type: "skillcard";
   }
 
+  type TL_obj = TL_chara | TL_skillcard;
   class timeline {
-    current: (TL_chara | TL_skillcard)[];
+    current: TL_obj[];
 
     color: string | undefined;
     place_of_currentTimeline: number;
@@ -690,7 +687,7 @@ import clonedeep from "lodash/cloneDeep";
       this.pushChara(id, initOrderValue);
     }
 
-    place_to_moved(calculated_moved_OrderValue: number):number {
+    place_to_moved(calculated_moved_OrderValue: number): number {
       let place_to_moved = -1;
       for (
         let i = this.current.length - 1;
@@ -719,9 +716,7 @@ import clonedeep from "lodash/cloneDeep";
     pushChara(id: string, calculated_moved_OrderValue: number) {
       let tmp_movechara;
       try {
-        tmp_movechara = objectCopy(this.get_chara_by_ID(id)) as
-          | TL_chara
-          | TL_skillcard;
+        tmp_movechara = objectCopy(this.get_chara_by_ID(id)) as TL_obj;
       } catch {
         tmp_movechara = { id } as TL_chara;
       }
@@ -807,7 +802,7 @@ import clonedeep from "lodash/cloneDeep";
       this.place_of_currentTimeline = 0;
     }
 
-    get firstChara(): TL_chara | TL_skillcard {
+    get firstChara(): TL_obj {
       return this.current[this.place_of_currentTimeline];
     }
 
@@ -837,7 +832,7 @@ import clonedeep from "lodash/cloneDeep";
       }
     }
 
-    get_chara_by_ID(id: string): TL_chara | TL_skillcard {
+    get_chara_by_ID(id: string): TL_obj {
       return this.current[this.placeToChara(id)];
     }
 
@@ -873,7 +868,7 @@ import clonedeep from "lodash/cloneDeep";
       this.LoadFactorReduce = LoadFactorReduce;
     }
 
-    calculateOrderValue(LoadFactor: number, LoadFactorReduce = 0):number {
+    calculateOrderValue(LoadFactor: number, LoadFactorReduce = 0): number {
       const SPD = this.SPD;
       const SPD_buff = this.SPD_buff / 100;
       const OrderValueRadix = Math.min(
@@ -890,67 +885,77 @@ import clonedeep from "lodash/cloneDeep";
       return Math.max(Math.min(OrderValue, 500), 15);
     }
 
-    initOrderValue() :number{
+    initOrderValue(): number {
       return this.calculateOrderValue(100, 0);
     }
   }
 
   window.onload = () => {
-    const input_elm = document.getElementById("input_txt") as HTMLTextAreaElement;
-    if (!input_elm) {
-      throw undefinedErr;
-    }
-    const TLparam = url.getParam("TL");
-    if (typeof TLparam !== null) {
-      input_elm.textContent = TLparam;
-    }
-    input_elm.oninput = main;
+    const elm_textarea = document.getElementById(
+      "input_txt"
+    ) as HTMLTextAreaElement | null;
     const elm_csvDownload = document.getElementById("csvDownload");
-    if (elm_csvDownload) elm_csvDownload.onclick = outputAsCSV;
-
     const elm_copyTL = document.getElementById("copyTL");
-    if (elm_copyTL) elm_copyTL.onclick = copyDataAsURL;
-
-    const elm_log_convertedTL = document.getElementById("log_convertedTL");
-    if (elm_log_convertedTL) elm_log_convertedTL.onclick = printConvertedTL;
-
     const elm_copy_ConvertedTL = document.getElementById("copy_ConvertedTL");
-    if (elm_copy_ConvertedTL) elm_copy_ConvertedTL.onclick = copyConvertedTL;
-
+    const elm_log_convertedTL = document.getElementById("log_convertedTL");
     const elm_jumpTwitter = document.getElementById("jumpTwitter");
-    if (elm_jumpTwitter)
-      elm_jumpTwitter.onclick = () => {
-        window.open(
-          "https://twitter.com/Y52en/status/1402239605978517505?s=20",
-          "_blank"
-        );
-      };
-
     const elm_unzipMoveList = document.getElementById("unzipMoveList");
-    if (elm_unzipMoveList)
-      elm_unzipMoveList.onclick = () => {
-        const elm_pop11 = document.getElementById("pop11") as HTMLInputElement;
-        if (elm_pop11) elm_pop11.checked = true;
-      };
-
     const elm_Set_onbeforeunload = document.getElementById(
       "isSet_onbeforeunload"
-    ) as HTMLInputElement;
-    if (!elm_Set_onbeforeunload) throw undefinedErr
-      window.onbeforeunload = function (e) {
-        if (input_elm.value.length !== 0 && elm_Set_onbeforeunload.checked) {
-          e.preventDefault();
-          e.returnValue = "ページから離れますか？";
-        }
-      };
+    ) as HTMLInputElement | null;
+    const elm_pop11 = document.getElementById(
+      "pop11"
+    ) as HTMLInputElement | null;
+
+    if (
+      !(
+        elm_textarea &&
+        elm_csvDownload &&
+        elm_copyTL &&
+        elm_copy_ConvertedTL &&
+        elm_log_convertedTL &&
+        elm_jumpTwitter &&
+        elm_unzipMoveList &&
+        elm_Set_onbeforeunload &&
+        elm_pop11
+      )
+    ) {
+      throw undefinedErr;
+    }
+
+    elm_textarea.oninput = main;
+    elm_csvDownload.onclick = outputAsCSV;
+    elm_copyTL.onclick = copyDataAsURL;
+    elm_log_convertedTL.onclick = printConvertedTL;
+    elm_copy_ConvertedTL.onclick = copyConvertedTL;
+    elm_jumpTwitter.onclick = () => {
+      window.open(
+        "https://twitter.com/Y52en/status/1402239605978517505?s=20",
+        "_blank"
+      );
+    };
+    elm_unzipMoveList.onclick = () => {
+      elm_pop11.checked = true;
+    };
+    window.onbeforeunload = function (e) {
+      if (elm_textarea.value.length !== 0 && elm_Set_onbeforeunload.checked) {
+        e.preventDefault();
+        e.returnValue = "ページから離れますか？";
+      }
+    };
+
+    const TLparam = url.getParam("TL");
+    if (typeof TLparam !== null) {
+      elm_textarea.textContent = TLparam;
+    }
 
     // textCopy
-    input_elm.addEventListener("keydown", (e) => {
+    elm_textarea.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
-        const cursorPlace_start = input_elm.selectionStart;
-        const cursorPlace_end = input_elm.selectionEnd;
+        const cursorPlace_start = elm_textarea.selectionStart;
+        const cursorPlace_end = elm_textarea.selectionEnd;
         if (cursorPlace_start === cursorPlace_end) {
-          const textValue = input_elm.value;
+          const textValue = elm_textarea.value;
           const numOfLines_start = [
             ...textValue
               .slice(0, cursorPlace_start)
@@ -973,11 +978,16 @@ import clonedeep from "lodash/cloneDeep";
     });
 
     //comment ctrl + /
-    input_elm.addEventListener("keydown", (e) => {
-      if (e.key === "/" && e.ctrlKey) {
-        let cursorPlace_start = input_elm.selectionStart;
-        let cursorPlace_end = input_elm.selectionEnd;
-        let textValue = input_elm.value;
+
+    elm_textarea.addEventListener("keydown", (e) => {
+      const shortcut_indent = (e.key === "[" || e.key === "]") && e.ctrlKey;
+      const shortcut_comment = e.key === "/" && e.ctrlKey;
+      // const shortcut_copyline = (e.key === "c" && e.ctrlKey)
+      if (shortcut_comment || shortcut_comment) {
+        let cursorPlace_start = elm_textarea.selectionStart;
+        let cursorPlace_end = elm_textarea.selectionEnd;
+        let textValue = elm_textarea.value;
+
         const numOfLines_start = [
           ...textValue
             .slice(0, cursorPlace_start)
@@ -991,78 +1001,55 @@ import clonedeep from "lodash/cloneDeep";
             .matchAll(/\n/g),
         ].length;
 
-        for (let i = numOfLines_start; i <= numOfLines_end; i++) {
-          const beforeLines_regex = "^(.*\n){" + i + "}";
+        if (shortcut_indent) {
+          for (let i = numOfLines_start; i <= numOfLines_end; i++) {
+            const beforeLines_regex = "^(.*\n){" + i + "}";
+            const beforeReplace_textValue = textValue;
 
-          // if comment found
-          if (new RegExp(beforeLines_regex + "( )*#").test(textValue)) {
-            textValue = textValue.replace(
-              new RegExp("(" + beforeLines_regex + "( )*)#"),
-              "$1"
-            );
-            if (i === numOfLines_start) {
-              cursorPlace_start--;
+            // if comment found
+            if (e.key === "[") {
+              textValue = textValue.replace(
+                new RegExp("(" + beforeLines_regex + ") "),
+                "$1"
+              );
+              if (beforeReplace_textValue !== textValue) {
+                if (i === numOfLines_start) {
+                  cursorPlace_start--;
+                }
+                cursorPlace_end--;
+              }
+            } else {
+              textValue = textValue.replace(
+                new RegExp("(" + beforeLines_regex + ")"),
+                "$1 "
+              );
+              if (beforeReplace_textValue !== textValue) {
+                if (i === numOfLines_start) {
+                  cursorPlace_start++;
+                }
+                cursorPlace_end++;
+              }
             }
-            cursorPlace_end--;
-          } else {
-            textValue = textValue.replace(
-              new RegExp("(" + beforeLines_regex + ")"),
-              "$1#"
-            );
-            if (i === numOfLines_start) {
-              cursorPlace_start++;
-            }
-            cursorPlace_end++;
           }
-        }
+        } else if (shortcut_comment) {
+          for (let i = numOfLines_start; i <= numOfLines_end; i++) {
+            const beforeLines_regex = "^(.*\n){" + i + "}";
 
-        input_elm.value = textValue;
-        input_elm.setSelectionRange(cursorPlace_start, cursorPlace_end);
-        main();
-      }
-    });
-
-    input_elm.addEventListener("keydown", (e) => {
-      if ((e.key === "[" || e.key === "]") && e.ctrlKey) {
-        let cursorPlace_start = input_elm.selectionStart;
-        let cursorPlace_end = input_elm.selectionEnd;
-        let textValue = input_elm.value;
-
-        const numOfLines_start = [
-          ...textValue
-            .slice(0, cursorPlace_start)
-            // .cursorBeforeText
-            .matchAll(/\n/g),
-        ].length;
-        const numOfLines_end = [
-          ...textValue
-            .slice(0, cursorPlace_end)
-            // .cursorBeforeText
-            .matchAll(/\n/g),
-        ].length;
-
-        for (let i = numOfLines_start; i <= numOfLines_end; i++) {
-          const beforeLines_regex = "^(.*\n){" + i + "}";
-          const beforeReplace_textValue = textValue;
-
-          // if comment found
-          if (e.key === "[") {
-            textValue = textValue.replace(
-              new RegExp("(" + beforeLines_regex + ") "),
-              "$1"
-            );
-            if (beforeReplace_textValue !== textValue) {
+            // if comment found
+            if (new RegExp(beforeLines_regex + "( )*#").test(textValue)) {
+              textValue = textValue.replace(
+                new RegExp("(" + beforeLines_regex + "( )*)#"),
+                "$1"
+              );
               if (i === numOfLines_start) {
                 cursorPlace_start--;
               }
               cursorPlace_end--;
-            }
-          } else {
-            textValue = textValue.replace(
-              new RegExp("(" + beforeLines_regex + ")"),
-              "$1 "
-            );
-            if (beforeReplace_textValue !== textValue) {
+            } else {
+              textValue = textValue.replace(
+                new RegExp("(" + beforeLines_regex + ")"),
+                "$1#"
+              );
               if (i === numOfLines_start) {
                 cursorPlace_start++;
               }
@@ -1070,9 +1057,8 @@ import clonedeep from "lodash/cloneDeep";
             }
           }
         }
-
-        input_elm.value = textValue;
-        input_elm.setSelectionRange(cursorPlace_start, cursorPlace_end);
+        elm_textarea.value = textValue;
+        elm_textarea.setSelectionRange(cursorPlace_start, cursorPlace_end);
         main();
       }
     });
@@ -1081,18 +1067,23 @@ import clonedeep from "lodash/cloneDeep";
 
   let tableData: [Array<Array<number | string | undefined>>, string[]];
   let convertedTLdata: {
-    main: [string[] | ["mv_ls" | "move_list", string, move_list[]]] | [];
-    set: [string[]] | [];
+    main: [AST?];
+    set: [string[]?];
   };
 
   function main() {
-    const elm_input_txt = document.getElementById("input_txt") as HTMLTextAreaElement; 
+    const err = document.getElementById("error");
+    const info = document.getElementById("info");
+    const elm_input_txt = document.getElementById(
+      "input_txt"
+    ) as HTMLTextAreaElement | null;
+
     let str;
     if (elm_input_txt) {
       str = elm_input_txt.value;
     } else {
       throw undefinedErr;
-    } 
+    }
     url.setParam("TL", str);
 
     convertedTLdata = { main: [], set: [] };
@@ -1100,18 +1091,13 @@ import clonedeep from "lodash/cloneDeep";
     const TL = new timeline();
     const chara_move_list: { [s: string]: move_list[] } = {};
 
-    const err = document.getElementById("error");
-    const info = document.getElementById("info");
     if (!err || !info) {
       throw undefinedErr;
     }
     err.innerHTML = "";
     info.innerHTML = "";
 
-    let parsed_tldata: (
-      | string[]
-      | ["mv_ls" | "move_list", string, move_list[]]
-    )[];
+    let parsed_tldata: AST[];
     try {
       // parsed_tldata = tl_parser.parse();
       const tl_parser_lexicallyAnalyze = new parser_lexicallyAnalyze(str);
@@ -1124,13 +1110,13 @@ import clonedeep from "lodash/cloneDeep";
       throw e;
     }
 
-    const mode_list = {
-      init: "init",
-      start: "start",
-      start_sort: "start_sort",
-      sorting: "sorting",
-      waiting_mode: "waiting_mode",
-    };
+    enum mode_list {
+      init,
+      start,
+      start_sort,
+      sorting,
+      waiting_mode,
+    }
     let mode = mode_list.init;
     for (let i = 0; i < parsed_tldata.length; i++) {
       try {
@@ -1140,7 +1126,15 @@ import clonedeep from "lodash/cloneDeep";
         const load_text_arg3 = parsed_tldata[i]?.[3];
         // const load_text_arg4 = parsed_tldata[i]?.[4];
 
-        let id, SPD, buff, LoadFactor, LoadFactor_list, to, from, ordervalue;
+        let id,
+          SPD,
+          buff,
+          LoadFactor,
+          LoadFactor_list,
+          to,
+          from,
+          ordervalue,
+          statement;
 
         switch (mode) {
           case mode_list.init:
@@ -1177,7 +1171,7 @@ import clonedeep from "lodash/cloneDeep";
             }
             break;
           case mode_list.start:
-            var statement = parsed_tldata[i];
+            statement = parsed_tldata[i];
             if (statement[0] !== "mv_ls" && statement[0] !== "move_list") {
               mainMode(...(statement as string[]));
             } else {
@@ -1228,6 +1222,7 @@ import clonedeep from "lodash/cloneDeep";
             throw Error("内部エラー");
         }
 
+        // eslint-disable-next-line no-inner-declarations
         function sorting() {
           while (true) {
             const id = TL.ID_of_firstChara();
@@ -1308,6 +1303,7 @@ import clonedeep from "lodash/cloneDeep";
           }
         }
 
+        // eslint-disable-next-line no-inner-declarations
         function mainMode(...arg: string[]) {
           const [
             load_text_command,
@@ -1325,7 +1321,15 @@ import clonedeep from "lodash/cloneDeep";
             }
           }
 
-          let id, buff;
+          let id,
+            buff,
+            color,
+            name,
+            spd,
+            time,
+            skillcard,
+            canMoveWithout1stChara,
+            canMoveWithout1stChara_act;
           switch (load_text_command) {
             case "buffset":
             case "b":
@@ -1361,7 +1365,7 @@ import clonedeep from "lodash/cloneDeep";
             case "m":
               LoadFactor = Number(load_text_arg1);
               id = load_text_arg2;
-              const canMoveWithout1stChara = load_text_arg3 === "true";
+              canMoveWithout1stChara = load_text_arg3 === "true";
               TL.move(
                 chara_list[TL.ID_of_firstChara()].calculateOrderValue(
                   LoadFactor
@@ -1375,7 +1379,7 @@ import clonedeep from "lodash/cloneDeep";
             case "ac":
               id = load_text_arg1;
               LoadFactor = Number(load_text_arg2);
-              const canMoveWithout1stChara_act = load_text_arg3 === "true";
+              canMoveWithout1stChara_act = load_text_arg3 === "true";
               TL.move(
                 chara_list[TL.ID_of_firstChara()].calculateOrderValue(
                   LoadFactor
@@ -1416,18 +1420,18 @@ import clonedeep from "lodash/cloneDeep";
 
             case "color":
             case "c":
-              var color = load_text_arg1;
+              color = load_text_arg1;
               TL.color = color;
               break;
 
             case "skillcard":
             case "sc":
-              var name = load_text_arg1;
-              var spd = Number(load_text_arg2);
+              name = load_text_arg1;
+              spd = Number(load_text_arg2);
               LoadFactor = Number(load_text_arg3);
-              var time = Number(load_text_arg4);
+              time = Number(load_text_arg4);
 
-              var skillcard = new chara(name, spd, 0);
+              skillcard = new chara(name, spd, 0);
               chara_list[name] = skillcard;
               TL.addSkillCard(
                 name,
@@ -1635,11 +1639,27 @@ import clonedeep from "lodash/cloneDeep";
     }
   }
 
-  function joinedTLdata():string {
+  function joinedTLdata(): string {
     return (
-      convertedTLdata.set.map((x) => x.join(" ")).join("\n") +
+      convertedTLdata.set
+        .map((x) => {
+          if (x) {
+            return x.join(" ");
+          } else {
+            return "";
+          }
+        })
+        .join("\n") +
       "\n\nstart\n" +
-      convertedTLdata.main.map((x) => "  " + x.join(" ")).join("\n") +
+      convertedTLdata.main
+        .map((x) => {
+          if (x) {
+            return "  " + x.join(" ");
+          } else {
+            return "";
+          }
+        })
+        .join("\n") +
       "\nend"
     );
   }
