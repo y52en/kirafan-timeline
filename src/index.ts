@@ -1,6 +1,12 @@
 /* eslint-disable no-constant-condition */
 "use strict";
 import clonedeep from "lodash/cloneDeep";
+import codemirror from "codemirror";
+import "codemirror/addon/mode/simple";
+import "codemirror/addon/comment/comment";
+import "codemirror/lib/codemirror.css";
+// import "codemirror/theme/panda-syntax.css";
+import "../public/css/panda-syntax.css";
 
 ((window) => {
   const undefinedErr = Error("undefined");
@@ -890,10 +896,9 @@ import clonedeep from "lodash/cloneDeep";
     }
   }
 
+  let cm: codemirror.Editor;
+
   window.onload = () => {
-    const elm_textarea = document.getElementById(
-      "input_txt"
-    ) as HTMLTextAreaElement | null;
     const elm_csvDownload = document.getElementById("csvDownload");
     const elm_copyTL = document.getElementById("copyTL");
     const elm_copy_ConvertedTL = document.getElementById("copy_ConvertedTL");
@@ -907,23 +912,150 @@ import clonedeep from "lodash/cloneDeep";
       "pop11"
     ) as HTMLInputElement | null;
 
+    const elm_editor = document.getElementById(
+      "editor"
+    ) as HTMLTextAreaElement | null;
+
     if (
       !(
-        elm_textarea &&
-        elm_csvDownload &&
-        elm_copyTL &&
-        elm_copy_ConvertedTL &&
-        elm_log_convertedTL &&
-        elm_jumpTwitter &&
-        elm_unzipMoveList &&
-        elm_Set_onbeforeunload &&
-        elm_pop11
+        // elm_textarea &&
+        (
+          elm_csvDownload &&
+          elm_copyTL &&
+          elm_copy_ConvertedTL &&
+          elm_log_convertedTL &&
+          elm_jumpTwitter &&
+          elm_unzipMoveList &&
+          elm_Set_onbeforeunload &&
+          elm_pop11 &&
+          elm_editor
+        )
       )
     ) {
       throw undefinedErr;
     }
 
-    elm_textarea.oninput = main;
+    codemirror.defineSimpleMode("kirafan-timeline", {
+      start: [
+        {
+          regex: /(mv_ls|move_list)[ 　]+/,
+          token: "keyword",
+          next: "move_list",
+        },
+
+        // string and byte string
+        { regex: /[a-zA-Z_]+$/, token: "keyword" },
+        { regex: /[a-zA-Z_]+/, token: "keyword", next: "arg" },
+        { regex: /\s+/, token: "" },
+        { regex: /#.*$/, token: "comment" },
+      ],
+      move_list: [
+        {
+          // regex: /([^\s]+)\s*(\[)/,
+          regex: /(?:([^[\s]+)(\s*)(\[))/,
+          next: "move_list_arg2",
+          token: ["operator", "", "age"],
+        },
+      ],
+      move_list_arg2: [
+        { regex: /\s+/, token: "" },
+
+        { regex: /\]/, token: "unit", next: "start" },
+        {
+          regex: /(\[)(\s*)([^\]\s*,]+)/,
+          token: ["unit", "", "string-3"],
+          next: "mvls_switch",
+        },
+        {
+          regex: /(\{)(\s*)([^\}\s*,]+)/,
+          token: ["unit", "", "keyword"],
+          next: "mvls_command",
+        },
+        {
+          regex: /(<)(\s*)([^>\s*,]+)/,
+          token: ["unit", "", "string-3"],
+          next: "mvls_order",
+        },
+      ],
+      mvls_switch: [
+        { regex: /\s+/ },
+        {
+          regex: /,/,
+        },
+        { regex: /\]/, token: "unit", next: "move_list_arg2" },
+
+        {
+          regex: /[^\s\],]+/,
+          token: "string-3",
+        },
+      ],
+      mvls_command: [
+        { regex: /\s+/ },
+        {
+          regex: /,/,
+        },
+        { regex: /\}/, token: "unit", next: "move_list_arg2" },
+
+        {
+          regex: /[^\s\},]+/,
+          token: "string-3",
+        },
+      ],
+      mvls_order: [
+        { regex: /\s+/ },
+        {
+          regex: /,/,
+        },
+        { regex: />/, token: "unit", next: "move_list_arg2" },
+
+        {
+          regex: /[^\s>,]+/,
+          token: "string-3",
+        },
+      ],
+      arg: [
+        { regex: /[^#]*$/, token: "arg", next: "start" },
+        { regex: /[^#]*/, token: "arg", next: "start" },
+
+        { regex: /#.*$/, token: "comment" },
+      ],
+      comment: [{ regex: /.*?$/, token: "comment", next: "start" }],
+      meta: {
+        dontIndentStates: ["comment"],
+        // electricInput: /^\s*\}$/,
+        // blockCommentStart: "/*",
+        // blockCommentEnd: "*/",
+        lineComment: "#",
+        fold: "brace",
+      },
+    });
+
+    const TLparam = url.getParam("TL");
+    let str = "";
+    if (typeof TLparam !== null) {
+      str = TLparam;
+    }
+
+    cm = codemirror(elm_editor, {
+      mode: "kirafan-timeline",
+      lineNumbers: true,
+      indentUnit: 4,
+      theme: "panda-syntax",
+      lineWrapping: true,
+      tabSize: 2,
+      value: str,
+    });
+    // enable scrollbar
+    cm.scrollTo(3, 3);
+
+    cm.on("change", main);
+    cm.on("keydown", (cm, e) => {
+      if (e.key === "/" && e.ctrlKey) {
+        cm.toggleComment({ lineComment: "#" });
+      }
+    });
+
+    // elm_textarea.oninput = main;
     elm_csvDownload.onclick = outputAsCSV;
     elm_copyTL.onclick = copyDataAsURL;
     elm_log_convertedTL.onclick = printConvertedTL;
@@ -938,130 +1070,12 @@ import clonedeep from "lodash/cloneDeep";
       elm_pop11.checked = true;
     };
     window.onbeforeunload = function (e) {
-      if (elm_textarea.value.length !== 0 && elm_Set_onbeforeunload.checked) {
+      if (cm.getValue().length !== 0 && elm_Set_onbeforeunload.checked) {
         e.preventDefault();
         e.returnValue = "ページから離れますか？";
       }
     };
 
-    const TLparam = url.getParam("TL");
-    if (typeof TLparam !== null) {
-      elm_textarea.textContent = TLparam;
-    }
-
-    // textCopy
-    elm_textarea.addEventListener("keydown", (e) => {
-      if (e.key === "c" && e.ctrlKey) {
-        const cursorPlace_start = elm_textarea.selectionStart;
-        const cursorPlace_end = elm_textarea.selectionEnd;
-        if (cursorPlace_start === cursorPlace_end) {
-          const textValue = elm_textarea.value;
-          const numOfLines_start = [
-            ...textValue
-              .slice(0, cursorPlace_start)
-              // .cursorBeforeText
-              .matchAll(/\n/g),
-          ].length;
-          const beforeLines_regex = "^(.*\\n){" + numOfLines_start + "}";
-
-          textCopy(
-            textValue.replace(
-              new RegExp(beforeLines_regex + "(.*)($|[\\s\\S]*$)"),
-              "$2"
-            )
-          );
-
-          return false;
-        }
-      }
-      return true;
-    });
-
-    //comment ctrl + /
-
-    elm_textarea.addEventListener("keydown", (e) => {
-      const shortcut_indent = (e.key === "[" || e.key === "]") && e.ctrlKey;
-      const shortcut_comment = e.key === "/" && e.ctrlKey;
-      // const shortcut_copyline = (e.key === "c" && e.ctrlKey)
-      if (shortcut_comment || shortcut_comment) {
-        let cursorPlace_start = elm_textarea.selectionStart;
-        let cursorPlace_end = elm_textarea.selectionEnd;
-        let textValue = elm_textarea.value;
-
-        const numOfLines_start = [
-          ...textValue
-            .slice(0, cursorPlace_start)
-            // .cursorBeforeText
-            .matchAll(/\n/g),
-        ].length;
-        const numOfLines_end = [
-          ...textValue
-            .slice(0, cursorPlace_end)
-            // .cursorBeforeText
-            .matchAll(/\n/g),
-        ].length;
-
-        if (shortcut_indent) {
-          for (let i = numOfLines_start; i <= numOfLines_end; i++) {
-            const beforeLines_regex = "^(.*\n){" + i + "}";
-            const beforeReplace_textValue = textValue;
-
-            // if comment found
-            if (e.key === "[") {
-              textValue = textValue.replace(
-                new RegExp("(" + beforeLines_regex + ") "),
-                "$1"
-              );
-              if (beforeReplace_textValue !== textValue) {
-                if (i === numOfLines_start) {
-                  cursorPlace_start--;
-                }
-                cursorPlace_end--;
-              }
-            } else {
-              textValue = textValue.replace(
-                new RegExp("(" + beforeLines_regex + ")"),
-                "$1 "
-              );
-              if (beforeReplace_textValue !== textValue) {
-                if (i === numOfLines_start) {
-                  cursorPlace_start++;
-                }
-                cursorPlace_end++;
-              }
-            }
-          }
-        } else if (shortcut_comment) {
-          for (let i = numOfLines_start; i <= numOfLines_end; i++) {
-            const beforeLines_regex = "^(.*\n){" + i + "}";
-
-            // if comment found
-            if (new RegExp(beforeLines_regex + "( )*#").test(textValue)) {
-              textValue = textValue.replace(
-                new RegExp("(" + beforeLines_regex + "( )*)#"),
-                "$1"
-              );
-              if (i === numOfLines_start) {
-                cursorPlace_start--;
-              }
-              cursorPlace_end--;
-            } else {
-              textValue = textValue.replace(
-                new RegExp("(" + beforeLines_regex + ")"),
-                "$1#"
-              );
-              if (i === numOfLines_start) {
-                cursorPlace_start++;
-              }
-              cursorPlace_end++;
-            }
-          }
-        }
-        elm_textarea.value = textValue;
-        elm_textarea.setSelectionRange(cursorPlace_start, cursorPlace_end);
-        main();
-      }
-    });
     main();
   };
 
@@ -1074,13 +1088,10 @@ import clonedeep from "lodash/cloneDeep";
   function main() {
     const err = document.getElementById("error");
     const info = document.getElementById("info");
-    const elm_input_txt = document.getElementById(
-      "input_txt"
-    ) as HTMLTextAreaElement | null;
 
     let str;
-    if (elm_input_txt) {
-      str = elm_input_txt.value;
+    if (cm) {
+      str = cm.getValue();
     } else {
       throw undefinedErr;
     }

@@ -16,6 +16,16 @@ module.exports = {
         // TypeScript をコンパイルする
         use: "ts-loader",
       },
+      {
+        test: /\.css/,
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: { url: false },
+          },
+        ],
+      },
     ],
   },
   // import 文で .ts ファイルを解決するため
