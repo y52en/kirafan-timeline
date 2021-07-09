@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 "use strict";
 
 ((window) => {
@@ -72,7 +73,7 @@
     }
 
     Normalize() {
-      let output = [];
+      const output = [];
       let i: number;
       const t = this;
       const type = () => this.timeline_parsed[i].type;
@@ -83,7 +84,7 @@
         output.push(this.timeline_parsed[i]);
       }
       function removeMeaninglessNewLine() {
-        let i_toErrMsg = [i];
+        const i_toErrMsg = [i];
         output.push(t.timeline_parsed[i]);
         i++;
         for (; i < t.timeline_parsed.length; i++) {
@@ -153,7 +154,7 @@
           ]
           
        */
-      let output: Array<
+      const output: Array<
         string[] | ["mv_ls" | "move_list", string, move_list[]]
       > = [];
       if (this.timeline_parsed.length === 0) {
@@ -282,7 +283,7 @@
     }
 
     getMoveListInList(endType: string): string[] {
-      let output: string[] = [];
+      const output: string[] = [];
       if (this.now_val_type === endType) {
         return output;
       }
@@ -414,7 +415,7 @@
 
     lexicalAnalysis(): lexicallyAnalyzed[] {
       let string = this.timeline_str;
-      let output = [];
+      const output = [];
       let tmp = "";
       const space = "\u{20}";
       string = string.replaceAll(/\\(\n|$)/g, "");
@@ -424,9 +425,9 @@
         value: value,
       });
       loop: for (let i = 0; i < string.length; i++) {
-        let char = string[i];
+        const char = string[i];
 
-        let val = parsed("", char);
+        const val = parsed("", char);
         const changeType = (type: string) => {
           val.type = type;
         };
@@ -480,7 +481,6 @@
             changeType("angle_bracketR");
             break;
 
-          case "(":
           case "(":
           case ")":
           case '"':
@@ -603,10 +603,10 @@
     switchData: [number, string, string][];
 
     constructor() {
-      this.current = new Array();
-      this.switchData = new Array();
-      this.cardData = new Array();
-      this.comment = new Array();
+      this.current = [];
+      this.switchData = [];
+      this.cardData = [];
+      this.comment = [];
       this.color = undefined;
 
       this.place_of_currentTimeline = 0;
@@ -625,9 +625,9 @@
       const moveChara_nowOrderValue =
         this.get_chara_by_ID(id).timeline_OrderValue;
 
-      let OrderValue_diff_between_1stchara_and_movechara =
+      const OrderValue_diff_between_1stchara_and_movechara =
         moveChara_nowOrderValue - this.OrderValue_of_firstChara();
-      let calculated_moved_OrderValue =
+      const calculated_moved_OrderValue =
         moveChara_nowOrderValue +
         OrderValue -
         OrderValue_diff_between_1stchara_and_movechara;
@@ -724,12 +724,12 @@
 
       tmp_movechara.timeline_OrderValue = calculated_moved_OrderValue;
 
-      let place_to_moved = this.place_to_moved(calculated_moved_OrderValue);
+      const place_to_moved = this.place_to_moved(calculated_moved_OrderValue);
       this.current.splice(place_to_moved, 0, tmp_movechara);
     }
 
     addChara(id: string, initOrderValue: number) {
-      let chara: TL_chara = {
+      const chara: TL_chara = {
         id: id,
         timeline_OrderValue: initOrderValue,
         type: "chara",
@@ -756,8 +756,8 @@
           throw Error("ここは実行されないはず");
         }
       } else {
-        let target_ov = this.OrderValue_of_firstChara() + OrderValue;
-        let target_place = this.place_to_moved(target_ov);
+        const target_ov = this.OrderValue_of_firstChara() + OrderValue;
+        const target_place = this.place_to_moved(target_ov);
         this.current.splice(target_place, 0, {
           type: "skillcard",
           time,
@@ -872,11 +872,11 @@
     calculateOrderValue(LoadFactor: number, LoadFactorReduce = 0):number {
       const SPD = this.SPD;
       const SPD_buff = this.SPD_buff / 100;
-      let OrderValueRadix = Math.min(
+      const OrderValueRadix = Math.min(
         Math.max(124 - Math.floor(SPD / 2), 0),
         100
       );
-      let OrderValue = Math.floor(
+      const OrderValue = Math.floor(
         OrderValueRadix *
           (LoadFactor / 100) *
           (1 - LoadFactorReduce) *
@@ -943,10 +943,10 @@
     // textCopy
     input_elm.addEventListener("keydown", (e) => {
       if (e.key === "c" && e.ctrlKey) {
-        let cursorPlace_start = input_elm.selectionStart;
-        let cursorPlace_end = input_elm.selectionEnd;
+        const cursorPlace_start = input_elm.selectionStart;
+        const cursorPlace_end = input_elm.selectionEnd;
         if (cursorPlace_start === cursorPlace_end) {
-          let textValue = input_elm.value;
+          const textValue = input_elm.value;
           const numOfLines_start = [
             ...textValue
               .slice(0, cursorPlace_start)
@@ -1092,9 +1092,9 @@
     url.setParam("TL", str);
 
     convertedTLdata = { main: [], set: [] };
-    let chara_list: { [s: string]: chara } = {};
-    let TL = new timeline();
-    let chara_move_list: { [s: string]: move_list[] } = {};
+    const chara_list: { [s: string]: chara } = {};
+    const TL = new timeline();
+    const chara_move_list: { [s: string]: move_list[] } = {};
 
     const err = document.getElementById("error");
     const info = document.getElementById("info");
@@ -1228,7 +1228,7 @@
           while (true) {
             const id = TL.ID_of_firstChara();
             if (chara_move_list[id]?.[0] === undefined) {
-              let output: { [s: string]: move_list[] } = {};
+              const output: { [s: string]: move_list[] } = {};
               Object.keys(chara_move_list).forEach(function (key) {
                 if (chara_move_list[key].length !== 0) {
                   output[key] = chara_move_list[key];
@@ -1454,27 +1454,27 @@
       }
     }
 
-    let chara_array: string[] = [];
-    for (let i in chara_list) {
+    const chara_array: string[] = [];
+    for (const i in chara_list) {
       chara_array.push(i);
     }
 
-    let outputTL: Array<Array<string | number | undefined>> = Array.from(
+    const outputTL: Array<Array<string | number | undefined>> = Array.from(
       new Array(Object.keys(chara_list).length),
       () => new Array(TL.current.length).fill(undefined)
     );
 
     TL.current.forEach((i, index) => {
-      let chara_id = i.id;
-      let OrderValue = i.timeline_OrderValue;
-      let charaPlace = chara_array.indexOf(chara_id);
+      const chara_id = i.id;
+      const OrderValue = i.timeline_OrderValue;
+      const charaPlace = chara_array.indexOf(chara_id);
 
       outputTL[charaPlace][index] = OrderValue;
     });
     TL.switchData.forEach((x) => {
       const [place, from_id, to_id] = x;
-      let from_charaPlace = chara_array.indexOf(from_id);
-      let to_charaPlace = chara_array.indexOf(to_id);
+      const from_charaPlace = chara_array.indexOf(from_id);
+      const to_charaPlace = chara_array.indexOf(to_id);
       let arrow_str = "";
       if (from_charaPlace < to_charaPlace) {
         arrow_str = "↓↓";
@@ -1486,7 +1486,7 @@
     });
 
     TL.cardData.forEach((x) => {
-      let charaPlace = chara_array.indexOf(x[1]);
+      const charaPlace = chara_array.indexOf(x[1]);
       outputTL[charaPlace][x[0]] = "→";
     });
     const now_place = TL.place_of_currentTimeline + 1;
@@ -1508,8 +1508,8 @@
     comment: [string, string, number, string][],
     now_place: number
   ) {
-    let output = htmltag("thead");
-    let inner_tr = htmltag("tr");
+    const output = htmltag("thead");
+    const inner_tr = htmltag("tr");
 
     for (let i = 0; i <= json[0].length; i++) {
       let tmp;
@@ -1526,14 +1526,14 @@
     output.appendChild(inner_tr);
 
     for (let x = 0; x < json.length; x++) {
-      let main_tl = htmltag("tr");
+      const main_tl = htmltag("tr");
       main_tl.appendChild(htmltag("td", charalist[x], "nowrap"));
       for (let y = 0; y < json[0].length; y++) {
         let tmp;
         const find = comment.find(
           (elm) => elm[0] === "color" && elm[1] === charalist[x] && elm[2] === y
         );
-        let inner_tmp = json[x][y];
+        const inner_tmp = json[x][y];
         let inner_tmp_string: string;
         if (typeof inner_tmp === "string") {
           inner_tmp_string = inner_tmp;
@@ -1582,11 +1582,11 @@
   }
 
   function makeCSVfile_download(csv: string, fileName = "timeline.csv") {
-    let bom = new Uint8Array([0xef, 0xbb, 0xbf]);
-    let blob = new Blob([bom, csv], { type: "text/csv" });
-    let blobUrl = URL.createObjectURL(blob);
+    const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+    const blob = new Blob([bom, csv], { type: "text/csv" });
+    const blobUrl = URL.createObjectURL(blob);
 
-    let link = document.createElement("a");
+    const link = document.createElement("a");
     link.href = blobUrl;
     link.download = fileName;
     link.style.display = "none";
