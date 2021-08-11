@@ -37,14 +37,6 @@ function textCopy(textVal: string): boolean {
   return retVal;
 }
 
-function arr2enum(arr: Array<string>): { [s: string]: string } {
-  const output: { [s: string]: string } = {};
-  arr.forEach((x) => {
-    output[x] = x;
-  });
-  return output;
-}
-
 // function isObject(val) {
 //   if (val !== null && typeof val === "object" && val.constructor === Object) {
 //     return true;
