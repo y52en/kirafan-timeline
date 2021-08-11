@@ -1,59 +1,82 @@
 /* eslint-disable no-constant-condition */
 "use strict";
-import clonedeep from "lodash/cloneDeep";
 import codemirror from "codemirror";
 import "codemirror/addon/mode/simple";
 import "codemirror/addon/comment/comment";
 import "codemirror/lib/codemirror.css";
 // import "codemirror/theme/panda-syntax.css";
 import "../public/css/panda-syntax.css";
-
+import lib from "./lib";
 ((window) => {
-  const undefinedErr = Error("undefined");
-
-  function htmltag(name: string, inner = "", Class = ""): HTMLElement {
-    const output = document.createElement(name);
-    if (output) {
-      if (inner) output.innerText = inner;
-      if (Class) output.classList.add(Class);
-      return output;
-    } else {
-      throw undefinedErr;
-    }
+  enum command {
+    set,
+    start,
+    end,
+    move,
+    action,
+    start_sort,
+    end_sort,
+    move_list,
+    buffset,
+    buffadd,
+    buffminus,
+    switch,
+    order,
+    skillcard,
+    color,
+    add,
   }
-
-  // eslint-disable-next-line
-  function objectCopy(obj: object | any[]): object | any[] {
-    return clonedeep(obj);
-  }
-  // function isObject(val) {
-  //   if (val !== null && typeof val === "object" && val.constructor === Object) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
-  function textCopy(textVal: string) {
-    const copyFrom = document.createElement("textarea");
-    copyFrom.textContent = textVal;
-    const bodyElm = document.getElementsByTagName("body")[0];
-    bodyElm.appendChild(copyFrom);
-    copyFrom.select();
-    const retVal = document.execCommand("copy");
-    bodyElm.removeChild(copyFrom);
-    return retVal;
-  }
+  const commandStr2Enum = (() => {
+    const output: { [s: string]: command } = {};
+    const command_list = [
+      "set",
+      "start",
+      "end",
+      "move",
+      "action",
+      "start_sort",
+      "end_sort",
+      "move_list",
+      "buffset",
+      "buffadd",
+      "buffminus",
+      "switch",
+      "order",
+      "skillcard",
+      "color",
+      "add",
+    ];
+    command_list.forEach((x) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      output[x] = command[x] as command;
+    });
+    const shorthand_list: [string, command][] = [
+      ["mv_ls", command.move_list],
+      ["b", command.buffset],
+      ["b+", command.buffadd],
+      ["b-", command.buffminus],
+      ["a", command.add],
+      ["m", command.move],
+      ["ac", command.action],
+      ["sw", command.switch],
+      ["c", command.color],
+      ["sc", command.skillcard],
+    ];
+    shorthand_list.forEach(([str, toCommand]) => {
+      output[str] = toCommand;
+    });
+    return output;
+  })();
 
   interface lexicallyAnalyzed {
-    type: string;
+    type: lexicallyAnalyzeStr;
     value: string;
   }
 
-  interface move_list {
-    mode: string;
-    value: string[];
-  }
-
-  type AST = string[] | ["mv_ls" | "move_list", string, move_list[]];
+  type AST_command = [command, ...string[]];
+  type AST_mvls = [command.move_list, string, move_list[]];
+  type AST = AST_command | AST_mvls;
   /*  [
             [set,syaro,144],
             [mv_ls,syaro, 
@@ -64,6 +87,57 @@ import "../public/css/panda-syntax.css";
           ]
           
        */
+
+  const enum mvls_mode {
+    switch,
+    order,
+    command,
+    action,
+  }
+  interface mvls_normal {
+    mode: mvls_mode.action | mvls_mode.order | mvls_mode.switch;
+    value: string[];
+  }
+
+  interface mvls_command {
+    mode: mvls_mode.command;
+    value: AST_command;
+  }
+
+  type move_list = mvls_normal | mvls_command;
+
+  const enum lexicallyAnalyzeStr {
+    commma,
+    new_line,
+    braceL,
+    braceR,
+    bracketL,
+    bracketR,
+    angle_bracketL,
+    angle_bracketR,
+    reserved,
+    word,
+  }
+
+  const enum TL_type {
+    chara,
+    skillcard,
+  }
+  interface TL_chara {
+    timeline_OrderValue: number;
+    id: string;
+    type: TL_type.chara;
+  }
+
+  interface TL_skillcard {
+    OrderValue: number;
+    id: string;
+    time: number;
+    timeline_OrderValue: number;
+    type: TL_type.skillcard;
+  }
+
+  type TL_obj = TL_chara | TL_skillcard;
 
   class parser_lexicallyAnalyze2AST {
     timeline_parsed: lexicallyAnalyzed[];
@@ -97,7 +171,7 @@ import "../public/css/panda-syntax.css";
       const t = this;
       const type = () => this.timeline_parsed[i].type;
       for (i = 0; i < this.timeline_parsed.length; i++) {
-        if (type() === "bracketL") {
+        if (type() === lexicallyAnalyzeStr.bracketL) {
           removeMeaninglessNewLine();
         }
         output.push(this.timeline_parsed[i]);
@@ -112,12 +186,12 @@ import "../public/css/panda-syntax.css";
             t.error_unexpectedToken("]が不足しています");
           }
 
-          if (type() === "bracketL") {
+          if (type() === lexicallyAnalyzeStr.bracketL) {
             i_toErrMsg.push(i);
             removeMeaninglessNewLine();
-          } else if (type() === "new_line") {
+          } else if (type() === lexicallyAnalyzeStr.new_line) {
             continue;
-          } else if (type() === "bracketR") {
+          } else if (type() === lexicallyAnalyzeStr.bracketR) {
             i_toErrMsg.pop();
             break;
           }
@@ -131,7 +205,7 @@ import "../public/css/panda-syntax.css";
       }
 
       for (let i = 0, isBeforeNewLine = true; i < output.length; i++) {
-        if (output[i].type === "new_line") {
+        if (output[i].type === lexicallyAnalyzeStr.new_line) {
           if (isBeforeNewLine) {
             output.splice(i, 1);
             i--;
@@ -152,7 +226,7 @@ import "../public/css/panda-syntax.css";
       // }
 
       for (let i = output.length - 1; i >= 0; i--) {
-        if (output[i].type === "new_line") {
+        if (output[i].type === lexicallyAnalyzeStr.new_line) {
           output.pop();
         } else {
           break;
@@ -167,7 +241,10 @@ import "../public/css/panda-syntax.css";
       if (this.timeline_parsed.length === 0) {
         return output;
       }
-      this.timeline_parsed.push({ type: "new_line", value: "\n" });
+      this.timeline_parsed.push({
+        type: lexicallyAnalyzeStr.new_line,
+        value: "\n",
+      });
 
       for (
         this.i_loading = 0;
@@ -178,7 +255,7 @@ import "../public/css/panda-syntax.css";
         const data: AST = this.loadStatement();
         output.push(data);
 
-        if (this.now_val_type !== "new_line") {
+        if (this.now_val_type !== lexicallyAnalyzeStr.new_line) {
           this.error_unexpectedToken(
             "]のあとにコメント以外の文を書くことはできません"
           );
@@ -192,7 +269,17 @@ import "../public/css/panda-syntax.css";
       // = [];
 
       this.checkIsWord();
-      const commmand = this.now_val.value;
+      const commmand_str = this.now_val.value;
+
+      const commmand = (() => {
+        const tmp = commandStr2Enum[commmand_str] as command | undefined;
+        if (typeof tmp !== "undefined") {
+          return tmp;
+        } else {
+          throw Error("コマンド名に誤りがあります");
+        }
+      })();
+
       this.nextVal();
 
       const push = () => {
@@ -200,12 +287,12 @@ import "../public/css/panda-syntax.css";
         this.nextVal();
       };
 
-      if (commmand === "move_list" || commmand === "mv_ls") {
+      if (commmand === command.move_list) {
         this.checkIsWord();
         const arg1 = this.now_val.value;
         this.nextVal();
 
-        if (this.now_val_type !== "bracketL") {
+        if (this.now_val_type !== lexicallyAnalyzeStr.bracketL) {
           this.error_unexpectedToken(
             "move_listの第二引数は [ から始まる必要があります"
           );
@@ -213,33 +300,35 @@ import "../public/css/panda-syntax.css";
         this.nextVal();
 
         const arg2: move_list[] = [];
-        if (this.now_val_type !== "bracketR") {
-          loop: while (true) {
+        if (this.now_val_type !== lexicallyAnalyzeStr.bracketR) {
+          while (true) {
             let list, val: move_list;
             switch (this.now_val_type) {
               // [
-              case "bracketL":
+              case lexicallyAnalyzeStr.bracketL:
                 this.nextVal();
-                list = this.getMoveListInList("bracketR");
-                arg2.push({ mode: "switch", value: list });
+                list = this.getMoveListInList(lexicallyAnalyzeStr.bracketR);
+                arg2.push({ mode: mvls_mode.switch, value: list });
                 break;
 
               // <
-              case "angle_bracketL":
+              case lexicallyAnalyzeStr.angle_bracketL:
                 this.nextVal();
-                list = this.getMoveListInList("angle_bracketR");
-                arg2.push({ mode: "order", value: list });
+                list = this.getMoveListInList(
+                  lexicallyAnalyzeStr.angle_bracketR
+                );
+                arg2.push({ mode: mvls_mode.order, value: list });
                 break;
 
               // {
-              case "braceL":
+              case lexicallyAnalyzeStr.braceL:
                 this.nextVal();
-                list = this.getMoveListInList("braceR");
-                arg2.push({ mode: "command", value: list });
+                list = this.getCommandListInList();
+                arg2.push({ mode: mvls_mode.command, value: list });
                 break;
 
-              case "word":
-                val = { mode: "action", value: [] };
+              case lexicallyAnalyzeStr.word:
+                val = { mode: mvls_mode.action, value: [] };
                 val.value.push(this.now_val.value);
                 arg2.push(val);
                 this.nextVal();
@@ -250,10 +339,11 @@ import "../public/css/panda-syntax.css";
                   "move_list内のパースエラー　正しい値が入力されているか確認してください"
                 );
             }
-
-            if (this.now_val_type === "bracketR") {
-              break loop;
-            } else if (this.now_val_type === "commma") {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            if (this.now_val_type === lexicallyAnalyzeStr.bracketR) {
+              break;
+            } else if (this.now_val_type === lexicallyAnalyzeStr.commma) {
               this.nextVal();
             } else {
               this.error_unexpectedToken(
@@ -262,18 +352,14 @@ import "../public/css/panda-syntax.css";
             }
           }
         }
-        statementList = [commmand, arg1, arg2] as [
-          "mv_ls" | "move_list",
-          string,
-          move_list[]
-        ];
+        statementList = [commmand, arg1, arg2] as AST_mvls;
         this.nextVal();
       } else {
-        statementList = [commmand] as string[];
+        statementList = [commmand] as AST_command;
         while (true) {
-          if (this.now_val_type === "word") {
+          if (this.now_val_type === lexicallyAnalyzeStr.word) {
             push();
-          } else if (this.now_val_type === "new_line") {
+          } else if (this.now_val_type === lexicallyAnalyzeStr.new_line) {
             break;
           } else {
             this.error_unexpectedToken("この文字は入力できません");
@@ -288,22 +374,34 @@ import "../public/css/panda-syntax.css";
       return this.i_loading + 1 >= this.timeline_parsed.length;
     }
 
-    getMoveListInList(endType: string): string[] {
-      const output: string[] = [];
-      if (this.now_val_type === endType) {
-        return output;
-      }
+    getCommandListInList(): AST_command {
+      const endType = lexicallyAnalyzeStr.braceR;
+      const output: (string | command)[] = [];
+      // if (this.now_val_type === endType) {
+      //   return output;
+      // }
 
+      let i = 0;
       loop: while (true) {
         switch (this.now_val_type) {
-          case "word":
-            output.push(this.now_val.value);
+          case lexicallyAnalyzeStr.word:
+            if (i === 0) {
+              const command_num =
+                commandStr2Enum[this.now_val.value] as command | undefined;
+              if (command_num) {
+                output.push(command_num); 
+              } else {
+                this.error_unexpectedToken("コマンド名に誤りがあります");
+              }
+            } else {
+              output.push(this.now_val.value);
+            }
             this.nextVal();
             break;
 
           default:
             this.error_unexpectedToken(
-              "move_list内のかっこが閉じれていないか引数が不正です"
+              "move_list内のかっこが閉じられていないか引数が不正です"
             );
         }
 
@@ -312,7 +410,45 @@ import "../public/css/panda-syntax.css";
             this.nextVal();
             break loop;
 
-          case "commma":
+          case lexicallyAnalyzeStr.commma:
+            this.nextVal();
+            break;
+
+          default:
+            this.error_unexpectedToken(
+              "move_list内のかっこが閉じれていないか引数が不正、もしくはコンマが不足しています"
+            );
+        }
+        i++;
+      }
+      return output as AST_command;
+    }
+
+    getMoveListInList(endType: lexicallyAnalyzeStr): string[] {
+      const output: string[] = [];
+      if (this.now_val_type === endType) {
+        return output;
+      }
+
+      loop: while (true) {
+        switch (this.now_val_type) {
+          case lexicallyAnalyzeStr.word:
+            output.push(this.now_val.value);
+            this.nextVal();
+            break;
+
+          default:
+            this.error_unexpectedToken(
+              "move_list内のかっこが閉じられていないか引数が不正です"
+            );
+        }
+
+        switch (this.now_val_type) {
+          case endType:
+            this.nextVal();
+            break loop;
+
+          case lexicallyAnalyzeStr.commma:
             this.nextVal();
             break;
 
@@ -341,26 +477,26 @@ import "../public/css/panda-syntax.css";
     }
 
     checkIsWord() {
-      if (this.now_val_type !== "word") {
+      if (this.now_val_type !== lexicallyAnalyzeStr.word) {
         this.error_unexpectedToken();
       }
     }
 
     checkIsCommma() {
-      if (this.now_val_type !== "commma") {
+      if (this.now_val_type !== lexicallyAnalyzeStr.commma) {
         this.error_unexpectedToken();
       }
     }
 
     error_unexpectedToken(errMsg = "") {
-      const output_err_where = htmltag("span");
+      const output_err_where = lib.htmltag("span");
       output_err_where.appendChild(
-        htmltag("span", "→→" + this.now_val.value + "←←", "errMsg")
+        lib.htmltag("span", "→→" + this.now_val.value + "←←", "errMsg")
       );
       // ....... \n
-      if (this.now_val.type !== "new_line") {
+      if (this.now_val.type !== lexicallyAnalyzeStr.new_line) {
         for (let i = this.i_loading + 1; i < this.timeline_parsed.length; i++) {
-          if (this.timeline_parsed[i].type === "new_line") {
+          if (this.timeline_parsed[i].type === lexicallyAnalyzeStr.new_line) {
             break;
           } else {
             output_err_where.insertAdjacentText(
@@ -371,7 +507,7 @@ import "../public/css/panda-syntax.css";
         }
       }
       for (let i = this.i_loading - 1; i >= 0; i--) {
-        if (this.timeline_parsed[i].type === "new_line") {
+        if (this.timeline_parsed[i].type === lexicallyAnalyzeStr.new_line) {
           break;
         } else {
           output_err_where.insertAdjacentText(
@@ -381,18 +517,18 @@ import "../public/css/panda-syntax.css";
         }
       }
 
-      if (this.now_val.type === "reserved") {
+      if (this.now_val.type === lexicallyAnalyzeStr.reserved) {
         errMsg = "予約文字です";
       }
-      const output = htmltag("span");
+      const output = lib.htmltag("span");
 
       output.insertAdjacentText(
         "beforeend",
         "想定外の値: 「" + JSON.stringify(this.now_val.value) + "」"
       );
-      output.appendChild(htmltag("br"));
+      output.appendChild(lib.htmltag("br"));
       output.appendChild(output_err_where);
-      output.appendChild(htmltag("br"));
+      output.appendChild(lib.htmltag("br"));
       output.insertAdjacentText("beforeend", errMsg);
 
       throw Error(output.outerHTML);
@@ -421,26 +557,29 @@ import "../public/css/panda-syntax.css";
 
     lexicalAnalysis(): lexicallyAnalyzed[] {
       let string = this.timeline_str;
-      const output = [];
+      const output: lexicallyAnalyzed[] = [];
       let tmp = "";
       const space = "\u{20}";
       string = string.replaceAll(/\\(\n|$)/g, "");
 
-      const parsed = (type: string, value: string) => ({
-        type: type,
-        value: value,
+      const parsed = (type: lexicallyAnalyzeStr, value: string) => ({
+        type,
+        value,
       });
       loop: for (let i = 0; i < string.length; i++) {
         const char = string[i];
 
-        const val = parsed("", char);
-        const changeType = (type: string) => {
-          val.type = type;
+        let val: lexicallyAnalyzed | { value: string } = { value: char };
+        const changeType = (type: lexicallyAnalyzeStr) => {
+          val = {
+            type: type,
+            value: val.value,
+          };
         };
 
         switch (char) {
           case ",":
-            changeType("commma");
+            changeType(lexicallyAnalyzeStr.commma);
             break;
           case "\n":
             // for (let m = i + 1; m < string.length; m++) {
@@ -449,7 +588,7 @@ import "../public/css/panda-syntax.css";
             //   }
             //   i++;
             // }
-            changeType("new_line");
+            changeType(lexicallyAnalyzeStr.new_line);
             break;
           case space:
           case "　":
@@ -469,22 +608,22 @@ import "../public/css/panda-syntax.css";
             // changeType("comment");
             continue;
           case "{":
-            changeType("braceL");
+            changeType(lexicallyAnalyzeStr.braceL);
             break;
           case "}":
-            changeType("braceR");
+            changeType(lexicallyAnalyzeStr.braceR);
             break;
           case "[":
-            changeType("bracketL");
+            changeType(lexicallyAnalyzeStr.bracketL);
             break;
           case "]":
-            changeType("bracketR");
+            changeType(lexicallyAnalyzeStr.bracketR);
             break;
           case "<":
-            changeType("angle_bracketL");
+            changeType(lexicallyAnalyzeStr.angle_bracketL);
             break;
           case ">":
-            changeType("angle_bracketR");
+            changeType(lexicallyAnalyzeStr.angle_bracketR);
             break;
 
           case "(":
@@ -503,7 +642,7 @@ import "../public/css/panda-syntax.css";
           case ";":
           case "`":
             // not @ _
-            changeType("reserved");
+            changeType(lexicallyAnalyzeStr.reserved);
             break;
 
           default:
@@ -511,14 +650,18 @@ import "../public/css/panda-syntax.css";
             continue loop;
         }
         push();
-        output.push(val);
+        if ("type" in val) {
+          output.push(val);
+        } else {
+          throw Error("未到達コード");
+        }
       }
 
       push();
 
       function push() {
-        if (tmp.length !== 0) {
-          output.push(parsed("word", tmp));
+        if (tmp.length > 0) {
+          output.push(parsed(lexicallyAnalyzeStr.word, tmp));
           tmp = "";
         }
       }
@@ -585,21 +728,6 @@ import "../public/css/panda-syntax.css";
   }
   const url = new OperateURL(undefined, false);
 
-  interface TL_chara {
-    timeline_OrderValue: number;
-    id: string;
-    type: "chara";
-  }
-
-  interface TL_skillcard {
-    OrderValue: number;
-    id: string;
-    time: number;
-    timeline_OrderValue: number;
-    type: "skillcard";
-  }
-
-  type TL_obj = TL_chara | TL_skillcard;
   class timeline {
     current: TL_obj[];
 
@@ -722,7 +850,7 @@ import "../public/css/panda-syntax.css";
     pushChara(id: string, calculated_moved_OrderValue: number) {
       let tmp_movechara;
       try {
-        tmp_movechara = objectCopy(this.get_chara_by_ID(id)) as TL_obj;
+        tmp_movechara = lib.objectCopy(this.get_chara_by_ID(id)) as TL_obj;
       } catch {
         tmp_movechara = { id } as TL_chara;
       }
@@ -737,7 +865,7 @@ import "../public/css/panda-syntax.css";
       const chara: TL_chara = {
         id: id,
         timeline_OrderValue: initOrderValue,
-        type: "chara",
+        type: TL_type.chara,
       };
       this.current.splice(this.place_of_currentTimeline, 0, chara);
     }
@@ -753,7 +881,7 @@ import "../public/css/panda-syntax.css";
 
       if (isFoundCard) {
         if (current_card) {
-          if (current_card.type !== "skillcard")
+          if (current_card.type !== TL_type.skillcard)
             throw Error("指定された名前はスキルカードではありません");
           current_card.time = time;
           this.current[this.placeToChara(id)] = current_card;
@@ -764,7 +892,7 @@ import "../public/css/panda-syntax.css";
         const target_ov = this.OrderValue_of_firstChara() + OrderValue;
         const target_place = this.place_to_moved(target_ov);
         this.current.splice(target_place, 0, {
-          type: "skillcard",
+          type: TL_type.skillcard,
           time,
           id,
           timeline_OrderValue: target_ov,
@@ -826,7 +954,7 @@ import "../public/css/panda-syntax.css";
 
     nextturn() {
       this.place_of_currentTimeline++;
-      if (this.firstChara?.type === "skillcard") {
+      if (this.firstChara?.type === TL_type.skillcard) {
         this.firstChara.time--;
         if (this.firstChara.time === 0) {
           this.nextturn();
@@ -932,96 +1060,120 @@ import "../public/css/panda-syntax.css";
         )
       )
     ) {
-      throw undefinedErr;
+      throw lib.undefinedErr;
+    }
+
+    const enum state {
+      start = "start",
+      move_list = "move_list",
+      move_list_arg2 = "move_list_arg2",
+      mvls_switch = "mvls_switch",
+      mvls_command = "mvls_command",
+      mvls_order = "mvls_order",
+      arg = "arg",
+      comment = "comment",
+    }
+
+    const enum token {
+      keyword = "keyword",
+      comment = "comment",
+      none = "",
+      operator = "operator",
+      age = "age",
+      unit = "unit",
+      string_3 = "string-3",
+      arg = "arg",
     }
 
     codemirror.defineSimpleMode("kirafan-timeline", {
-      start: [
+      [state.start]: [
         {
-          regex: /(mv_ls|move_list)[ 　]+/,
-          token: "keyword",
-          next: "move_list",
+          regex: /(mv_ls|move_list)[ \u3000]+/,
+          token: token.keyword,
+          next: state.move_list,
         },
 
         // string and byte string
-        { regex: /[a-zA-Z_]+$/, token: "keyword" },
-        { regex: /[a-zA-Z_]+/, token: "keyword", next: "arg" },
-        { regex: /\s+/, token: "" },
-        { regex: /#.*$/, token: "comment" },
+        { regex: /[a-zA-Z_]+$/, token: token.keyword },
+        { regex: /[a-zA-Z_]+/, token: token.keyword, next: state.arg },
+        { regex: /\s+/ },
+        { regex: /#.*$/, token: token.comment },
       ],
-      move_list: [
+      [state.move_list]: [
         {
           // regex: /([^\s]+)\s*(\[)/,
           regex: /(?:([^[\s]+)(\s*)(\[))/,
-          next: "move_list_arg2",
-          token: ["operator", "", "age"],
+          next: state.move_list_arg2,
+          token: [token.operator, token.none, token.age],
         },
       ],
-      move_list_arg2: [
-        { regex: /\s+/, token: "" },
+      [state.move_list_arg2]: [
+        { regex: /\s+/ },
 
-        { regex: /\]/, token: "unit", next: "start" },
+        { regex: /\]/, token: token.unit, next: state.start },
         {
           regex: /(\[)(\s*)([^\]\s*,]+)/,
-          token: ["unit", "", "string-3"],
-          next: "mvls_switch",
+          token: [token.unit, token.none, token.string_3],
+          next: state.mvls_switch,
         },
         {
-          regex: /(\{)(\s*)([^\}\s*,]+)/,
-          token: ["unit", "", "keyword"],
-          next: "mvls_command",
+          regex: /(\{)(\s*)([^}\s*,]+)/,
+          token: [token.unit, token.none, token.keyword],
+          next: state.mvls_command,
         },
         {
           regex: /(<)(\s*)([^>\s*,]+)/,
-          token: ["unit", "", "string-3"],
-          next: "mvls_order",
+          token: [token.unit, token.none, token.string_3],
+          next: state.mvls_order,
         },
       ],
-      mvls_switch: [
+      [state.mvls_switch]: [
         { regex: /\s+/ },
         {
           regex: /,/,
         },
-        { regex: /\]/, token: "unit", next: "move_list_arg2" },
+        { regex: /\]/, token: token.unit, next: state.move_list_arg2 },
 
         {
           regex: /[^\s\],]+/,
-          token: "string-3",
+          token: token.string_3,
         },
       ],
-      mvls_command: [
+      [state.mvls_command]: [
         { regex: /\s+/ },
         {
           regex: /,/,
         },
-        { regex: /\}/, token: "unit", next: "move_list_arg2" },
+        { regex: /\}/, token: token.unit, next: state.move_list_arg2 },
 
         {
-          regex: /[^\s\},]+/,
-          token: "string-3",
+          regex: /[^\s},]+/,
+          token: token.string_3,
         },
       ],
-      mvls_order: [
+      [state.mvls_order]: [
         { regex: /\s+/ },
         {
           regex: /,/,
         },
-        { regex: />/, token: "unit", next: "move_list_arg2" },
+        { regex: />/, token: token.unit, next: state.move_list_arg2 },
 
         {
           regex: /[^\s>,]+/,
-          token: "string-3",
+          token: token.string_3,
         },
       ],
-      arg: [
-        { regex: /[^#]*$/, token: "arg", next: "start" },
-        { regex: /[^#]*/, token: "arg", next: "start" },
+      [state.arg]: [
+        { regex: /[^#]*$/, token: token.arg, next: state.start },
+        { regex: /[^#]*/, token: token.arg, next: state.start },
 
-        { regex: /#.*$/, token: "comment" },
+        { regex: /#.*$/, token: token.comment },
       ],
-      comment: [{ regex: /.*?$/, token: "comment", next: "start" }],
+      [state.comment]: [
+        { regex: /.*?$/, token: token.comment, next: state.start },
+      ],
       meta: {
-        dontIndentStates: ["comment"],
+        dontIndentStates: [state.comment],
         // electricInput: /^\s*\}$/,
         // blockCommentStart: "/*",
         // blockCommentEnd: "*/",
@@ -1048,7 +1200,9 @@ import "../public/css/panda-syntax.css";
     // enable scrollbar
     cm.scrollTo(3, 3);
 
-    cm.on("change", main);
+    cm.on("change", () => {
+      main();
+    });
     cm.on("keydown", (cm, e) => {
       if (e.key === "/" && e.ctrlKey) {
         cm.toggleComment({ lineComment: "#" });
@@ -1070,6 +1224,8 @@ import "../public/css/panda-syntax.css";
       elm_pop11.checked = true;
     };
     window.onbeforeunload = function (e) {
+      save();
+
       if (cm.getValue().length !== 0 && elm_Set_onbeforeunload.checked) {
         e.preventDefault();
         e.returnValue = "ページから離れますか？";
@@ -1081,9 +1237,23 @@ import "../public/css/panda-syntax.css";
 
   let tableData: [Array<Array<number | string | undefined>>, string[]];
   let convertedTLdata: {
-    main: [AST?];
+    main: string[][];
     set: [string[]?];
   };
+
+  function save() {
+    const nowUrlTlParam = new OperateURL(location.href).getParam("TL");
+    const title = "自動保存:TL生成ツール";
+
+    if (nowUrlTlParam !== url.getParam("TL")) {
+      if (nowUrlTlParam.length === 0) {
+        history.replaceState(null, title, url.href);
+      } else {
+        history.pushState(null, title, url.href);
+      }
+      lib.changeTitle(title);
+    }
+  }
 
   function main() {
     const err = document.getElementById("error");
@@ -1093,9 +1263,10 @@ import "../public/css/panda-syntax.css";
     if (cm) {
       str = cm.getValue();
     } else {
-      throw undefinedErr;
+      throw lib.undefinedErr;
     }
     url.setParam("TL", str);
+    save();
 
     convertedTLdata = { main: [], set: [] };
     const chara_list: { [s: string]: chara } = {};
@@ -1103,12 +1274,13 @@ import "../public/css/panda-syntax.css";
     const chara_move_list: { [s: string]: move_list[] } = {};
 
     if (!err || !info) {
-      throw undefinedErr;
+      throw lib.undefinedErr;
     }
     err.innerHTML = "";
     info.innerHTML = "";
 
     let parsed_tldata: AST[];
+
     try {
       // parsed_tldata = tl_parser.parse();
       const tl_parser_lexicallyAnalyze = new parser_lexicallyAnalyze(str);
@@ -1121,7 +1293,7 @@ import "../public/css/panda-syntax.css";
       throw e;
     }
 
-    enum mode_list {
+    const enum mode_list {
       init,
       start,
       start_sort,
@@ -1150,7 +1322,7 @@ import "../public/css/panda-syntax.css";
         switch (mode) {
           case mode_list.init:
             switch (load_text_command) {
-              case "set":
+              case command.set:
                 id = load_text_arg1.toString();
                 SPD = Number(load_text_arg2);
                 buff = Number(load_text_arg3) || 0;
@@ -1164,17 +1336,14 @@ import "../public/css/panda-syntax.css";
                 }
                 break;
 
-              case "start":
+              case command.start:
                 mode = mode_list.start;
                 TL.inited();
                 break;
 
-              case "start_sort":
+              case command.start_sort:
                 mode = mode_list.start_sort;
                 TL.inited();
-                break;
-
-              case "":
                 break;
 
               default:
@@ -1183,27 +1352,23 @@ import "../public/css/panda-syntax.css";
             break;
           case mode_list.start:
             statement = parsed_tldata[i];
-            if (statement[0] !== "mv_ls" && statement[0] !== "move_list") {
-              mainMode(...(statement as string[]));
+            if (statement[0] !== command.move_list) {
+              mainMode(...statement);
             } else {
               throw Error("start_sort ~ end_sort内にmove_listを書いてください");
             }
             break;
           case mode_list.start_sort:
             switch (load_text_command) {
-              case "move_list":
-              case "mv_ls":
+              case command.move_list:
                 id = load_text_arg1;
                 LoadFactor_list = load_text_arg2;
                 chara_move_list[id] = LoadFactor_list as move_list[];
                 break;
 
-              case "end_sort":
+              case command.end_sort:
                 sorting();
                 mode = mode_list.waiting_mode;
-                break;
-
-              case "":
                 break;
 
               default:
@@ -1213,15 +1378,12 @@ import "../public/css/panda-syntax.css";
             break;
           case mode_list.waiting_mode:
             switch (load_text_command) {
-              case "start":
+              case command.start:
                 mode = mode_list.start;
                 break;
 
-              case "start_sort":
+              case command.start_sort:
                 mode = mode_list.start_sort;
-                break;
-
-              case "":
                 break;
 
               default:
@@ -1245,7 +1407,7 @@ import "../public/css/panda-syntax.css";
                 }
               });
               if (Object.keys(output).length !== 0) {
-                if (!info) throw undefinedErr;
+                if (!info) throw lib.undefinedErr;
                 info.insertAdjacentText(
                   "beforeend",
                   "ⓘinfo :move_listに使われていないスキルがあります:" +
@@ -1253,8 +1415,19 @@ import "../public/css/panda-syntax.css";
                       Object.fromEntries(
                         Object.entries(output).map(([key, value]) => [
                           key,
-                          value.map((x: { value: string[] | string }) => {
+                          value.map((x: { value: string[] | AST_command }) => {
+                            if (x.value.length > 0) {
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              // @ts-ignore
+                              if (x.mode === mvls_mode.command) {
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                x.value[0] = command[x.value[0]];
+                              }
+                            }
                             if (x.value.length === 1) {
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              // @ts-ignore
                               x.value = x.value[0];
                             }
                             return x.value;
@@ -1275,35 +1448,35 @@ import "../public/css/panda-syntax.css";
               );
 
             try {
-              if (input.mode === "order") {
+              if (input.mode === mvls_mode.order) {
                 const [Color_OrderValue] = input.value;
                 const Color = Color_OrderValue.match(/^[a-zA-Z]/g);
                 const OrderValue = Color_OrderValue.match(/\d+/g);
 
-                if (Color) mainMode("color", Color[0]);
+                if (Color) mainMode(command.color, Color[0]);
                 if (OrderValue) {
-                  mainMode("order", id, OrderValue[0]);
+                  mainMode(command.order, id, OrderValue[0]);
                 } else {
                   throw Error("硬直が見つかりませんでした");
                 }
-              } else if (input.mode === "action") {
+              } else if (input.mode === mvls_mode.action) {
                 const [Color_LoadFactor] = input.value;
 
                 const Color = Color_LoadFactor.match(/^[a-zA-Z]/g);
                 const LoadFactor = Color_LoadFactor.match(/\d+/g);
 
-                if (Color) mainMode("color", Color[0]);
+                if (Color) mainMode(command.color, Color[0]);
                 if (LoadFactor) {
-                  mainMode("action", id, LoadFactor[0]);
+                  mainMode(command.action, id, LoadFactor[0]);
                 } else {
                   throw Error("硬直値が見つかりませんでした");
                 }
-              } else if (input.mode === "switch") {
+              } else if (input.mode === mvls_mode.switch) {
                 const [to_name, SPD, buff] = input.value;
-                mainMode("switch", id, to_name, SPD, buff || "0");
+                mainMode(command.switch, id, to_name, SPD, buff || "0");
                 chara_move_list[to_name] = chara_move_list[id];
                 chara_move_list[id] = [];
-              } else if (input.mode === "command") {
+              } else if (input.mode === mvls_mode.command) {
                 mainMode(...input.value);
               } else {
                 throw Error("テキストのパースエラー");
@@ -1315,21 +1488,22 @@ import "../public/css/panda-syntax.css";
         }
 
         // eslint-disable-next-line no-inner-declarations
-        function mainMode(...arg: string[]) {
+        function mainMode(...arg: AST_command) {
           const [
             load_text_command,
             load_text_arg1,
             load_text_arg2,
             load_text_arg3,
             load_text_arg4,
-          ] = arg;
+          ] = arg;          
 
-          if (load_text_command !== "" && load_text_command !== "end") {
+          if (load_text_command !== command.end) {
+            const tmp: [(command|string), ...string[]] = arg;
+            tmp[0] = command[load_text_command];
             if (convertedTLdata.main.length === 0) {
-              convertedTLdata.main = [arg.filter((x) => x || x === "0")];
-            } else {
-              convertedTLdata.main.push(arg.filter((x) => x || x === "0"));
-            }
+              convertedTLdata.main = [];
+            } 
+            convertedTLdata.main.push(tmp as string[]);
           }
 
           let id,
@@ -1342,29 +1516,26 @@ import "../public/css/panda-syntax.css";
             canMoveWithout1stChara,
             canMoveWithout1stChara_act;
           switch (load_text_command) {
-            case "buffset":
-            case "b":
+
+            case command.buffset:
               id = load_text_arg1;
               buff = Number(load_text_arg2) || 0;
               chara_list[id].SPD_buff = buff;
               break;
 
-            case "buffadd":
-            case "b+":
+            case command.buffadd:
               id = load_text_arg1;
               buff = Number(load_text_arg2) || 0;
               chara_list[id].SPD_buff += buff;
               break;
 
-            case "buffminus":
-            case "b-":
+            case command.buffminus:
               id = load_text_arg1;
               buff = Number(load_text_arg2) || 0;
               chara_list[id].SPD_buff -= buff;
               break;
 
-            case "add":
-            case "a":
+            case command.add:
               id = load_text_arg1;
               SPD = Number(load_text_arg2);
               buff = Number(load_text_arg3) || 0;
@@ -1372,8 +1543,7 @@ import "../public/css/panda-syntax.css";
               TL.addChara(id, chara_list[id].initOrderValue());
               break;
 
-            case "move":
-            case "m":
+            case command.move:
               LoadFactor = Number(load_text_arg1);
               id = load_text_arg2;
               canMoveWithout1stChara = load_text_arg3 === "true";
@@ -1386,8 +1556,7 @@ import "../public/css/panda-syntax.css";
               );
               break;
 
-            case "action":
-            case "ac":
+            case command.action:
               id = load_text_arg1;
               LoadFactor = Number(load_text_arg2);
               canMoveWithout1stChara_act = load_text_arg3 === "true";
@@ -1400,7 +1569,7 @@ import "../public/css/panda-syntax.css";
               );
               break;
 
-            case "order":
+            case command.order:
               id = load_text_arg1;
               ordervalue = Number(load_text_arg2);
               // const canMoveWithout1stChara_act = load_text_arg3 === "true";
@@ -1409,8 +1578,7 @@ import "../public/css/panda-syntax.css";
 
               break;
 
-            case "switch":
-            case "sw":
+            case command.switch:
               to = load_text_arg1;
               from = load_text_arg2;
               SPD = Number(load_text_arg3);
@@ -1429,18 +1597,20 @@ import "../public/css/panda-syntax.css";
             //   chara_list[from] = new chara(from, SPD, buff);
             //   break;
 
-            case "color":
-            case "c":
+            case command.color:
               color = load_text_arg1;
               TL.color = color;
               break;
 
-            case "skillcard":
-            case "sc":
+            case command.skillcard:
               name = load_text_arg1;
               spd = Number(load_text_arg2);
               LoadFactor = Number(load_text_arg3);
               time = Number(load_text_arg4);
+
+              if ([spd, LoadFactor, time].includes(NaN)) {
+                throw Error("引数不足です");
+              }
 
               skillcard = new chara(name, spd, 0);
               chara_list[name] = skillcard;
@@ -1451,13 +1621,10 @@ import "../public/css/panda-syntax.css";
               );
               break;
 
-            case "end":
+            case command.end:
               mode = mode_list.waiting_mode;
               break;
-
-            case "":
-              break;
-
+            
             default:
               throw Error("no command found");
           }
@@ -1467,7 +1634,7 @@ import "../public/css/panda-syntax.css";
 
         // err.innerText =
         //   i + 1 + "行目にエラー(" + str_splited[i].join(" ") + ")";
-        err.appendChild(htmltag("br"));
+        err.appendChild(lib.htmltag("br"));
         err.insertAdjacentText("beforeend", e);
         break;
       }
@@ -1518,6 +1685,7 @@ import "../public/css/panda-syntax.css";
 
     tableData = [outputTL, chara_array];
     outputAsTable(outputTL, chara_array, TL.comment, now_place);
+
     printConvertedTL();
   }
 
@@ -1527,17 +1695,17 @@ import "../public/css/panda-syntax.css";
     comment: [string, string, number, string][],
     now_place: number
   ) {
-    const output = htmltag("thead");
-    const inner_tr = htmltag("tr");
+    const output = lib.htmltag("thead");
+    const inner_tr = lib.htmltag("tr");
 
     for (let i = 0; i <= json[0].length; i++) {
       let tmp;
       if (i === now_place) {
-        tmp = htmltag("th", i.toString(), "now_place");
+        tmp = lib.htmltag("th", i.toString(), "now_place");
       } else if (i === 0) {
-        tmp = htmltag("th", "", "nowrap");
+        tmp = lib.htmltag("th", "", "nowrap");
       } else {
-        tmp = htmltag("th", i.toString());
+        tmp = lib.htmltag("th", i.toString());
       }
       inner_tr.appendChild(tmp);
     }
@@ -1545,8 +1713,8 @@ import "../public/css/panda-syntax.css";
     output.appendChild(inner_tr);
 
     for (let x = 0; x < json.length; x++) {
-      const main_tl = htmltag("tr");
-      main_tl.appendChild(htmltag("td", charalist[x], "nowrap"));
+      const main_tl = lib.htmltag("tr");
+      main_tl.appendChild(lib.htmltag("td", charalist[x], "nowrap"));
       for (let y = 0; y < json[0].length; y++) {
         let tmp;
         const find = comment.find(
@@ -1562,9 +1730,9 @@ import "../public/css/panda-syntax.css";
           inner_tmp_string = "";
         }
         if (find) {
-          tmp = htmltag("td", inner_tmp_string, "color-" + find[3]);
+          tmp = lib.htmltag("td", inner_tmp_string, "color-" + find[3]);
         } else {
-          tmp = htmltag("td", inner_tmp_string);
+          tmp = lib.htmltag("td", inner_tmp_string);
         }
         main_tl.appendChild(tmp);
       }
@@ -1576,7 +1744,7 @@ import "../public/css/panda-syntax.css";
       target_elm.innerHTML = "";
       target_elm.appendChild(output);
     } else {
-      throw undefinedErr;
+      throw lib.undefinedErr;
     }
   }
 
@@ -1616,7 +1784,7 @@ import "../public/css/panda-syntax.css";
   }
 
   function copyDataAsURL() {
-    textCopy(url.href);
+    lib.textCopy(url.href);
     const copyed = document.getElementById("copyed");
     if (copyed) {
       copyed.style.display = "block";
@@ -1624,7 +1792,7 @@ import "../public/css/panda-syntax.css";
         copyed.style.display = "none";
       }, 1000);
     } else {
-      throw undefinedErr;
+      throw lib.undefinedErr;
     }
   }
 
@@ -1633,12 +1801,12 @@ import "../public/css/panda-syntax.css";
     if (popup_elm) {
       popup_elm.innerText = joinedTLdata();
     } else {
-      throw undefinedErr;
+      throw lib.undefinedErr;
     }
   }
 
   function copyConvertedTL() {
-    textCopy(joinedTLdata());
+    lib.textCopy(joinedTLdata());
     const copyed = document.getElementById("copyed_popup");
     if (copyed) {
       copyed.style.display = "block";
@@ -1646,7 +1814,7 @@ import "../public/css/panda-syntax.css";
         copyed.style.display = "none";
       }, 1000);
     } else {
-      throw undefinedErr;
+      throw lib.undefinedErr;
     }
   }
 
