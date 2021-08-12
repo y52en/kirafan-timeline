@@ -1243,18 +1243,23 @@ import lib from "./lib";
 
   function save() {
     const nowUrlTlParam = new OperateURL(location.href).getParam("TL");
-    const title = "自動保存:TL生成ツール";
+    const title = String(new Date()) + "自動保存:TL生成ツール";
 
     if (nowUrlTlParam !== url.getParam("TL")) {
       if (nowUrlTlParam.length === 0) {
         history.pushState(null, title, url.href);
       } else {
         history.replaceState(null, title, url.href);
-
       }
       lib.changeTitle(title);
     }
   }
+
+  (() => {
+    setInterval(() => {
+      save()
+    },1000 * 60 * 5)
+  })()
 
   function main() {
     const err = document.getElementById("error");
@@ -1267,7 +1272,7 @@ import lib from "./lib";
       throw lib.undefinedErr;
     }
     url.setParam("TL", str);
-    save();
+    // save();
 
     convertedTLdata = { main: [], set: [] };
     const chara_list: { [s: string]: chara } = {};
