@@ -1247,9 +1247,10 @@ import lib from "./lib";
 
     if (nowUrlTlParam !== url.getParam("TL")) {
       if (nowUrlTlParam.length === 0) {
-        history.replaceState(null, title, url.href);
-      } else {
         history.pushState(null, title, url.href);
+      } else {
+        history.replaceState(null, title, url.href);
+
       }
       lib.changeTitle(title);
     }
