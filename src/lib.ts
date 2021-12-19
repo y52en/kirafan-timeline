@@ -37,6 +37,31 @@ function textCopy(textVal: string): boolean {
   return retVal;
 }
 
+function makeTable(headers:string[], data:any[][]):HTMLElement {
+  const table = htmltag("table");
+  const thead = htmltag("thead");
+  const tr = htmltag("tr");
+  for (const header of headers) {
+    const th = htmltag("th");
+    th.innerText = header;
+    tr.appendChild(th);
+  }
+  thead.appendChild(tr);
+  table.appendChild(thead);
+  const tbody = htmltag("tbody");
+  for (const row of data) {
+    const tr = htmltag("tr");
+    for (const col of row) {
+      const td = htmltag("td");
+      td.innerText = col;
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  return table;  
+}
+
 // function isObject(val) {
 //   if (val !== null && typeof val === "object" && val.constructor === Object) {
 //     return true;
@@ -50,4 +75,5 @@ export default {
   changeTitle,
   objectCopy,
   textCopy,
+  makeTable,
 };

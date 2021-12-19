@@ -40,7 +40,8 @@
   </div>
 
   現在先頭のキャラ:<span id="firstchara"> </span><br />
-  現在 <span id="now_place"></span> 行目
+  現在 <span id="now_place"></span> 行目 <br>
+  <span class="ttk display-none">とっておきゲージ:<span class="ttk-value"></span>%</span>
   <span id="error"></span>
   <span id="info"></span>
 
@@ -124,8 +125,13 @@
     Ctrl + / : コメント ]
     が使えます<br />
     あとブラウザの機能ですがF11で全画面です<br />
-    <br />
 
+    <br>
+    2021/12/19<br>
+    ttk,ttk_untilを追加 <br>
+    ざっくりとしたとっておきの値を出せます<br>
+
+    <br />
     <strong>使い方<br /></strong>
     コマンドは半角で、またスペース区切りで設定すること<br />
     []内が引数(かっこ自体は書かない) <br />
@@ -227,7 +233,23 @@
 
     <strong> skillcard [name] [SPD] [硬直] [回数]</strong><br />
     スキルカード <br />
+    <br />
 
+    <strong> ttk [name] [name] [name] ...</strong><br />
+    <strong> ttk_until [n行目]</strong><br />
+    とっておきカウント <br />
+    ttkは引数にプレイヤーのキャラ、スキルカードの名前を書きます <br />
+    ttk_untilは引数に何行目までカウントしたいか書きます <br />
+    <br />
+    使用しているテーブル(以下にないものは0として計算)<br />
+
+    スキル<br />
+    <!-- prettier-ignore -->
+    <table class="normal-table"><thead><th>硬直</th><th>チャージ</th></thead><tbody><tr><td>0</td><td>5</td></tr><tr><td>10</td><td>0</td></tr><tr><td>35</td><td>17</td></tr><tr><td>40</td><td>8</td></tr><tr><td>45</td><td>2</td></tr><tr><td>50</td><td>5</td></tr><tr><td>55</td><td>8</td></tr><tr><td>60</td><td>8</td></tr><tr><td>65</td><td>8</td></tr><tr><td>67.5</td><td>17</td></tr><tr><td>70</td><td>17</td></tr><tr><td>75</td><td>17</td></tr><tr><td>80</td><td>5</td></tr><tr><td>100</td><td>17</td></tr><tr><td>110</td><td>22</td></tr><tr><td>120</td><td>8</td></tr><tr><td>125</td><td>0</td></tr><tr><td>130</td><td>10</td></tr><tr><td>135</td><td>17</td></tr><tr><td>140</td><td>8</td></tr><tr><td>145</td><td>8</td></tr><tr><td>150</td><td>17</td></tr><tr><td>155</td><td>8</td></tr><tr><td>165</td><td>10</td></tr><tr><td>170</td><td>17</td></tr><tr><td>190</td><td>17</td></tr><tr><td>200</td><td>17</td></tr></tbody></table>
+    
+    <br />
+    スキルカード<br />
+    <table class="normal-table"><thead><th>硬直</th><th>チャージ</th></thead><tbody><tr><td>75</td><td>5</td></tr><tr><td>80</td><td>22</td></tr><tr><td>100</td><td>22</td></tr></tbody></table>
     <br />
 
     <strong>color [色]</strong> <br />
@@ -253,6 +275,10 @@ set yuzuko 131
 
 #set hiro 130
 #set hideri 135
+
+ttk aikawa kurumi yuzuko hiro hideri heal
+ttk_until 34
+
 start_sort
 
 mv_ls enemy [{skillcard,dmg3000,224,1100,1},400,400,400,g400,r500,400,p200]

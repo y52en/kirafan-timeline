@@ -7,9 +7,12 @@ import "codemirror/lib/codemirror.css";
 // import "codemirror/theme/panda-syntax.css";
 import "../public/css/panda-syntax.css";
 import lib from "./lib";
+import define from "./define";
 ((window) => {
   enum command {
     set,
+    countTTK,
+    countTTKuntil,
     start,
     end,
     move,
@@ -30,6 +33,8 @@ import lib from "./lib";
     const output: { [s: string]: command } = {};
     const command_list = [
       "set",
+      "countTTK",
+      "countTTKuntil",
       "start",
       "end",
       "move",
@@ -52,6 +57,8 @@ import lib from "./lib";
       output[x] = command[x] as command;
     });
     const shorthand_list: [string, command][] = [
+      ["ttk", command.countTTK],
+      ["ttk_until", command.countTTKuntil],
       ["mv_ls", command.move_list],
       ["b", command.buffset],
       ["b+", command.buffadd],
@@ -129,12 +136,15 @@ import lib from "./lib";
     type: TL_type.chara;
   }
 
+  type card_event = (id: string, OrderValue: number, time: number) => any;
+
   interface TL_skillcard {
     OrderValue: number;
     id: string;
     time: number;
     timeline_OrderValue: number;
     type: TL_type.skillcard;
+    event: card_event;
   }
 
   type TL_obj = TL_chara | TL_skillcard;
@@ -386,10 +396,11 @@ import lib from "./lib";
         switch (this.now_val_type) {
           case lexicallyAnalyzeStr.word:
             if (i === 0) {
-              const command_num =
-                commandStr2Enum[this.now_val.value] as command | undefined;
+              const command_num = commandStr2Enum[this.now_val.value] as
+                | command
+                | undefined;
               if (command_num) {
-                output.push(command_num); 
+                output.push(command_num);
               } else {
                 this.error_unexpectedToken("コマンド名に誤りがあります");
               }
@@ -870,7 +881,12 @@ import lib from "./lib";
       this.current.splice(this.place_of_currentTimeline, 0, chara);
     }
 
-    addSkillCard(id: string, OrderValue: number, time: number) {
+    addSkillCard(
+      id: string,
+      OrderValue: number,
+      time: number,
+      event?: card_event
+    ) {
       let current_card;
       let isFoundCard = true;
       try {
@@ -891,13 +907,17 @@ import lib from "./lib";
       } else {
         const target_ov = this.OrderValue_of_firstChara() + OrderValue;
         const target_place = this.place_to_moved(target_ov);
+
+        event = event || ((..._) => undefined);
         this.current.splice(target_place, 0, {
           type: TL_type.skillcard,
           time,
           id,
           timeline_OrderValue: target_ov,
           OrderValue,
+          event,
         });
+
         this.cardData.push([this.place_of_currentTimeline, id]);
       }
     }
@@ -954,8 +974,14 @@ import lib from "./lib";
 
     nextturn() {
       this.place_of_currentTimeline++;
-      if (this.firstChara?.type === TL_type.skillcard) {
+      if (this.firstChara.type === TL_type.skillcard) {
+        this.firstChara.event(
+          this.firstChara.id,
+          this.firstChara.OrderValue,
+          this.firstChara.time
+        );
         this.firstChara.time--;
+        this.firstChara;
         if (this.firstChara.time === 0) {
           this.nextturn();
         } else if (this.firstChara.time < 0) {
@@ -1257,9 +1283,9 @@ import lib from "./lib";
 
   (() => {
     setInterval(() => {
-      save()
-    },1000 * 60 * 5)
-  })()
+      save();
+    }, 1000 * 60 * 5);
+  })();
 
   function main() {
     const err = document.getElementById("error");
@@ -1286,6 +1312,14 @@ import lib from "./lib";
     info.innerHTML = "";
 
     let parsed_tldata: AST[];
+    const count_ttk_ls: { [s: string]: boolean } = {};
+    let ttk = 0;
+    let ttk_count_until = Infinity;
+    const add_ttk = (n: number) => {
+      if(TL.place_of_currentTimeline < ttk_count_until) {
+        ttk += n;
+      }
+    };
 
     try {
       // parsed_tldata = tl_parser.parse();
@@ -1295,7 +1329,7 @@ import lib from "./lib";
       const tl_parser_AST = new parser_lexicallyAnalyze2AST(lexicallyAnalyzed);
       parsed_tldata = tl_parser_AST.parse();
     } catch (e) {
-      err.innerHTML = e;
+      err.innerHTML = String(e);
       throw e;
     }
 
@@ -1307,6 +1341,7 @@ import lib from "./lib";
       waiting_mode,
     }
     let mode = mode_list.init;
+
     for (let i = 0; i < parsed_tldata.length; i++) {
       try {
         const load_text_command = parsed_tldata[i]?.[0];
@@ -1323,7 +1358,8 @@ import lib from "./lib";
           to,
           from,
           ordervalue,
-          statement;
+          statement,
+          ttk_ls;
 
         switch (mode) {
           case mode_list.init:
@@ -1340,6 +1376,19 @@ import lib from "./lib";
                 } else {
                   convertedTLdata.set.push(parsed_tldata[i] as string[]);
                 }
+                break;
+
+              case command.countTTK:
+                ttk_ls = parsed_tldata[i].slice(1);
+                ttk_ls.forEach((v) => {
+                  if (typeof v === "string") {
+                    count_ttk_ls[v] = true;
+                  }
+                });
+                break;
+              
+              case command.countTTKuntil:
+                ttk_count_until = Number(load_text_arg1) || Infinity;
                 break;
 
               case command.start:
@@ -1501,14 +1550,14 @@ import lib from "./lib";
             load_text_arg2,
             load_text_arg3,
             load_text_arg4,
-          ] = arg;          
+          ] = arg;
 
           if (load_text_command !== command.end) {
-            const tmp: [(command|string), ...string[]] = arg;
+            const tmp: [command | string, ...string[]] = arg;
             tmp[0] = command[load_text_command];
             if (convertedTLdata.main.length === 0) {
               convertedTLdata.main = [];
-            } 
+            }
             convertedTLdata.main.push(tmp as string[]);
           }
 
@@ -1519,10 +1568,9 @@ import lib from "./lib";
             spd,
             time,
             skillcard,
-            canMoveWithout1stChara,
-            canMoveWithout1stChara_act;
+            canMoveWithout1stChara;
+            // canMoveWithout1stChara_act;
           switch (load_text_command) {
-
             case command.buffset:
               id = load_text_arg1;
               buff = Number(load_text_arg2) || 0;
@@ -1550,30 +1598,40 @@ import lib from "./lib";
               break;
 
             case command.move:
-              LoadFactor = Number(load_text_arg1);
-              id = load_text_arg2;
+            case command.action:
+              if (load_text_command === command.move) {
+                LoadFactor = Number(load_text_arg1);
+                id = load_text_arg2;
+              } else {
+                id = load_text_arg1;
+                LoadFactor = Number(load_text_arg2);
+              }
+
               canMoveWithout1stChara = load_text_arg3 === "true";
+              if (count_ttk_ls[id]) {
+                add_ttk(define.getCharge(LoadFactor, false));
+              }
               TL.move(
                 chara_list[TL.ID_of_firstChara()].calculateOrderValue(
                   LoadFactor
                 ),
                 id,
-                canMoveWithout1stChara
+                canMoveWithout1stChara,
               );
               break;
 
-            case command.action:
-              id = load_text_arg1;
-              LoadFactor = Number(load_text_arg2);
-              canMoveWithout1stChara_act = load_text_arg3 === "true";
-              TL.move(
-                chara_list[TL.ID_of_firstChara()].calculateOrderValue(
-                  LoadFactor
-                ),
-                id,
-                canMoveWithout1stChara_act
-              );
-              break;
+            // case command.action:
+            //   id = load_text_arg1;
+            //   LoadFactor = Number(load_text_arg2);
+            //   canMoveWithout1stChara_act = load_text_arg3 === "true";
+            //   TL.move(
+            //     chara_list[TL.ID_of_firstChara()].calculateOrderValue(
+            //       LoadFactor
+            //     ),
+            //     id,
+            //     canMoveWithout1stChara_act
+            //   );
+            //   break;
 
             case command.order:
               id = load_text_arg1;
@@ -1589,6 +1647,7 @@ import lib from "./lib";
               from = load_text_arg2;
               SPD = Number(load_text_arg3);
               buff = Number(load_text_arg4) || 0;
+              // count_ttk_ls[to] = count_ttk_ls[from];
               TL.switchChara(to, from);
               chara_list[from] = new chara(from, SPD, buff);
               break;
@@ -1623,14 +1682,20 @@ import lib from "./lib";
               TL.addSkillCard(
                 name,
                 skillcard.calculateOrderValue(LoadFactor),
-                time
+                time,
+                (id, _, _i) =>
+                  add_ttk(
+                    count_ttk_ls[id]
+                      ? define.getCharge(Number(load_text_arg3), true)
+                      : 0
+                  )
               );
               break;
 
             case command.end:
               mode = mode_list.waiting_mode;
               break;
-            
+
             default:
               throw Error("no command found");
           }
@@ -1641,7 +1706,7 @@ import lib from "./lib";
         // err.innerText =
         //   i + 1 + "行目にエラー(" + str_splited[i].join(" ") + ")";
         err.appendChild(lib.htmltag("br"));
-        err.insertAdjacentText("beforeend", e);
+        err.insertAdjacentText("beforeend", String(e));
         break;
       }
     }
@@ -1693,6 +1758,17 @@ import lib from "./lib";
     outputAsTable(outputTL, chara_array, TL.comment, now_place);
 
     printConvertedTL();
+
+    document.querySelectorAll(".ttk").forEach((elm) => {
+      if (Object.values(count_ttk_ls).filter((x) => x).length === 0) {
+        elm.classList.add("display-none");
+      } else {
+        elm.classList.remove("display-none");
+        document.querySelectorAll(".ttk-value").forEach((elm) => {
+          elm.textContent = String(ttk);
+        });
+      }
+    });
   }
 
   function outputAsTable(
