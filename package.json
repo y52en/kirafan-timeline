@@ -28,8 +28,10 @@
   "private": true,
   "dependencies": {
     "@types/three": "^0.129.2",
+    "brython": "^3.10.4",
     "codemirror": "^5.62.0",
     "lodash": "^4.17.21",
+    "micropython": "^1.1.8",
     "three": "^0.130.0"
   }
 }

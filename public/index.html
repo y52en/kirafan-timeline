@@ -6,10 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- liveserver : 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE=' -->
   <!-- Browsersync : 'sha256-d/yERybm6Vg1oK5uXfPNUtFdLqpjo+RlG7iGStOnXLg=' -->
+  <!-- micropython : sha256-42w4hoKtyK3xF0okutlfQNLmYl3CkFq/V26KmFvzBFY= -->
   <meta http-equiv="Content-Security-Policy"
-    content="script-src 'self' 'unsafe-eval' 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE=' 'sha256-d/yERybm6Vg1oK5uXfPNUtFdLqpjo+RlG7iGStOnXLg=';">
+    content="script-src 'self' 'unsafe-eval' 'sha256-42w4hoKtyK3xF0okutlfQNLmYl3CkFq/V26KmFvzBFY=' 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE=' 'sha256-d/yERybm6Vg1oK5uXfPNUtFdLqpjo+RlG7iGStOnXLg=';">
   <link rel="icon" href="./favicon.png" />
   <title>TL生成ツール</title>
+  <script>
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.webpackJsonp = window.webpackJsonp || [];
+  </script>
   <!-- IEで表示した際にアラート
     IEではCSPは(ほとんど)未対応なので設定する必要性なし -->
   <script>

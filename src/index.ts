@@ -3,11 +3,98 @@
 import codemirror from "codemirror";
 import "codemirror/addon/mode/simple";
 import "codemirror/addon/comment/comment";
+import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 // import "codemirror/theme/panda-syntax.css";
 import "../public/css/panda-syntax.css";
 import lib from "./lib";
 import define from "./define";
+import _brython from "brython";
+
+declare global {
+  interface Window {
+    brython: any;
+    python: boolean | undefined;
+    brython_error: string | undefined;
+    unlock: () => void;
+  }
+}
+const unlockedPython =
+  localStorage.getItem("I am aware of the dangers of this operation.") ===
+  "true";
+
+Object.defineProperty(window, "unlock", {
+  get: () => {
+    const input = prompt(
+      "この操作が何をしているか分かっている場合、以下の文字列を入力してください。\nI am aware of the dangers of this operation.",
+      ""
+    );
+    if (input === "I am aware of the dangers of this operation.") {
+      localStorage.setItem(
+        "I am aware of the dangers of this operation.",
+        "true"
+      );
+      window.location.reload();
+    } else {
+      alert("キャンセルしました");
+    }
+    return () => undefined;
+  },
+});
+
+void _brython;
+
+const brython = window.brython;
+let str: string | undefined = undefined;
+brython.builtins.print = (s: string) => (str = s);
+
+brython.builtins.JSON = JSON.stringify;
+
+function brython_err(str: string) {
+  console.error(str);
+  return str;
+}
+
+// let brython_error:string|undefined = undefined;
+brython.$raise = new Proxy(brython_err, {
+  apply: (target, thisarg) => {
+    try {
+      target(...thisarg);
+    } catch (e) {
+      window.brython_error = e as string;
+      throw e;
+    }
+  },
+});
+
+// brython.builtins.Exception = brython_err;
+// Object.keys(brython.builtins).forEach((key) => {
+//   if(key.toUpperCase().match("ERROR")){
+//     brython.builtins[key].$factory = brython_err;
+//   }
+// })
+
+function execPy(code: string): string | undefined {
+  let output = str;
+  try {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.pyexec(code);
+    output = str;
+    str = undefined;
+  } catch ($err) {
+    console.error($err);
+
+    throw $err;
+  }
+  return output;
+}
+
+// console.log("mp :>> ", mp);
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+window.py = execPy;
+
 ((window) => {
   enum command {
     set,
@@ -28,6 +115,7 @@ import define from "./define";
     skillcard,
     color,
     add,
+    nomove,
   }
   const commandStr2Enum = (() => {
     const output: { [s: string]: command } = {};
@@ -50,6 +138,7 @@ import define from "./define";
       "skillcard",
       "color",
       "add",
+      "nomove",
     ];
     command_list.forEach((x) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -692,11 +781,17 @@ import define from "./define";
     }
 
     getParam(param: string): string {
-      return decodeURIComponent(this._urlAPI.searchParams.get(param) || "");
+      const val = this._urlAPI.searchParams.get(param) || "";
+      try {
+        return decodeURIComponent(val);
+      } catch {
+        alert(val)
+        return val;
+      }
     }
 
     setParam(name: string, value = "") {
-      this._urlAPI.searchParams.set(name, encodeURIComponent(value));
+      this._urlAPI.searchParams.set(name, value);
       if (this.autochange) {
         this._setURL(this._urlAPI.href);
       }
@@ -992,6 +1087,10 @@ import define from "./define";
       }
     }
 
+    skip() {
+      this.nextturn();
+    }
+
     get_chara_by_ID(id: string): TL_obj {
       return this.current[this.placeToChara(id)];
     }
@@ -1215,7 +1314,7 @@ import define from "./define";
     }
 
     cm = codemirror(elm_editor, {
-      mode: "kirafan-timeline",
+      mode: window.python ? "python" : "kirafan-timeline",
       lineNumbers: true,
       indentUnit: 4,
       theme: "panda-syntax",
@@ -1287,6 +1386,58 @@ import define from "./define";
     }, 1000 * 60 * 5);
   })();
 
+  function transfer(arr: any): AST[] {
+    return arr.map((x) => {
+      const output = [];
+      const commmand_str = x[0];
+      const cmd = (() => {
+        const tmp = commandStr2Enum[commmand_str] as command | undefined;
+        if (typeof tmp !== "undefined") {
+          return tmp;
+        } else {
+          throw Error("コマンド名に誤りがあります");
+        }
+      })();
+      output.push(cmd);
+
+      for (let i = 1; i < x.length; i++) {
+        const type = typeof x[i];
+        if (type === "number") {
+          output.push(String(x[i]));
+        } else if (type === "string") {
+          output.push(x[i]);
+        } else if (Array.isArray(x[i])) {
+          if (cmd === command.move_list) {
+            const tmp = x[i].map((elem) => {
+              elem.mode = elem.mode as mvls_mode;
+              const is_mode_command = elem.mode === mvls_mode.command;
+              if (is_mode_command) {
+                elem.value[0] = commandStr2Enum[elem.value[0]] as command;
+              }
+
+              for (
+                let j = Number(is_mode_command);
+                j < elem.value.length;
+                j++
+              ) {
+                if (typeof elem.value[j] === "number") {
+                  elem.value[j] = String(elem.value[j]);
+                }
+              }
+              return elem;
+            });
+            output.push(tmp);
+          } else {
+            throw Error("move_list以外に配列が指定されています");
+          }
+        } else {
+          throw Error("不正な型です: " + JSON.stringify(x) + " -> " + x[i]);
+        }
+      }
+
+      return output as AST;
+    }) as AST[];
+  }
   function main() {
     const err = document.getElementById("error");
     const info = document.getElementById("info");
@@ -1297,6 +1448,8 @@ import define from "./define";
     } else {
       throw lib.undefinedErr;
     }
+    window.python = Boolean(str.match(/^#python#\n/));
+    const isPython = window.python && unlockedPython;
     url.setParam("TL", str);
     // save();
 
@@ -1316,18 +1469,162 @@ import define from "./define";
     let ttk = 0;
     let ttk_count_until = Infinity;
     const add_ttk = (n: number) => {
-      if(TL.place_of_currentTimeline < ttk_count_until) {
+      if (TL.place_of_currentTimeline < ttk_count_until) {
         ttk += n;
       }
     };
 
     try {
       // parsed_tldata = tl_parser.parse();
-      const tl_parser_lexicallyAnalyze = new parser_lexicallyAnalyze(str);
-      const lexicallyAnalyzed = tl_parser_lexicallyAnalyze.parse();
+      if (isPython) {
+        const tmp =
+          `_output = []
 
-      const tl_parser_AST = new parser_lexicallyAnalyze2AST(lexicallyAnalyzed);
-      parsed_tldata = tl_parser_AST.parse();
+_command__ = [
+    "set",
+    "countTTK",
+    "countTTKuntil",
+    "start",
+    "end",
+    "move",
+    "action",
+    "start_sort",
+    "end_sort",
+    "move_list",
+    "buffset",
+    "buffadd",
+    "buffminus",
+    "switch",
+    "order",
+    "skillcard",
+    "color",
+    "add",
+    "nomove"
+]
+
+
+def _command_fn(command, *args):
+    tmp = [command]
+    tmp += list(args)
+    _output.append(tmp)
+
+
+class _wrapper_command:
+    def __init__(self, command):
+        self.command = command
+        self.isCommand = True
+
+    def __call__(self, *args):
+        _command_fn(self.command, *args)
+
+
+for _cmd__ in _command__:
+    globals()[_cmd__] = _wrapper_command(_cmd__)
+
+
+ttk = countTTK
+ttk_until = countTTKuntil
+mv_ls = move_list
+bs = buffset
+bp = buffadd
+bm = buffminus
+# a = add
+# m = move
+# ac = action
+sw = switch
+# c = color
+sc = skillcard
+
+
+def ___set(*args):
+	globals()[list(args)[0]] = list(args)[0]
+	_wrapper_command("set")(*args)
+
+set = ___set
+
+
+
+# b-10 -> "b10"
+class _color__():
+
+    def __init__(self, color):
+        self.color = color
+
+    def __sub__(self, num):
+        return self.color + str(num)
+
+
+for _alp_num in range(26):
+    alphabet = str(chr(_alp_num + 97))
+    globals()[alphabet] = _color__(alphabet)
+
+
+class _mv_ls():
+    def __call__(self):
+        return _color__("m")
+
+#     def _str(self, arg):
+#         ___output = []
+#         for i in list(arg):
+#             ___output.append(str(i))
+#         return __output 
+
+    def _obj(self, mode, arg):
+        return {"mode": mode, "value": list(arg)}
+
+    def s(self, *args):
+        return self._obj(0, args)
+
+    def o(self, *args):
+        return self._obj(1, args)
+
+    def c(self, *args):
+        args = list(args)
+        if args[0].isCommand != True:
+            raise Exception("args[0] must be command function")
+        args[0] = args[0].command
+        return self._obj(2, args)
+
+    def a(self, *args):
+        return self._obj(3, args)
+
+
+m = _mv_ls()
+
+# print(a-10)
+######################
+` +
+          str +
+          `
+######################
+
+m = _mv_ls()
+for (i, cmd) in enumerate(_output):
+    if(cmd[0] == "move_list"):
+        for (j, o) in enumerate(cmd[2]):
+            o_type = type(o)
+
+            if(o_type == int or o_type == float or o_type == str):
+                _output[i][2][j] = m.a(o)
+            elif(o_type == list):
+                _output[i][2][j] = m.s(*o)
+
+
+print(str(_output))
+
+`;
+
+        const tl_json = JSON.parse(execPy(tmp)?.replaceAll("'", '"'));
+        parsed_tldata = transfer(tl_json);
+      } else {
+        const tl_parser_lexicallyAnalyze = new parser_lexicallyAnalyze(str);
+        const lexicallyAnalyzed = tl_parser_lexicallyAnalyze.parse();
+
+        const tl_parser_AST = new parser_lexicallyAnalyze2AST(
+          lexicallyAnalyzed
+        );
+        parsed_tldata = tl_parser_AST.parse();
+      }
     } catch (e) {
       err.innerHTML = String(e);
       throw e;
@@ -1386,7 +1683,7 @@ import define from "./define";
                   }
                 });
                 break;
-              
+
               case command.countTTKuntil:
                 ttk_count_until = Number(load_text_arg1) || Infinity;
                 break;
@@ -1569,7 +1866,7 @@ import define from "./define";
             time,
             skillcard,
             canMoveWithout1stChara;
-            // canMoveWithout1stChara_act;
+          // canMoveWithout1stChara_act;
           switch (load_text_command) {
             case command.buffset:
               id = load_text_arg1;
@@ -1616,7 +1913,7 @@ import define from "./define";
                   LoadFactor
                 ),
                 id,
-                canMoveWithout1stChara,
+                canMoveWithout1stChara
               );
               break;
 
@@ -1690,6 +1987,10 @@ import define from "./define";
                       : 0
                   )
               );
+              break;
+
+            case command.nomove:
+              TL.skip();
               break;
 
             case command.end:
