@@ -9,6 +9,8 @@ import "codemirror/lib/codemirror.css";
 import "../public/css/panda-syntax.css";
 import lib from "./lib";
 import define from "./define";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import _brython from "brython";
 
 declare global {
@@ -59,6 +61,8 @@ function brython_err(str: string) {
 brython.$raise = new Proxy(brython_err, {
   apply: (target, thisarg) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       target(...thisarg);
     } catch (e) {
       window.brython_error = e as string;
@@ -1387,7 +1391,7 @@ window.py = execPy;
   })();
 
   function transfer(arr: any): AST[] {
-    return arr.map((x) => {
+    return arr.map((x:any) => {
       const output = [];
       const commmand_str = x[0];
       const cmd = (() => {
@@ -1408,7 +1412,7 @@ window.py = execPy;
           output.push(x[i]);
         } else if (Array.isArray(x[i])) {
           if (cmd === command.move_list) {
-            const tmp = x[i].map((elem) => {
+            const tmp = x[i].map((elem:any) => {
               elem.mode = elem.mode as mvls_mode;
               const is_mode_command = elem.mode === mvls_mode.command;
               if (is_mode_command) {
@@ -1614,6 +1618,8 @@ print(str(_output))
 
 `;
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         const tl_json = JSON.parse(execPy(tmp)?.replaceAll("'", '"'));
         parsed_tldata = transfer(tl_json);
       } else {
