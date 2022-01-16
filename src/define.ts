@@ -14,34 +14,34 @@ function getCharge(load: number, isCard: boolean): number {
   };
   // [load,charge]
   const db_skill: [number, number][] = [
-      [0, 0.05],
-      [0.1, 0.08],
-      [0.275, 0.17],
-      [0.35, 0.17],
-      [0.4, 0.08],
-      [0.45, 0.02],
-      [0.5, 0.05],
-      [0.55, 0.08],
-      [0.6, 0.08],
-      [0.65, 0.08],
-      [0.675, 0.17],
-      [0.7, 0.02],
-      [0.75, 0.08],
-      [0.8, 0.05],
-      [1, 0.05],
-      [1.1, 0.22],
-      [1.2, 0.08],
-      [1.25, 0.08],
-      [1.3, 0.08],
-      [1.35, 0.17],
-      [1.4, 0.08],
-      [1.45, 0.08],
-      [1.5, 0.17],
-      [1.55, 0.08],
-      [1.65, 0.1],
-      [1.7, 0.17],
-      [1.9, 0.17],
-      [2, 0.17],
+    [0, 5],
+    [10, 8],
+    [27.5, 17],
+    [35, 17],
+    [40, 8],
+    [45, 2],
+    [50, 5],
+    [55, 8],
+    [60, 8],
+    [65, 8],
+    [67.5, 17],
+    [70, 2],
+    [75, 8],
+    [80, 5],
+    [100, 5],
+    [110, 22],
+    [120, 8],
+    [125, 8],
+    [130, 8],
+    [135, 17],
+    [140, 8],
+    [145, 8],
+    [150, 17],
+    [155, 8],
+    [165, 10],
+    [170, 17],
+    [190, 17],
+    [200, 17],
   ] as [number, number][];
 
   switch_db(db_skill, [125, 0]);
@@ -62,8 +62,8 @@ function getCharge(load: number, isCard: boolean): number {
 
   const db = isCard ? db_skill_card : db_skill;
 
-//   console.log(lib.makeTable([], db_skill).outerHTML);
-//   console.log(lib.makeTable([], db_skill_card).outerHTML);
+  //   console.log(lib.makeTable([], db_skill).outerHTML);
+  //   console.log(lib.makeTable([], db_skill_card).outerHTML);
 
   const charge = db.find((x) => x[0] === load);
   if (charge) {
