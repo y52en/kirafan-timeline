@@ -33,7 +33,7 @@ function textCopy(textVal: string): boolean {
   bodyElm.appendChild(copyFrom);
   copyFrom.select();
   const retVal = document.execCommand("copy");
-  bodyElm.removeChild(copyFrom);
+  // bodyElm.removeChild(copyFrom);
   return retVal;
 }
 
