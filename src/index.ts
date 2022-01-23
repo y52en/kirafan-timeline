@@ -1808,7 +1808,7 @@ print(str(_output))
               if (input.mode === mvls_mode.order) {
                 const [Color_OrderValue] = input.value;
                 const Color = Color_OrderValue.match(/^[a-zA-Z]/g);
-                const OrderValue = Color_OrderValue.match(/\d+/g);
+                const OrderValue = Color_OrderValue.match(/\d+(\.(\d+)?)?/g);
 
                 if (Color) mainMode(command.color, Color[0]);
                 if (OrderValue) {
