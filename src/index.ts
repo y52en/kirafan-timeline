@@ -789,7 +789,6 @@ window.py = execPy;
       try {
         return decodeURIComponent(val);
       } catch {
-        alert(val)
         return val;
       }
     }
