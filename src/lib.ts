@@ -26,14 +26,27 @@ function objectCopy(obj: object | any[]): object | any[] {
   return clonedeep(obj);
 }
 
+// function textCopy(textVal: string): boolean {
+//   const copyFrom = document.createElement("textarea");
+//   copyFrom.textContent = textVal;
+//   const bodyElm = document.getElementsByTagName("body")[0];
+//   bodyElm.appendChild(copyFrom);
+//   copyFrom.select();
+//   const retVal = document.execCommand("copy");
+//   // bodyElm.removeChild(copyFrom);
+//   return retVal;
+// }
+
 function textCopy(textVal: string): boolean {
-  const copyFrom = document.createElement("textarea");
-  copyFrom.textContent = textVal;
-  const bodyElm = document.getElementsByTagName("body")[0];
-  bodyElm.appendChild(copyFrom);
-  copyFrom.select();
+  const elm_textarea = document.createElement("textarea");
+  elm_textarea.value = textVal;
+  elm_textarea.setAttribute("readonly", "");
+  elm_textarea.style.position = "absolute";
+  elm_textarea.style.left = "-9999px";
+  document.body.appendChild(elm_textarea);
+  elm_textarea.select();
   const retVal = document.execCommand("copy");
-  // bodyElm.removeChild(copyFrom);
+  document.body.removeChild(elm_textarea);
   return retVal;
 }
 
