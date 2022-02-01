@@ -71,11 +71,11 @@ function waitInit() {
 
 const asyncRun = (() => {
   let id = 0; // identify a Promise
-  if (!pyodideWorker) {
-    makeWorker();
-    setmsg();
-  }
   return (script, context) => {
+    if (!pyodideWorker) {
+      makeWorker();
+      setmsg();
+    }
     // the id could be generated more carefully
     id = (id + 1) % Number.MAX_SAFE_INTEGER;
     return new Promise((onSuccess) => {
