@@ -13,11 +13,6 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1551475730309963"
      crossorigin="anonymous"></script>
   <title>TL生成ツール</title>
-  <script>
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    window.webpackJsonp = window.webpackJsonp || [];
-  </script>
   <!-- IEで表示した際にアラート
     IEではCSPは(ほとんど)未対応なので設定する必要性なし -->
   <script>
@@ -31,8 +26,6 @@
       document.write('<script src="./js/ie11.js"/><\/script>')
     }
   </script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1551475730309963"
-     crossorigin="anonymous"></script>
   <script src="./js/bundle.js"></script>
   <link rel="stylesheet" href="./css/style.css" />
 </head>
@@ -51,9 +44,13 @@
 
   現在先頭のキャラ:<span id="firstchara"> </span><br />
   現在 <span id="now_place"></span> 行目 <br>
-  <span class="ttk display-none">とっておきゲージ:<span class="ttk-value"></span>%</span>
-  <span id="error"></span>
-  <span id="info"></span>
+  <div class="ttk display-none">とっておきゲージ:<span class="ttk-value"></span>%</div>
+  <div id="error"></div>
+  <div id="info"></div>
+  <span>
+    <div id="loading_python" class="hide">Python 初期化中…</div>
+    <div id="executing_python" class="hide">Python 実行中…</div>
+  </span>
 
 
   <span id="cm-resize-frame">
@@ -273,6 +270,35 @@
     c copper<br />
     d dark<br />
 
+    <strong>#python#</strong> <br />
+    一番最初に#python#を入れるとpythonとして入力できます <br />
+    <textarea cols="30" rows="10">
+#python#
+set("syaro",144)
+set("media",124)
+
+start_sort()
+
+mv_ls(syaro,[m.command(bp,syaro,-200),10,99,m.order(10.66)])
+mv_ls(media,[d-80,80,69,m.order(c-14.5),["I",140],60])
+
+end_sort()
+    </textarea>
+    各コマンドは関数になっているのでそれを呼び出すと反映されます<br />
+    交代はそのままlistで書き、硬直値入力はm.order,コマンド入力はm.commandです<br />
+    注意点として、m.commandの第一引数はfunctionを渡します<br />
+    <br />
+    一部のコマンドの略称が変わります<br />
+    bs = buffset<br />
+    bp = buffadd<br />
+    bm = buffminus<br />
+    <br />
+    色を付ける場合、色-数字としてください<br />
+    b-40<br />
+    m.order(b-40)<br />
+
+    
+
     <br />
     <br />
     <strong>例</strong><br />
@@ -304,8 +330,6 @@ end_sort
 </textarea>
   </div><br>
   広告<br>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1551475730309963"
-     crossorigin="anonymous"></script>
       <!-- ad-1 -->
       <ins class="adsbygoogle"
           style="display:block"

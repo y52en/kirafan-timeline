@@ -9,95 +9,7 @@ import "codemirror/lib/codemirror.css";
 import "../public/css/panda-syntax.css";
 import lib from "./lib";
 import define from "./define";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import _brython from "brython";
-
-declare global {
-  interface Window {
-    brython: any;
-    python: boolean | undefined;
-    brython_error: string | undefined;
-    unlock: () => void;
-  }
-}
-const unlockedPython =
-  localStorage.getItem("I am aware of the dangers of this operation.") ===
-  "true";
-
-Object.defineProperty(window, "unlock", {
-  get: () => {
-    const input = prompt(
-      "この操作が何をしているか分かっている場合、以下の文字列を入力してください。\nI am aware of the dangers of this operation.",
-      ""
-    );
-    if (input === "I am aware of the dangers of this operation.") {
-      localStorage.setItem(
-        "I am aware of the dangers of this operation.",
-        "true"
-      );
-      window.location.reload();
-    } else {
-      alert("キャンセルしました");
-    }
-    return () => undefined;
-  },
-});
-
-void _brython;
-
-const brython = window.brython;
-let str: string | undefined = undefined;
-brython.builtins.print = (s: string) => (str = s);
-
-brython.builtins.JSON = JSON.stringify;
-
-function brython_err(str: string) {
-  console.error(str);
-  return str;
-}
-
-// let brython_error:string|undefined = undefined;
-brython.$raise = new Proxy(brython_err, {
-  apply: (target, thisarg) => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      target(...thisarg);
-    } catch (e) {
-      window.brython_error = e as string;
-      throw e;
-    }
-  },
-});
-
-// brython.builtins.Exception = brython_err;
-// Object.keys(brython.builtins).forEach((key) => {
-//   if(key.toUpperCase().match("ERROR")){
-//     brython.builtins[key].$factory = brython_err;
-//   }
-// })
-
-function execPy(code: string): string | undefined {
-  let output = str;
-  try {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    window.pyexec(code);
-    output = str;
-    str = undefined;
-  } catch ($err) {
-    console.error($err);
-
-    throw $err;
-  }
-  return output;
-}
-
-// console.log("mp :>> ", mp);
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-window.py = execPy;
+import python from "./python";
 
 ((window) => {
   enum command {
@@ -168,6 +80,14 @@ window.py = execPy;
     });
     return output;
   })();
+
+  const globalVar = {
+    cm: undefined as codemirror.Editor | undefined,
+  };
+  const enum editor_mode {
+    python = "python",
+    "kirafan-timeline" = "kirafan-timeline",
+  }
 
   interface lexicallyAnalyzed {
     type: lexicallyAnalyzeStr;
@@ -1317,7 +1237,7 @@ window.py = execPy;
     }
 
     cm = codemirror(elm_editor, {
-      mode: window.python ? "python" : "kirafan-timeline",
+      mode: "kirafan-timeline",
       lineNumbers: true,
       indentUnit: 4,
       theme: "panda-syntax",
@@ -1336,6 +1256,7 @@ window.py = execPy;
         cm.toggleComment({ lineComment: "#" });
       }
     });
+    globalVar.cm = cm;
 
     // elm_textarea.oninput = main;
     elm_csvDownload.onclick = outputAsCSV;
@@ -1390,7 +1311,7 @@ window.py = execPy;
   })();
 
   function transfer(arr: any): AST[] {
-    return arr.map((x:any) => {
+    return arr.map((x: any) => {
       const output = [];
       const commmand_str = x[0];
       const cmd = (() => {
@@ -1411,7 +1332,7 @@ window.py = execPy;
           output.push(x[i]);
         } else if (Array.isArray(x[i])) {
           if (cmd === command.move_list) {
-            const tmp = x[i].map((elem:any) => {
+            const tmp = x[i].map((elem: any) => {
               elem.mode = elem.mode as mvls_mode;
               const is_mode_command = elem.mode === mvls_mode.command;
               if (is_mode_command) {
@@ -1441,9 +1362,12 @@ window.py = execPy;
       return output as AST;
     }) as AST[];
   }
-  function main() {
+  async function main() {
     const err = document.getElementById("error");
     const info = document.getElementById("info");
+
+    const loading_python = document.getElementById("loading_python");
+    const executing_python = document.getElementById("executing_python");
 
     let str;
     if (cm) {
@@ -1451,8 +1375,7 @@ window.py = execPy;
     } else {
       throw lib.undefinedErr;
     }
-    window.python = Boolean(str.match(/^#python#\n/));
-    const isPython = window.python && unlockedPython;
+    const isPython = Boolean(str.match(/^#python#/));
     url.setParam("TL", str);
     // save();
 
@@ -1461,11 +1384,9 @@ window.py = execPy;
     const TL = new timeline();
     const chara_move_list: { [s: string]: move_list[] } = {};
 
-    if (!err || !info) {
+    if (!err || !info || !loading_python || !executing_python) {
       throw lib.undefinedErr;
     }
-    err.innerHTML = "";
-    info.innerHTML = "";
 
     let parsed_tldata: AST[];
     const count_ttk_ls: { [s: string]: boolean } = {};
@@ -1480,148 +1401,44 @@ window.py = execPy;
     try {
       // parsed_tldata = tl_parser.parse();
       if (isPython) {
-        const tmp =
-          `_output = []
+        if (globalVar.cm?.getOption("mode") !== editor_mode.python) {
+          cm.setOption("mode", editor_mode.python);
+        }
+        const timer = setTimeout(() => { 
+          err.innerHTML = "";
+          info.innerHTML = "";
 
-_command__ = [
-    "set",
-    "countTTK",
-    "countTTKuntil",
-    "start",
-    "end",
-    "move",
-    "action",
-    "start_sort",
-    "end_sort",
-    "move_list",
-    "buffset",
-    "buffadd",
-    "buffminus",
-    "switch",
-    "order",
-    "skillcard",
-    "color",
-    "add",
-    "nomove"
-]
+          loading_python.classList.remove("hide");
+        },1500)
+        await python.waitInit();
+        clearTimeout(timer);
+        loading_python.classList.add("hide");
 
+        const timer2 = setTimeout(() => {
+          err.innerHTML = "";
+          info.innerHTML = "";
+          
+          executing_python.classList.remove("hide");
+        },1500)
+        const { results, error } = await python.main(str);
+        clearTimeout(timer2);
+        executing_python.classList.add("hide");
+        if (error) {
+          throw error;
+        }
 
-def _command_fn(command, *args):
-    tmp = [command]
-    tmp += list(args)
-    _output.append(tmp)
-
-
-class _wrapper_command:
-    def __init__(self, command):
-        self.command = command
-        self.isCommand = True
-
-    def __call__(self, *args):
-        _command_fn(self.command, *args)
-
-
-for _cmd__ in _command__:
-    globals()[_cmd__] = _wrapper_command(_cmd__)
-
-
-ttk = countTTK
-ttk_until = countTTKuntil
-mv_ls = move_list
-bs = buffset
-bp = buffadd
-bm = buffminus
-# a = add
-# m = move
-# ac = action
-sw = switch
-# c = color
-sc = skillcard
-
-
-def ___set(*args):
-	globals()[list(args)[0]] = list(args)[0]
-	_wrapper_command("set")(*args)
-
-set = ___set
-
-
-
-# b-10 -> "b10"
-class _color__():
-
-    def __init__(self, color):
-        self.color = color
-
-    def __sub__(self, num):
-        return self.color + str(num)
-
-
-for _alp_num in range(26):
-    alphabet = str(chr(_alp_num + 97))
-    globals()[alphabet] = _color__(alphabet)
-
-
-class _mv_ls():
-    def __call__(self):
-        return _color__("m")
-
-#     def _str(self, arg):
-#         ___output = []
-#         for i in list(arg):
-#             ___output.append(str(i))
-#         return __output 
-
-    def _obj(self, mode, arg):
-        return {"mode": mode, "value": list(arg)}
-
-    def s(self, *args):
-        return self._obj(0, args)
-
-    def o(self, *args):
-        return self._obj(1, args)
-
-    def c(self, *args):
-        args = list(args)
-        if args[0].isCommand != True:
-            raise Exception("args[0] must be command function")
-        args[0] = args[0].command
-        return self._obj(2, args)
-
-    def a(self, *args):
-        return self._obj(3, args)
-
-
-m = _mv_ls()
-
-# print(a-10)
-######################
-` +
-          str +
-          `
-######################
-
-m = _mv_ls()
-for (i, cmd) in enumerate(_output):
-    if(cmd[0] == "move_list"):
-        for (j, o) in enumerate(cmd[2]):
-            o_type = type(o)
-
-            if(o_type == int or o_type == float or o_type == str):
-                _output[i][2][j] = m.a(o)
-            elif(o_type == list):
-                _output[i][2][j] = m.s(*o)
-
-
-print(str(_output))
-
-`;
+        const tl_json = JSON.parse(results);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const tl_json = JSON.parse(execPy(tmp)?.replaceAll("'", '"'));
+        // ts-ignore
+        // const tl_json = JSON.parse(execPy(tmp)?.replaceAll("'", '"'));
         parsed_tldata = transfer(tl_json);
       } else {
+        if (
+          globalVar.cm?.getOption("mode") !== editor_mode["kirafan-timeline"]
+        ) {
+          cm.setOption("mode", editor_mode["kirafan-timeline"]);
+        }
         const tl_parser_lexicallyAnalyze = new parser_lexicallyAnalyze(str);
         const lexicallyAnalyzed = tl_parser_lexicallyAnalyze.parse();
 
@@ -1631,9 +1448,18 @@ print(str(_output))
         parsed_tldata = tl_parser_AST.parse();
       }
     } catch (e) {
-      err.innerHTML = String(e);
-      throw e;
+      if (isPython) {
+        const tmp = String(e).split("\n")
+        err.innerText = tmp[tmp.length - 2];
+      } else {
+        err.innerHTML = String(e);
+      }
+      info.innerHTML = "";
+      return;
+      // throw e;
     }
+    info.innerHTML = "";
+    err.innerHTML = "";
 
     const enum mode_list {
       init,

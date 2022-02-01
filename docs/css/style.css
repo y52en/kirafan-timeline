@@ -285,3 +285,7 @@ table.normal-table > *
   background: rgb(105, 105, 104);
   color: #fff;
 } */
+
+.hide {
+  display: none;
+}
