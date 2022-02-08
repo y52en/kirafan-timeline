@@ -3,13 +3,16 @@
 import codemirror from "codemirror";
 import "codemirror/addon/mode/simple";
 import "codemirror/addon/comment/comment";
+import "codemirror/addon/hint/show-hint";
 import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
+import "codemirror/addon/hint/show-hint.css";
 // import "codemirror/theme/panda-syntax.css";
 import "../public/css/panda-syntax.css";
 import lib from "./lib";
 import define from "./define";
 import python from "./python";
+import CodeMirror from "codemirror";
 
 ((window) => {
   enum command {
@@ -1236,6 +1239,71 @@ import python from "./python";
       str = TLparam;
     }
 
+    const command_name = Object.keys(commandStr2Enum);
+    function synonyms(cm: codemirror.Editor): Promise<codemirror.Hints | void> {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          const cursor = cm.getCursor(),
+            line = cm.getLine(cursor.line);
+          let start = cursor.ch,
+            end = cursor.ch;
+          while (start && /[^\s,{}[\]<>]/.test(line.charAt(start - 1))) --start;
+          while (end < line.length && /[^\s,{}[\]<>]/.test(line.charAt(end)))
+            ++end;
+          const word = line.slice(start, end).toLowerCase();
+          const output: string[] = [];
+          command_name.forEach((v) => {
+            if (v.startsWith(word)) {
+              output.push(v);
+            }
+          });
+          const val = cm
+            .getValue()
+            .replaceAll(/#([^\n])+/g, "")
+            .split("\n")
+            .map((v) => v.trim().split(/\s/));
+          
+          
+          const charas = val
+            .filter((v) => {
+              if (v.length < 1) {
+                return false;
+              }
+              return v[0].startsWith("set");
+            })
+            .map(v => v[1]);
+            
+          
+          val.forEach((v) => {
+            if (v.length <= 2) {
+              return;
+            }
+            if (v[0].startsWith("mv_ls") || v[0].startsWith("move_list")) {
+              const arg = [
+                ...v[2].replaceAll(/\t/g, "").matchAll(/[[,]\[([^,]+)/g),
+              ];
+
+              arg.forEach((x) => {
+                charas.push(x[1]);
+              });
+            }
+          });
+
+          charas.filter(x => x.startsWith(word) && x !== word)
+            .forEach((x) => output.push(x));
+
+          if (output.length > 0) {
+            return resolve({
+              list: output,
+              from: CodeMirror.Pos(cursor.line, start),
+              to: CodeMirror.Pos(cursor.line, end),
+            } as codemirror.Hints);
+          }
+          return resolve(undefined);
+        }, 100);
+      });
+    }
+
     cm = codemirror(elm_editor, {
       mode: "kirafan-timeline",
       lineNumbers: true,
@@ -1244,7 +1312,10 @@ import python from "./python";
       lineWrapping: true,
       tabSize: 2,
       value: str,
+      extraKeys: { "Ctrl-Space": "autocomplete" },
+      hintOptions: { hint: synonyms as CodeMirror.HintFunction},
     });
+    
     // enable scrollbar
     cm.scrollTo(3, 3);
 
@@ -1294,6 +1365,9 @@ import python from "./python";
         ) {
           rmBracketLR(cm);
           e.preventDefault();
+        }
+        if (e.key.match(/^\w$/)){
+          cm.showHint();
         }
       });
     });
@@ -1412,7 +1486,7 @@ import python from "./python";
 
     let str;
     if (cm) {
-      str = cm.getValue();
+      str = cm.getValue() + "\n";
     } else {
       throw lib.undefinedErr;
     }
