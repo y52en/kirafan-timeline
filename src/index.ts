@@ -1251,10 +1251,51 @@ import python from "./python";
     cm.on("change", () => {
       main();
     });
+    function getPosition(pos: codemirror.Editor, to = 1): string {
+      const { line, ch } = pos.getCursor();
+      const lineText = pos.getLine(line);
+      return lineText.substring(ch, ch + to);
+    }
+    function moveCursor(pos: codemirror.Editor, moveto: number): void {
+      const { line, ch } = pos.getCursor();
+      pos.setCursor({ line, ch: ch + moveto });
+    }
+    function addBracketR(pos: codemirror.Editor, str: string) {
+      const cursor = pos.getCursor();
+      pos.replaceRange(str, cursor);
+      moveCursor(pos, -1);
+    }
+    function rmBracketLR(pos: codemirror.Editor) {
+      const { line, ch } = pos.getCursor();
+      pos.replaceRange("", { line, ch: ch - 1 }, { line, ch: ch + 1 });
+    }
+    const bracket = [
+      ["[", "]"],
+      ["{", "}"],
+      ["<", ">"],
+    ];
     cm.on("keydown", (cm, e) => {
       if (e.key === "/" && e.ctrlKey) {
         cm.toggleComment({ lineComment: "#" });
       }
+      bracket.forEach(([open, close]) => {
+        if (e.key === open) {
+          addBracketR(cm, open + close);
+          e.preventDefault();
+        }
+        if (e.key === close && getPosition(cm) === close) {
+          moveCursor(cm, 1);
+          e.preventDefault();
+        }
+        if (
+          e.key === "Backspace" &&
+          getPosition(cm, -1) === open &&
+          getPosition(cm, 1) === close
+        ) {
+          rmBracketLR(cm);
+          e.preventDefault();
+        }
+      });
     });
     globalVar.cm = cm;
 
@@ -1404,12 +1445,12 @@ import python from "./python";
         if (globalVar.cm?.getOption("mode") !== editor_mode.python) {
           cm.setOption("mode", editor_mode.python);
         }
-        const timer = setTimeout(() => { 
+        const timer = setTimeout(() => {
           err.innerHTML = "";
           info.innerHTML = "";
 
           loading_python.classList.remove("hide");
-        },1500)
+        }, 1500);
         await python.waitInit();
         clearTimeout(timer);
         loading_python.classList.add("hide");
@@ -1417,9 +1458,9 @@ import python from "./python";
         const timer2 = setTimeout(() => {
           err.innerHTML = "";
           info.innerHTML = "";
-          
+
           executing_python.classList.remove("hide");
-        },1500)
+        }, 1500);
         const { results, error } = await python.main(str);
         clearTimeout(timer2);
         executing_python.classList.add("hide");
@@ -1449,7 +1490,7 @@ import python from "./python";
       }
     } catch (e) {
       if (isPython) {
-        const tmp = String(e).split("\n")
+        const tmp = String(e).split("\n");
         err.innerText = tmp[tmp.length - 2];
       } else {
         err.innerHTML = String(e);
