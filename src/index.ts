@@ -1615,6 +1615,269 @@ import CodeMirror from "codemirror";
     }
     let mode = mode_list.init;
 
+    // eslint-disable-next-line no-inner-declarations
+    function sorting() {
+      while (true) {
+        const id = TL.ID_of_firstChara();
+        if (chara_move_list[id]?.[0] === undefined) {
+          const output: { [s: string]: move_list[] } = {};
+          Object.keys(chara_move_list).forEach(function (key) {
+            if (chara_move_list[key].length !== 0) {
+              output[key] = chara_move_list[key];
+            }
+          });
+          if (Object.keys(output).length !== 0) {
+            if (!info) throw lib.undefinedErr;
+            info.insertAdjacentText(
+              "beforeend",
+              "ⓘinfo :move_listに使われていないスキルがあります:" +
+                JSON.stringify(
+                  Object.fromEntries(
+                    Object.entries(output).map(([key, value]) => [
+                      key,
+                      value.map((x: { value: string[] | AST_command }) => {
+                        if (x.value.length > 0) {
+                          // @ts-ignore
+                          if (x.mode === mvls_mode.command) {
+                            // @ts-ignore
+                            x.value[0] = command[x.value[0]];
+                          }
+                        }
+                        if (x.value.length === 1) {
+                          // @ts-ignore
+                          x.value = x.value[0];
+                        }
+                        return x.value;
+                      }),
+                    ])
+                  )
+                ).replaceAll('"', "")
+            );
+          }
+          break;
+        }
+
+        const input = chara_move_list[id].shift();
+
+        if (!input)
+          throw Error(
+            "内部エラーの可能性があります。このメッセージが出たらお知らせお願いします。"
+          );
+
+        try {
+          if (input.mode === mvls_mode.order) {
+            const [Color_OrderValue] = input.value;
+            const Color = Color_OrderValue.match(/^[a-zA-Z]/g);
+            const OrderValue = Color_OrderValue.match(/\d+(\.(\d+)?)?/g);
+
+            if (Color) mainMode(command.color, Color[0]);
+            if (OrderValue) {
+              mainMode(command.order, id, OrderValue[0]);
+            } else {
+              throw Error("硬直が見つかりませんでした");
+            }
+          } else if (input.mode === mvls_mode.action) {
+            const [Color_LoadFactor] = input.value;
+
+            const Color = Color_LoadFactor.match(/^[a-zA-Z]/g);
+            const LoadFactor = Color_LoadFactor.match(/\d+/g);
+
+            if (Color) mainMode(command.color, Color[0]);
+            if (LoadFactor) {
+              mainMode(command.action, id, LoadFactor[0]);
+            } else {
+              throw Error("硬直値が見つかりませんでした");
+            }
+          } else if (input.mode === mvls_mode.switch) {
+            const [to_name, SPD, buff] = input.value;
+            mainMode(command.switch, id, to_name, SPD, buff || "0");
+            chara_move_list[to_name] = chara_move_list[id];
+            chara_move_list[id] = [];
+          } else if (input.mode === mvls_mode.command) {
+            mainMode(...input.value);
+          } else {
+            throw Error("テキストのパースエラー");
+          }
+        } catch (e) {
+          throw Error(e + ":  " + JSON.stringify(input.value) + " ");
+        }
+      }
+    }
+
+    // eslint-disable-next-line no-inner-declarations
+    function mainMode(...arg: AST_command) {
+      const [
+        load_text_command,
+        load_text_arg1,
+        load_text_arg2,
+        load_text_arg3,
+        load_text_arg4,
+      ] = arg;
+
+      if (load_text_command !== command.end) {
+        const tmp: [command | string, ...string[]] = arg;
+        tmp[0] = command[load_text_command];
+        if (convertedTLdata.main.length === 0) {
+          convertedTLdata.main = [];
+        }
+        convertedTLdata.main.push(tmp as string[]);
+      }
+
+      let id,
+        buff,
+        color,
+        name,
+        spd,
+        SPD,
+        time,
+        turn,
+        skillcard,
+        canMoveWithout1stChara,
+        LoadFactor,
+        to,
+        from,
+        ordervalue;
+
+      // canMoveWithout1stChara_act;
+      switch (load_text_command) {
+        case command.buffset:
+          id = load_text_arg1;
+          buff = Number(load_text_arg2) || 0;
+          turn = Number(load_text_arg3) ?? Infinity;
+          chara_list[id]._SPD_buff = [];
+          chara_list[id].setSPDbuff(buff, turn);
+          break;
+
+        case command.buffadd:
+          id = load_text_arg1;
+          buff = Number(load_text_arg2) || 0;
+          turn = Number(load_text_arg3) ?? Infinity;
+          chara_list[id].setSPDbuff(buff, turn);
+          break;
+
+        case command.buffminus:
+          id = load_text_arg1;
+          buff = Number(load_text_arg2) || 0;
+          turn = Number(load_text_arg3) ?? Infinity;
+          chara_list[id].setSPDbuff(-buff, turn);
+          break;
+
+        case command.add:
+          id = load_text_arg1;
+          SPD = Number(load_text_arg2);
+          buff = Number(load_text_arg3) || 0;
+          chara_list[id] = new chara(id, SPD, buff);
+          TL.addChara(id, chara_list[id].initOrderValue());
+          break;
+
+        case command.move:
+        case command.action:
+          if (load_text_command === command.move) {
+            LoadFactor = Number(load_text_arg1);
+            id = load_text_arg2;
+          } else {
+            id = load_text_arg1;
+            LoadFactor = Number(load_text_arg2);
+          }
+
+          canMoveWithout1stChara = load_text_arg3 === "true";
+          if (count_ttk_ls[id]) {
+            add_ttk(define.getCharge(LoadFactor, false));
+          }
+          TL.move(
+            chara_list[TL.ID_of_firstChara()].calculateOrderValue(LoadFactor),
+            id,
+            canMoveWithout1stChara
+          );
+          chara_list[id].nextTurn();
+          break;
+
+        // case command.action:
+        //   id = load_text_arg1;
+        //   LoadFactor = Number(load_text_arg2);
+        //   canMoveWithout1stChara_act = load_text_arg3 === "true";
+        //   TL.move(
+        //     chara_list[TL.ID_of_firstChara()].calculateOrderValue(
+        //       LoadFactor
+        //     ),
+        //     id,
+        //     canMoveWithout1stChara_act
+        //   );
+        //   break;
+
+        case command.order:
+          id = load_text_arg1;
+          ordervalue = Number(load_text_arg2);
+          // const canMoveWithout1stChara_act = load_text_arg3 === "true";
+
+          TL.move(ordervalue, id, false);
+          chara_list[id].nextTurn();
+
+          break;
+
+        case command.switch:
+          to = load_text_arg1;
+          from = load_text_arg2;
+          SPD = Number(load_text_arg3);
+          buff = Number(load_text_arg4) || 0;
+          // count_ttk_ls[to] = count_ttk_ls[from];
+          TL.switchChara(to, from);
+          chara_list[from] = new chara(from, SPD, buff);
+          break;
+
+        // case "switchSupport":
+        // case "swS":
+        //   to = load_text_arg1.toString();
+        //   from = load_text_arg2.toString();
+        //   SPD = load_text_arg3;
+        //   buff = load_text_arg4 || 0;
+        //   TL.switchSupportChara(to, from);
+        //   chara_list[from] = new chara(from, SPD, buff);
+        //   break;
+
+        case command.color:
+          color = load_text_arg1;
+          TL.color = color;
+          break;
+
+        case command.skillcard:
+          name = load_text_arg1;
+          spd = Number(load_text_arg2);
+          LoadFactor = Number(load_text_arg3);
+          time = Number(load_text_arg4);
+
+          if ([spd, LoadFactor, time].includes(NaN)) {
+            throw Error("引数不足です");
+          }
+
+          skillcard = new chara(name, spd, 0);
+          chara_list[name] = skillcard;
+          TL.addSkillCard(
+            name,
+            skillcard.calculateOrderValue(LoadFactor),
+            time,
+            (id, _, _i) =>
+              add_ttk(
+                count_ttk_ls[id]
+                  ? define.getCharge(Number(load_text_arg3), true)
+                  : 0
+              )
+          );
+          break;
+
+        case command.nomove:
+          TL.skip();
+          break;
+
+        case command.end:
+          mode = mode_list.waiting_mode;
+          break;
+
+        default:
+          throw Error("no command found");
+      }
+    }
+
     for (let i = 0; i < parsed_tldata.length; i++) {
       try {
         const load_text_command = parsed_tldata[i]?.[0];
@@ -1623,16 +1886,7 @@ import CodeMirror from "codemirror";
         const load_text_arg3 = parsed_tldata[i]?.[3];
         // const load_text_arg4 = parsed_tldata[i]?.[4];
 
-        let id,
-          SPD,
-          buff,
-          LoadFactor,
-          LoadFactor_list,
-          to,
-          from,
-          ordervalue,
-          statement,
-          ttk_ls;
+        let id, SPD, buff, LoadFactor_list, statement, ttk_ls;
 
         switch (mode) {
           case mode_list.init:
@@ -1672,6 +1926,12 @@ import CodeMirror from "codemirror";
               case command.start_sort:
                 mode = mode_list.start_sort;
                 TL.inited();
+                break;
+
+              case command.move_list:
+                mode = mode_list.start_sort;
+                TL.inited();
+                i--;
                 break;
 
               default:
@@ -1722,266 +1982,8 @@ import CodeMirror from "codemirror";
           default:
             throw Error("内部エラー");
         }
-
-        // eslint-disable-next-line no-inner-declarations
-        function sorting() {
-          while (true) {
-            const id = TL.ID_of_firstChara();
-            if (chara_move_list[id]?.[0] === undefined) {
-              const output: { [s: string]: move_list[] } = {};
-              Object.keys(chara_move_list).forEach(function (key) {
-                if (chara_move_list[key].length !== 0) {
-                  output[key] = chara_move_list[key];
-                }
-              });
-              if (Object.keys(output).length !== 0) {
-                if (!info) throw lib.undefinedErr;
-                info.insertAdjacentText(
-                  "beforeend",
-                  "ⓘinfo :move_listに使われていないスキルがあります:" +
-                    JSON.stringify(
-                      Object.fromEntries(
-                        Object.entries(output).map(([key, value]) => [
-                          key,
-                          value.map((x: { value: string[] | AST_command }) => {
-                            if (x.value.length > 0) {
-                              // @ts-ignore
-                              if (x.mode === mvls_mode.command) {
-                                // @ts-ignore
-                                x.value[0] = command[x.value[0]];
-                              }
-                            }
-                            if (x.value.length === 1) {
-                              // @ts-ignore
-                              x.value = x.value[0];
-                            }
-                            return x.value;
-                          }),
-                        ])
-                      )
-                    ).replaceAll('"', "")
-                );
-              }
-              break;
-            }
-
-            const input = chara_move_list[id].shift();
-
-            if (!input)
-              throw Error(
-                "内部エラーの可能性があります。このメッセージが出たらお知らせお願いします。"
-              );
-
-            try {
-              if (input.mode === mvls_mode.order) {
-                const [Color_OrderValue] = input.value;
-                const Color = Color_OrderValue.match(/^[a-zA-Z]/g);
-                const OrderValue = Color_OrderValue.match(/\d+(\.(\d+)?)?/g);
-
-                if (Color) mainMode(command.color, Color[0]);
-                if (OrderValue) {
-                  mainMode(command.order, id, OrderValue[0]);
-                } else {
-                  throw Error("硬直が見つかりませんでした");
-                }
-              } else if (input.mode === mvls_mode.action) {
-                const [Color_LoadFactor] = input.value;
-
-                const Color = Color_LoadFactor.match(/^[a-zA-Z]/g);
-                const LoadFactor = Color_LoadFactor.match(/\d+/g);
-
-                if (Color) mainMode(command.color, Color[0]);
-                if (LoadFactor) {
-                  mainMode(command.action, id, LoadFactor[0]);
-                } else {
-                  throw Error("硬直値が見つかりませんでした");
-                }
-              } else if (input.mode === mvls_mode.switch) {
-                const [to_name, SPD, buff] = input.value;
-                mainMode(command.switch, id, to_name, SPD, buff || "0");
-                chara_move_list[to_name] = chara_move_list[id];
-                chara_move_list[id] = [];
-              } else if (input.mode === mvls_mode.command) {
-                mainMode(...input.value);
-              } else {
-                throw Error("テキストのパースエラー");
-              }
-            } catch (e) {
-              throw Error(e + ":  " + JSON.stringify(input.value) + " ");
-            }
-          }
-        }
-
-        // eslint-disable-next-line no-inner-declarations
-        function mainMode(...arg: AST_command) {
-          const [
-            load_text_command,
-            load_text_arg1,
-            load_text_arg2,
-            load_text_arg3,
-            load_text_arg4,
-          ] = arg;
-
-          if (load_text_command !== command.end) {
-            const tmp: [command | string, ...string[]] = arg;
-            tmp[0] = command[load_text_command];
-            if (convertedTLdata.main.length === 0) {
-              convertedTLdata.main = [];
-            }
-            convertedTLdata.main.push(tmp as string[]);
-          }
-
-          let id,
-            buff,
-            color,
-            name,
-            spd,
-            time,
-            turn,
-            skillcard,
-            canMoveWithout1stChara;
-          // canMoveWithout1stChara_act;
-          switch (load_text_command) {
-            case command.buffset:
-              id = load_text_arg1;
-              buff = Number(load_text_arg2) || 0;
-              turn = Number(load_text_arg3) ?? Infinity;
-              chara_list[id]._SPD_buff = [];
-              chara_list[id].setSPDbuff(buff, turn);
-              break;
-
-            case command.buffadd:
-              id = load_text_arg1;
-              buff = Number(load_text_arg2) || 0;
-              turn = Number(load_text_arg3) ?? Infinity;
-              chara_list[id].setSPDbuff(buff, turn);
-              break;
-
-            case command.buffminus:
-              id = load_text_arg1;
-              buff = Number(load_text_arg2) || 0;
-              turn = Number(load_text_arg3) ?? Infinity;
-              chara_list[id].setSPDbuff(-buff, turn);
-              break;
-
-            case command.add:
-              id = load_text_arg1;
-              SPD = Number(load_text_arg2);
-              buff = Number(load_text_arg3) || 0;
-              chara_list[id] = new chara(id, SPD, buff);
-              TL.addChara(id, chara_list[id].initOrderValue());
-              break;
-
-            case command.move:
-            case command.action:
-              if (load_text_command === command.move) {
-                LoadFactor = Number(load_text_arg1);
-                id = load_text_arg2;
-              } else {
-                id = load_text_arg1;
-                LoadFactor = Number(load_text_arg2);
-              }
-
-              canMoveWithout1stChara = load_text_arg3 === "true";
-              if (count_ttk_ls[id]) {
-                add_ttk(define.getCharge(LoadFactor, false));
-              }
-              TL.move(
-                chara_list[TL.ID_of_firstChara()].calculateOrderValue(
-                  LoadFactor
-                ),
-                id,
-                canMoveWithout1stChara
-              );
-              chara_list[id].nextTurn();
-              break;
-
-            // case command.action:
-            //   id = load_text_arg1;
-            //   LoadFactor = Number(load_text_arg2);
-            //   canMoveWithout1stChara_act = load_text_arg3 === "true";
-            //   TL.move(
-            //     chara_list[TL.ID_of_firstChara()].calculateOrderValue(
-            //       LoadFactor
-            //     ),
-            //     id,
-            //     canMoveWithout1stChara_act
-            //   );
-            //   break;
-
-            case command.order:
-              id = load_text_arg1;
-              ordervalue = Number(load_text_arg2);
-              // const canMoveWithout1stChara_act = load_text_arg3 === "true";
-
-              TL.move(ordervalue, id, false);
-              chara_list[id].nextTurn();
-
-              break;
-
-            case command.switch:
-              to = load_text_arg1;
-              from = load_text_arg2;
-              SPD = Number(load_text_arg3);
-              buff = Number(load_text_arg4) || 0;
-              // count_ttk_ls[to] = count_ttk_ls[from];
-              TL.switchChara(to, from);
-              chara_list[from] = new chara(from, SPD, buff);
-              break;
-
-            // case "switchSupport":
-            // case "swS":
-            //   to = load_text_arg1.toString();
-            //   from = load_text_arg2.toString();
-            //   SPD = load_text_arg3;
-            //   buff = load_text_arg4 || 0;
-            //   TL.switchSupportChara(to, from);
-            //   chara_list[from] = new chara(from, SPD, buff);
-            //   break;
-
-            case command.color:
-              color = load_text_arg1;
-              TL.color = color;
-              break;
-
-            case command.skillcard:
-              name = load_text_arg1;
-              spd = Number(load_text_arg2);
-              LoadFactor = Number(load_text_arg3);
-              time = Number(load_text_arg4);
-
-              if ([spd, LoadFactor, time].includes(NaN)) {
-                throw Error("引数不足です");
-              }
-
-              skillcard = new chara(name, spd, 0);
-              chara_list[name] = skillcard;
-              TL.addSkillCard(
-                name,
-                skillcard.calculateOrderValue(LoadFactor),
-                time,
-                (id, _, _i) =>
-                  add_ttk(
-                    count_ttk_ls[id]
-                      ? define.getCharge(Number(load_text_arg3), true)
-                      : 0
-                  )
-              );
-              break;
-
-            case command.nomove:
-              TL.skip();
-              break;
-
-            case command.end:
-              mode = mode_list.waiting_mode;
-              break;
-
-            default:
-              throw Error("no command found");
-          }
-        }
       } catch (e) {
+        console.error(e);
         // console.error(i + 1 + "行目にエラー", e);
 
         // err.innerText =
@@ -1990,6 +1992,10 @@ import CodeMirror from "codemirror";
         err.insertAdjacentText("beforeend", String(e));
         break;
       }
+    }
+
+    if (mode === mode_list.start_sort) {
+      sorting();
     }
 
     const chara_array: string[] = [];
