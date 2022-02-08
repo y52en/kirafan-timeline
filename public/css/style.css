@@ -289,3 +289,10 @@ table.normal-table > *
 .hide {
   display: none;
 }
+
+.CodeMirror-wrap > div > textarea {
+    top: 0;
+    height: 26px;
+    min-height: 26px;
+    margin-bottom: -26px;
+}
