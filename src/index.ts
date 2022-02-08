@@ -7,6 +7,7 @@ import "codemirror/addon/hint/show-hint";
 import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/addon/hint/show-hint.css";
+import "codemirror/addon/edit/closebrackets";
 // import "codemirror/theme/panda-syntax.css";
 import "../public/css/panda-syntax.css";
 import lib from "./lib";
@@ -1333,7 +1334,7 @@ import CodeMirror from "codemirror";
     }
     function addBracketR(pos: codemirror.Editor, str: string) {
       const cursor = pos.getCursor();
-      pos.replaceRange(str, cursor);
+      pos.replaceRange(str, cursor,cursor);
       moveCursor(pos, -1);
     }
     function rmBracketLR(pos: codemirror.Editor) {
@@ -1349,11 +1350,13 @@ import CodeMirror from "codemirror";
       if (e.key === "/" && e.ctrlKey) {
         cm.toggleComment({ lineComment: "#" });
       }
+      if (!lib.isPC()) return;
       bracket.forEach(([open, close]) => {
         if (e.key === open) {
-          addBracketR(cm, open + close);
+          addBracketR(cm, close);
           e.preventDefault();
         }
+        
         if (e.key === close && getPosition(cm) === close) {
           moveCursor(cm, 1);
           e.preventDefault();

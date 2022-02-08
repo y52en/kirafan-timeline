@@ -75,6 +75,10 @@ function makeTable(headers:string[], data:any[][]):HTMLElement {
   return table;  
 }
 
+function isPC(): boolean {
+  return navigator.platform.indexOf("Win") > -1;
+}
+
 // function isObject(val) {
 //   if (val !== null && typeof val === "object" && val.constructor === Object) {
 //     return true;
@@ -89,4 +93,5 @@ export default {
   objectCopy,
   textCopy,
   makeTable,
+  isPC,
 };

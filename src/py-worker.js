@@ -102,5 +102,4 @@ const asyncRun = (() => {
     });
   };
 })();
-window.a = asyncRun;
 export { asyncRun,waitInit };
