@@ -61,7 +61,6 @@ import CodeMirror from "codemirror";
       "nomove",
     ];
     command_list.forEach((x) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       output[x] = command[x] as command;
     });
@@ -162,6 +161,11 @@ import CodeMirror from "codemirror";
     timeline_OrderValue: number;
     type: TL_type.skillcard;
     event: card_event;
+  }
+
+  interface buff {
+    val: number;
+    turn: number;
   }
 
   type TL_obj = TL_chara | TL_skillcard;
@@ -366,7 +370,6 @@ import CodeMirror from "codemirror";
                   "move_list内のパースエラー　正しい値が入力されているか確認してください"
                 );
             }
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             if (this.now_val_type === lexicallyAnalyzeStr.bracketR) {
               break;
@@ -1039,7 +1042,8 @@ import CodeMirror from "codemirror";
   class chara {
     id: string;
     SPD: number;
-    SPD_buff: number;
+    // SPD_buff: number;
+    _SPD_buff: buff[];
     LoadFactorReduce: number;
 
     constructor(
@@ -1051,6 +1055,7 @@ import CodeMirror from "codemirror";
       this.id = id;
       this.SPD = SPD;
       this.SPD_buff = SPD_buff;
+      this._SPD_buff = [];
       this.LoadFactorReduce = LoadFactorReduce;
     }
 
@@ -1073,6 +1078,29 @@ import CodeMirror from "codemirror";
 
     initOrderValue(): number {
       return this.calculateOrderValue(100, 0);
+    }
+
+    get SPD_buff() {
+      return this._SPD_buff.reduce((a, b) => a + b.val, 0);
+    }
+
+    set SPD_buff(val: number) {
+      this._SPD_buff = [{ val, turn: Infinity }];
+    }
+
+    setSPDbuff(val: number, turn = Infinity) {
+      if (turn === 0) return;
+      if (turn < 0) throw Error("turnは0以上の整数でなければなりません");
+      this._SPD_buff.push({ val, turn });
+    }
+
+    nextTurn() {
+      this._SPD_buff = this._SPD_buff
+        .map((buff) => {
+          buff.turn--;
+          return buff;
+        })
+        .filter((buff) => buff.turn > 0);
     }
   }
 
@@ -1263,8 +1291,7 @@ import CodeMirror from "codemirror";
             .replaceAll(/#([^\n])+/g, "")
             .split("\n")
             .map((v) => v.trim().split(/\s/));
-          
-          
+
           const charas = val
             .filter((v) => {
               if (v.length < 1) {
@@ -1272,9 +1299,8 @@ import CodeMirror from "codemirror";
               }
               return v[0].startsWith("set");
             })
-            .map(v => v[1]);
-            
-          
+            .map((v) => v[1]);
+
           val.forEach((v) => {
             if (v.length <= 2) {
               return;
@@ -1290,7 +1316,8 @@ import CodeMirror from "codemirror";
             }
           });
 
-          charas.filter(x => x.startsWith(word) && x !== word)
+          charas
+            .filter((x) => x.startsWith(word) && x !== word)
             .forEach((x) => output.push(x));
 
           if (output.length > 0) {
@@ -1314,9 +1341,9 @@ import CodeMirror from "codemirror";
       tabSize: 2,
       value: str,
       extraKeys: { "Ctrl-Space": "autocomplete" },
-      hintOptions: { hint: synonyms as CodeMirror.HintFunction},
+      hintOptions: { hint: synonyms as CodeMirror.HintFunction },
     });
-    
+
     // enable scrollbar
     cm.scrollTo(3, 3);
 
@@ -1334,7 +1361,7 @@ import CodeMirror from "codemirror";
     }
     function addBracketR(pos: codemirror.Editor, str: string) {
       const cursor = pos.getCursor();
-      pos.replaceRange(str, cursor,cursor);
+      pos.replaceRange(str, cursor, cursor);
       moveCursor(pos, -1);
     }
     function rmBracketLR(pos: codemirror.Editor) {
@@ -1353,10 +1380,10 @@ import CodeMirror from "codemirror";
       if (!lib.isPC()) return;
       bracket.forEach(([open, close]) => {
         if (e.key === open) {
-          addBracketR(cm, close);
+          addBracketR(cm, open + close);
           e.preventDefault();
         }
-        
+
         if (e.key === close && getPosition(cm) === close) {
           moveCursor(cm, 1);
           e.preventDefault();
@@ -1369,7 +1396,7 @@ import CodeMirror from "codemirror";
           rmBracketLR(cm);
           e.preventDefault();
         }
-        if (e.key.match(/^\w$/)){
+        if (e.key.match(/^\w$/)) {
           cm.showHint();
         }
       });
@@ -1718,16 +1745,13 @@ import CodeMirror from "codemirror";
                           key,
                           value.map((x: { value: string[] | AST_command }) => {
                             if (x.value.length > 0) {
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                               // @ts-ignore
                               if (x.mode === mvls_mode.command) {
-                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                 // @ts-ignore
                                 x.value[0] = command[x.value[0]];
                               }
                             }
                             if (x.value.length === 1) {
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                               // @ts-ignore
                               x.value = x.value[0];
                             }
@@ -1813,6 +1837,7 @@ import CodeMirror from "codemirror";
             name,
             spd,
             time,
+            turn,
             skillcard,
             canMoveWithout1stChara;
           // canMoveWithout1stChara_act;
@@ -1820,19 +1845,23 @@ import CodeMirror from "codemirror";
             case command.buffset:
               id = load_text_arg1;
               buff = Number(load_text_arg2) || 0;
-              chara_list[id].SPD_buff = buff;
+              turn = Number(load_text_arg3) ?? Infinity;
+              chara_list[id]._SPD_buff = [];
+              chara_list[id].setSPDbuff(buff, turn);
               break;
 
             case command.buffadd:
               id = load_text_arg1;
               buff = Number(load_text_arg2) || 0;
-              chara_list[id].SPD_buff += buff;
+              turn = Number(load_text_arg3) ?? Infinity;
+              chara_list[id].setSPDbuff(buff, turn);
               break;
 
             case command.buffminus:
               id = load_text_arg1;
               buff = Number(load_text_arg2) || 0;
-              chara_list[id].SPD_buff -= buff;
+              turn = Number(load_text_arg3) ?? Infinity;
+              chara_list[id].setSPDbuff(-buff, turn);
               break;
 
             case command.add:
@@ -1864,6 +1893,7 @@ import CodeMirror from "codemirror";
                 id,
                 canMoveWithout1stChara
               );
+              chara_list[id].nextTurn();
               break;
 
             // case command.action:
@@ -1885,6 +1915,7 @@ import CodeMirror from "codemirror";
               // const canMoveWithout1stChara_act = load_text_arg3 === "true";
 
               TL.move(ordervalue, id, false);
+              chara_list[id].nextTurn();
 
               break;
 
