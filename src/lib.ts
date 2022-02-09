@@ -74,7 +74,9 @@ function makeTable(headers: string[], data: any[][]): HTMLElement {
   table.appendChild(tbody);
   return table;
 }
-
+function isAndroid(): boolean {
+  return navigator.userAgent.indexOf("Android") > 0;
+}
 function isPC(): boolean {
   return !(
     navigator.userAgent.indexOf("iPhone") > 0 ||
@@ -100,4 +102,5 @@ export default {
   textCopy,
   makeTable,
   isPC,
+  isAndroid
 };

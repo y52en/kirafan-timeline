@@ -1388,6 +1388,7 @@ import CodeMirror from "codemirror";
         }
 
         if (e.key === close && getPosition(cm) === close) {
+          if (lib.isAndroid()) return;
           moveCursor(cm, 1);
           e.preventDefault();
         }
