@@ -9,6 +9,10 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/addon/hint/show-hint.css";
 import "codemirror/addon/edit/closebrackets";
 // import "codemirror/theme/panda-syntax.css";
+
+// import Keyboard from "simple-keyboard";
+// import "simple-keyboard/build/css/index.css";
+
 import "../public/css/panda-syntax.css";
 import lib from "./lib";
 import define from "./define";
@@ -1359,10 +1363,9 @@ import CodeMirror from "codemirror";
       const { line, ch } = pos.getCursor();
       pos.setCursor({ line, ch: ch + moveto });
     }
-    function addBracketR(pos: codemirror.Editor, str: string) {
+    function insertString(pos: codemirror.Editor, str: string) {
       const cursor = pos.getCursor();
-      pos.replaceRange(str, cursor, cursor);
-      moveCursor(pos, -1);
+      pos.replaceRange(str, cursor);
     }
     function rmBracketLR(pos: codemirror.Editor) {
       const { line, ch } = pos.getCursor();
@@ -1377,11 +1380,11 @@ import CodeMirror from "codemirror";
       if (e.key === "/" && e.ctrlKey) {
         cm.toggleComment({ lineComment: "#" });
       }
-      if (!lib.isPC()) return;
+      // if (!lib.isPC()) return;
       bracket.forEach(([open, close]) => {
         if (e.key === open) {
-          addBracketR(cm, open + close);
-          e.preventDefault();
+          insertString(cm, close);
+          moveCursor(cm, -1);
         }
 
         if (e.key === close && getPosition(cm) === close) {
@@ -1396,12 +1399,66 @@ import CodeMirror from "codemirror";
           rmBracketLR(cm);
           e.preventDefault();
         }
-        if (e.key.match(/^\w$/)) {
-          cm.showHint();
-        }
       });
+
+      if(!lib.isPC()) return;
+      if (e.key.match(/^\w$/)) {
+        cm.showHint();
+      }
     });
     globalVar.cm = cm;
+
+
+// const keyboard = new Keyboard(".keyboard",{
+//   onChange: input => onChange(input),
+//   onKeyPress: button => onKeyPress(button)
+// });
+
+// /**
+//  * Update simple-keyboard when input is changed directly
+//  */
+//     document.querySelector(".keyboard").addEventListener("input", (event) => {
+//       console.log("event :>> ", event);
+//       // @ts-ignore
+//       keyboard.setInput(event?.target?.value);
+//     });
+
+// console.log(keyboard);
+
+// function onChange(input:string) {
+//   // document.querySelector(".keyboard").value = input;
+//   console.log("Input changed", input);
+// }
+
+// function onKeyPress(button:string) {
+//   console.log("Button pressed", button);
+
+//   /**
+//    * If you want to handle the shift and caps lock buttons
+//    */
+//   if (button === "{shift}" || button === "{lock}") handleShift();
+// }
+
+// function handleShift():void {
+//   const currentLayout = keyboard.options.layoutName;
+//   const shiftToggle = currentLayout === "default" ? "shift" : "default";
+
+//   keyboard.setOptions({
+//     layoutName: shiftToggle
+//   });
+// }
+
+
+    // cm.on("focus", (cm) => {
+    //   console.log(1);
+    //   insertString(cm,"{}")
+    // });
+
+    // cm.on("blur", () => {
+    //   console.log(2);
+    //   insertString(cm,"[]")
+
+    // });
 
     // elm_textarea.oninput = main;
     elm_csvDownload.onclick = outputAsCSV;
