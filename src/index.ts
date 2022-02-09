@@ -1737,13 +1737,15 @@ import CodeMirror from "codemirror";
         to,
         from,
         ordervalue;
+      
+      const str2num_inf = (n:string) => Number.isNaN(Number(n)) ? Infinity : Number(n);
 
       // canMoveWithout1stChara_act;
       switch (load_text_command) {
         case command.buffset:
           id = load_text_arg1;
           buff = Number(load_text_arg2) || 0;
-          turn = Number(load_text_arg3) ?? Infinity;
+          turn = str2num_inf(load_text_arg3);
           chara_list[id]._SPD_buff = [];
           chara_list[id].setSPDbuff(buff, turn);
           break;
@@ -1751,14 +1753,14 @@ import CodeMirror from "codemirror";
         case command.buffadd:
           id = load_text_arg1;
           buff = Number(load_text_arg2) || 0;
-          turn = Number(load_text_arg3) ?? Infinity;
+          turn = str2num_inf(load_text_arg3);
           chara_list[id].setSPDbuff(buff, turn);
           break;
 
         case command.buffminus:
           id = load_text_arg1;
           buff = Number(load_text_arg2) || 0;
-          turn = Number(load_text_arg3) ?? Infinity;
+          turn = str2num_inf(load_text_arg3);
           chara_list[id].setSPDbuff(-buff, turn);
           break;
 
