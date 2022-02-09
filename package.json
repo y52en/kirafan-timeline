@@ -32,6 +32,7 @@
     "codemirror": "^5.62.0",
     "lodash": "^4.17.21",
     "micropython": "^1.1.8",
+    "simple-keyboard": "^3.4.46",
     "three": "^0.130.0"
   }
 }

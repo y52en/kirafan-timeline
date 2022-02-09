@@ -50,7 +50,7 @@ function textCopy(textVal: string): boolean {
   return retVal;
 }
 
-function makeTable(headers:string[], data:any[][]):HTMLElement {
+function makeTable(headers: string[], data: any[][]): HTMLElement {
   const table = htmltag("table");
   const thead = htmltag("thead");
   const tr = htmltag("tr");
@@ -72,11 +72,17 @@ function makeTable(headers:string[], data:any[][]):HTMLElement {
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);
-  return table;  
+  return table;
 }
 
 function isPC(): boolean {
-  return navigator.platform.indexOf("Win") > -1;
+  return !(
+    navigator.userAgent.indexOf("iPhone") > 0 ||
+    (navigator.userAgent.indexOf("Android") > 0 &&
+      navigator.userAgent.indexOf("Mobile") > 0) ||
+    navigator.userAgent.indexOf("iPad") > 0 ||
+    navigator.userAgent.indexOf("Android") > 0
+  );
 }
 
 // function isObject(val) {

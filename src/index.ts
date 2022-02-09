@@ -1054,8 +1054,8 @@ import CodeMirror from "codemirror";
     ) {
       this.id = id;
       this.SPD = SPD;
-      this.SPD_buff = SPD_buff;
       this._SPD_buff = [];
+      this.SPD_buff = SPD_buff;
       this.LoadFactorReduce = LoadFactorReduce;
     }
 
