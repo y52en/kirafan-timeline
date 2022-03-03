@@ -322,13 +322,13 @@ ttk_until 34
 
 start_sort
 
-mv_ls enemy [{skillcard,dmg3000,224,1100,1},400,400,400,g400,r500,400,p200]
+mv_ls enemy [{skillcard,dmg3000,224,1100,1},400*3,g400,r500,400,p200,{nomove}]
 
 mv_ls aikawa [40,70,[hiro,130],70,70,40,40,[kurumi,123],35,40,b125]
 
 mv_ls kurumi [[hideri,135],40,70,70,o40,[aikawa,123],70,[hideri,135],70,70,b125]
 
-mv_ls yuzuko [{sc,heal,131,100,5},g40,s40,{b,yuzuko,22.4},100,70,70,{b,yuzuko,0},100,s40,{b,yuzuko,22.4},g40,b125]
+mv_ls yuzuko [{sc,heal,131,100,5},g40,s40,{b+,yuzuko,22.4,3},100,70,70,100,s40,{b+,yuzuko,22.4,3},g40,b125]
 
 
 end_sort
