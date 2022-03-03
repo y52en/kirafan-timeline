@@ -87,6 +87,20 @@ function isPC(): boolean {
   );
 }
 
+
+// 自然数であるか
+function isNaturalString(str: string): boolean {
+  return /^[+]?\d+$/.test(str);
+}
+
+function unreachable(msg = "unreachable code"): never {
+  throw new Error(msg);
+}
+
+// function isNumberString(str: string): boolean {
+//   return /^[+-]?\d+$/.test(str);
+// }
+
 // function isObject(val) {
 //   if (val !== null && typeof val === "object" && val.constructor === Object) {
 //     return true;
@@ -102,5 +116,7 @@ export default {
   textCopy,
   makeTable,
   isPC,
-  isAndroid
+  isAndroid,
+  isNaturalString,
+  unreachable,
 };

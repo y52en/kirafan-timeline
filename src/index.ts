@@ -20,6 +20,7 @@ import python from "./python";
 import CodeMirror from "codemirror";
 
 ((window) => {
+  const TIMES_FAILSAFE = 20;
   enum command {
     set,
     countTTK,
@@ -142,6 +143,7 @@ import CodeMirror from "codemirror";
     bracketR,
     angle_bracketL,
     angle_bracketR,
+    asterisk,
     reserved,
     word,
   }
@@ -374,6 +376,46 @@ import CodeMirror from "codemirror";
                   "move_list内のパースエラー　正しい値が入力されているか確認してください"
                 );
             }
+            
+            if (this.now_val_type === lexicallyAnalyzeStr.asterisk) {
+              const before_val = arg2.pop();
+              const inputNumIsIllegalError = () => {
+                this.error_unexpectedToken(
+                  "*の後は0以上の整数である必要があります"
+                );
+              };
+              if (!before_val) {
+                this.error_unexpectedToken("unreachable code");
+                throw Error("unreachable code");
+              }
+              this.nextVal();
+              // @ts-ignore
+              if (this.now_val_type === lexicallyAnalyzeStr.word) {
+                const times = this.now_val.value;
+
+                if (!lib.isNaturalString(times)) {
+                  inputNumIsIllegalError();
+                }
+                const num_times = Number(times);
+                if (num_times < 0) {
+                  inputNumIsIllegalError();
+                }
+
+                if (num_times > TIMES_FAILSAFE) {
+                  this.error_unexpectedToken(
+                    `エラー : ${TIMES_FAILSAFE}回を超える繰り返しはできません(極端な値が入力され重くなることを防ぐため)`
+                  );
+                }
+                for (let i = 0; i < num_times; i++) {
+                  const tmp = lib.objectCopy(before_val) as move_list;
+                  arg2.push(tmp);
+                }
+                this.nextVal();
+              } else {
+                inputNumIsIllegalError();
+              }
+            }
+
             // @ts-ignore
             if (this.now_val_type === lexicallyAnalyzeStr.bracketR) {
               break;
@@ -661,6 +703,10 @@ import CodeMirror from "codemirror";
             changeType(lexicallyAnalyzeStr.angle_bracketR);
             break;
 
+          case "*":
+            changeType(lexicallyAnalyzeStr.asterisk);
+            break;
+
           case "(":
           case ")":
           case '"':
@@ -672,7 +718,6 @@ import CodeMirror from "codemirror";
           case "=":
           case "^":
           case "~":
-          case "*":
           case "?":
           case ";":
           case "`":
@@ -1402,53 +1447,51 @@ import CodeMirror from "codemirror";
         }
       });
 
-      if(!lib.isPC()) return;
+      if (!lib.isPC()) return;
       if (e.key.match(/^\w$/)) {
         cm.showHint();
       }
     });
     globalVar.cm = cm;
 
+    // const keyboard = new Keyboard(".keyboard",{
+    //   onChange: input => onChange(input),
+    //   onKeyPress: button => onKeyPress(button)
+    // });
 
-// const keyboard = new Keyboard(".keyboard",{
-//   onChange: input => onChange(input),
-//   onKeyPress: button => onKeyPress(button)
-// });
+    // /**
+    //  * Update simple-keyboard when input is changed directly
+    //  */
+    //     document.querySelector(".keyboard").addEventListener("input", (event) => {
+    //       console.log("event :>> ", event);
+    //       // @ts-ignore
+    //       keyboard.setInput(event?.target?.value);
+    //     });
 
-// /**
-//  * Update simple-keyboard when input is changed directly
-//  */
-//     document.querySelector(".keyboard").addEventListener("input", (event) => {
-//       console.log("event :>> ", event);
-//       // @ts-ignore
-//       keyboard.setInput(event?.target?.value);
-//     });
+    // console.log(keyboard);
 
-// console.log(keyboard);
+    // function onChange(input:string) {
+    //   // document.querySelector(".keyboard").value = input;
+    //   console.log("Input changed", input);
+    // }
 
-// function onChange(input:string) {
-//   // document.querySelector(".keyboard").value = input;
-//   console.log("Input changed", input);
-// }
+    // function onKeyPress(button:string) {
+    //   console.log("Button pressed", button);
 
-// function onKeyPress(button:string) {
-//   console.log("Button pressed", button);
+    //   /**
+    //    * If you want to handle the shift and caps lock buttons
+    //    */
+    //   if (button === "{shift}" || button === "{lock}") handleShift();
+    // }
 
-//   /**
-//    * If you want to handle the shift and caps lock buttons
-//    */
-//   if (button === "{shift}" || button === "{lock}") handleShift();
-// }
+    // function handleShift():void {
+    //   const currentLayout = keyboard.options.layoutName;
+    //   const shiftToggle = currentLayout === "default" ? "shift" : "default";
 
-// function handleShift():void {
-//   const currentLayout = keyboard.options.layoutName;
-//   const shiftToggle = currentLayout === "default" ? "shift" : "default";
-
-//   keyboard.setOptions({
-//     layoutName: shiftToggle
-//   });
-// }
-
+    //   keyboard.setOptions({
+    //     layoutName: shiftToggle
+    //   });
+    // }
 
     // cm.on("focus", (cm) => {
     //   console.log(1);
@@ -1795,8 +1838,9 @@ import CodeMirror from "codemirror";
         to,
         from,
         ordervalue;
-      
-      const str2num_inf = (n:string) => Number.isNaN(Number(n)) ? Infinity : Number(n);
+
+      const str2num_inf = (n: string) =>
+        Number.isNaN(Number(n)) ? Infinity : Number(n);
 
       // canMoveWithout1stChara_act;
       switch (load_text_command) {

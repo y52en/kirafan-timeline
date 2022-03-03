@@ -4,7 +4,6 @@ module.exports = {
   watchOptions: { ignored: "node_modules" },
   server: {
     baseDir: "./public/",
-    // middleware: [[Function(anonymous)], [Function(anonymous)]],
   },
   "open": false,
 };
