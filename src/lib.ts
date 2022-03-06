@@ -87,7 +87,6 @@ function isPC(): boolean {
   );
 }
 
-
 // 自然数であるか
 function isNaturalString(str: string): boolean {
   return /^[+]?\d+$/.test(str);
@@ -95,6 +94,41 @@ function isNaturalString(str: string): boolean {
 
 function unreachable(msg = "unreachable code"): never {
   throw new Error(msg);
+}
+
+type match_callback = (any:any) => void;
+const matched = Symbol();
+type match_result = {
+  case: (x: any, fn: match_callback) => match_result;
+  default: (fn: match_callback) => void;
+};
+
+function match(val: any): match_result {
+  return {
+    case: (x: any, fn: match_callback) => _matcher(val, x, fn),
+    default: (fn: match_callback) => {
+      if (val !== matched) {
+        fn(val);
+      }
+    },
+  };
+}
+
+function _matcher(val: any, matcher_val: any, fn: (any:any) => void) {
+  let _matched = false;
+  if (Array.isArray(matcher_val)) {
+    if (matcher_val.includes(val)) {
+      _matched = true;
+    }
+  } else if (val === matcher_val) {
+    _matched = true;
+  }
+
+  if (_matched) {
+    fn(val);
+    return match(matched);
+  }
+  return match(val);
 }
 
 // function isNumberString(str: string): boolean {
@@ -108,7 +142,10 @@ function unreachable(msg = "unreachable code"): never {
 //   return false;
 // }
 
-export default {
+
+
+// XXX:どう直したらいいかわからない
+const _export = {
   undefinedErr,
   htmltag,
   changeTitle,
@@ -119,4 +156,20 @@ export default {
   isAndroid,
   isNaturalString,
   unreachable,
+  match,
 };
+
+export {
+  undefinedErr,
+  htmltag,
+  changeTitle,
+  objectCopy,
+  textCopy,
+  makeTable,
+  isPC,
+  isAndroid,
+  isNaturalString,
+  unreachable,
+  match,
+};
+export default _export;

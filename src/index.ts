@@ -1,6 +1,6 @@
 /* eslint-disable no-constant-condition */
 "use strict";
-import codemirror from "codemirror";
+import CodeMirror from "codemirror";
 import "codemirror/addon/mode/simple";
 import "codemirror/addon/comment/comment";
 import "codemirror/addon/hint/show-hint";
@@ -8,16 +8,23 @@ import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/addon/hint/show-hint.css";
 import "codemirror/addon/edit/closebrackets";
-// import "codemirror/theme/panda-syntax.css";
 
-// import Keyboard from "simple-keyboard";
-// import "simple-keyboard/build/css/index.css";
+// import { when, A } from "pattern-matching-js";
 
 import "../public/css/panda-syntax.css";
-import lib from "./lib";
+import lib, { match } from "./lib";
 import define from "./define";
 import python from "./python";
-import CodeMirror from "codemirror";
+
+declare global {
+  interface Window {
+    debug: {
+      [s: string]: any;
+    };
+  }
+}
+
+window.debug = {};
 
 ((window) => {
   const TIMES_FAILSAFE = 20;
@@ -90,7 +97,7 @@ import CodeMirror from "codemirror";
   })();
 
   const globalVar = {
-    cm: undefined as codemirror.Editor | undefined,
+    cm: undefined as CodeMirror.Editor | undefined,
   };
   const enum editor_mode {
     python = "python",
@@ -340,43 +347,42 @@ import CodeMirror from "codemirror";
         if (this.now_val_type !== lexicallyAnalyzeStr.bracketR) {
           while (true) {
             let list, val: move_list;
-            switch (this.now_val_type) {
+            match(this.now_val_type)
               // [
-              case lexicallyAnalyzeStr.bracketL:
+              .case(lexicallyAnalyzeStr.bracketL, () => {
                 this.nextVal();
                 list = this.getMoveListInList(lexicallyAnalyzeStr.bracketR);
                 arg2.push({ mode: mvls_mode.switch, value: list });
-                break;
+              })
 
               // <
-              case lexicallyAnalyzeStr.angle_bracketL:
+              .case(lexicallyAnalyzeStr.angle_bracketL, () => {
                 this.nextVal();
                 list = this.getMoveListInList(
                   lexicallyAnalyzeStr.angle_bracketR
                 );
                 arg2.push({ mode: mvls_mode.order, value: list });
-                break;
-
+              })
               // {
-              case lexicallyAnalyzeStr.braceL:
+              .case(lexicallyAnalyzeStr.braceL, () => {
                 this.nextVal();
                 list = this.getCommandListInList();
                 arg2.push({ mode: mvls_mode.command, value: list });
-                break;
+              })
 
-              case lexicallyAnalyzeStr.word:
+              .case(lexicallyAnalyzeStr.word, () => {
                 val = { mode: mvls_mode.action, value: [] };
                 val.value.push(this.now_val.value);
                 arg2.push(val);
                 this.nextVal();
-                break;
+              })
 
-              default:
+              .default(() => {
                 this.error_unexpectedToken(
                   "move_list内のパースエラー　正しい値が入力されているか確認してください"
                 );
-            }
-            
+              });
+
             if (this.now_val_type === lexicallyAnalyzeStr.asterisk) {
               const before_val = arg2.pop();
               const inputNumIsIllegalError = () => {
@@ -459,8 +465,8 @@ import CodeMirror from "codemirror";
 
       let i = 0;
       loop: while (true) {
-        switch (this.now_val_type) {
-          case lexicallyAnalyzeStr.word:
+        match(this.now_val_type)
+          .case(lexicallyAnalyzeStr.word, () => {
             if (i === 0) {
               const command_num = commandStr2Enum[this.now_val.value] as
                 | command
@@ -474,28 +480,33 @@ import CodeMirror from "codemirror";
               output.push(this.now_val.value);
             }
             this.nextVal();
-            break;
+          })
 
-          default:
+          .default(() => {
             this.error_unexpectedToken(
               "move_list内のかっこが閉じられていないか引数が不正です"
             );
-        }
+          });
 
-        switch (this.now_val_type) {
-          case endType:
+        let is_end = false;
+        match(this.now_val_type)
+          .case(endType, () => {
             this.nextVal();
-            break loop;
-
-          case lexicallyAnalyzeStr.commma:
+            is_end = true;
+          })
+          .case(lexicallyAnalyzeStr.commma, () => {
             this.nextVal();
-            break;
-
-          default:
+          })
+          .default(() => {
             this.error_unexpectedToken(
               "move_list内のかっこが閉じれていないか引数が不正、もしくはコンマが不足しています"
             );
+          });
+
+        if (is_end) {
+          break loop;
         }
+
         i++;
       }
       return output as AST_command;
@@ -508,31 +519,36 @@ import CodeMirror from "codemirror";
       }
 
       loop: while (true) {
-        switch (this.now_val_type) {
-          case lexicallyAnalyzeStr.word:
+        match(this.now_val_type)
+          .case(lexicallyAnalyzeStr.word, () => {
             output.push(this.now_val.value);
             this.nextVal();
-            break;
-
-          default:
+          })
+          .default(() => {
             this.error_unexpectedToken(
               "move_list内のかっこが閉じられていないか引数が不正です"
             );
-        }
+          });
 
-        switch (this.now_val_type) {
-          case endType:
+        let is_end = false;
+        match(this.now_val_type)
+          .case(endType, () => {
             this.nextVal();
-            break loop;
+            is_end = true;
+          })
 
-          case lexicallyAnalyzeStr.commma:
+          .case(lexicallyAnalyzeStr.commma, () => {
             this.nextVal();
-            break;
+          })
 
-          default:
+          .default(() => {
             this.error_unexpectedToken(
               "move_list内のかっこが閉じれていないか引数が不正、もしくはコンマが不足しています"
             );
+          });
+
+        if (is_end) {
+          break loop;
         }
       }
       return output;
@@ -970,14 +986,14 @@ import CodeMirror from "codemirror";
       }
 
       if (isFoundCard) {
-        if (current_card) {
-          if (current_card.type !== TL_type.skillcard)
-            throw Error("指定された名前はスキルカードではありません");
-          current_card.time = time;
-          this.current[this.placeToChara(id)] = current_card;
-        } else {
-          throw Error("ここは実行されないはず");
+        if (!current_card) {
+          throw Error("unreachable");
         }
+        if (current_card.type !== TL_type.skillcard)
+          throw Error("指定された名前はスキルカードではありません");
+        current_card.time = time;
+        this.current[this.placeToChara(id)] = current_card;
+        
       } else {
         const target_ov = this.OrderValue_of_firstChara() + OrderValue;
         const target_place = this.place_to_moved(target_ov);
@@ -1153,7 +1169,7 @@ import CodeMirror from "codemirror";
     }
   }
 
-  let cm: codemirror.Editor;
+  let cm: CodeMirror.Editor;
 
   window.onload = () => {
     const elm_csvDownload = document.getElementById("csvDownload");
@@ -1214,7 +1230,7 @@ import CodeMirror from "codemirror";
       arg = "arg",
     }
 
-    codemirror.defineSimpleMode("kirafan-timeline", {
+    CodeMirror.defineSimpleMode("kirafan-timeline", {
       [state.start]: [
         {
           regex: /(mv_ls|move_list)[ \u3000]+/,
@@ -1318,7 +1334,7 @@ import CodeMirror from "codemirror";
     }
 
     const command_name = Object.keys(commandStr2Enum);
-    function synonyms(cm: codemirror.Editor): Promise<codemirror.Hints | void> {
+    function synonyms(cm: CodeMirror.Editor): Promise<CodeMirror.Hints | void> {
       return new Promise(function (resolve) {
         setTimeout(function () {
           const cursor = cm.getCursor(),
@@ -1374,14 +1390,14 @@ import CodeMirror from "codemirror";
               list: output,
               from: CodeMirror.Pos(cursor.line, start),
               to: CodeMirror.Pos(cursor.line, end),
-            } as codemirror.Hints);
+            } as CodeMirror.Hints);
           }
           return resolve(undefined);
         }, 100);
       });
     }
 
-    cm = codemirror(elm_editor, {
+    cm = CodeMirror(elm_editor, {
       mode: "kirafan-timeline",
       lineNumbers: true,
       indentUnit: 4,
@@ -1399,20 +1415,20 @@ import CodeMirror from "codemirror";
     cm.on("change", () => {
       main();
     });
-    function getPosition(pos: codemirror.Editor, to = 1): string {
+    function getPosition(pos: CodeMirror.Editor, to = 1): string {
       const { line, ch } = pos.getCursor();
       const lineText = pos.getLine(line);
       return lineText.substring(ch, ch + to);
     }
-    function moveCursor(pos: codemirror.Editor, moveto: number): void {
+    function moveCursor(pos: CodeMirror.Editor, moveto: number): void {
       const { line, ch } = pos.getCursor();
       pos.setCursor({ line, ch: ch + moveto });
     }
-    function insertString(pos: codemirror.Editor, str: string) {
+    function insertString(pos: CodeMirror.Editor, str: string) {
       const cursor = pos.getCursor();
       pos.replaceRange(str, cursor);
     }
-    function rmBracketLR(pos: codemirror.Editor) {
+    function rmBracketLR(pos: CodeMirror.Editor) {
       const { line, ch } = pos.getCursor();
       pos.replaceRange("", { line, ch: ch - 1 }, { line, ch: ch + 1 });
     }
@@ -1824,58 +1840,43 @@ import CodeMirror from "codemirror";
         convertedTLdata.main.push(tmp as string[]);
       }
 
-      let id,
-        buff,
-        color,
-        name,
-        spd,
-        SPD,
-        time,
-        turn,
-        skillcard,
-        canMoveWithout1stChara,
-        LoadFactor,
-        to,
-        from,
-        ordervalue;
-
       const str2num_inf = (n: string) =>
         Number.isNaN(Number(n)) ? Infinity : Number(n);
 
       // canMoveWithout1stChara_act;
-      switch (load_text_command) {
-        case command.buffset:
-          id = load_text_arg1;
-          buff = Number(load_text_arg2) || 0;
-          turn = str2num_inf(load_text_arg3);
+      match(load_text_command)
+        .case(command.buffset, () => {
+          const id = load_text_arg1;
+          const buff = Number(load_text_arg2) || 0;
+          const turn = str2num_inf(load_text_arg3);
           chara_list[id]._SPD_buff = [];
           chara_list[id].setSPDbuff(buff, turn);
-          break;
+        })
 
-        case command.buffadd:
-          id = load_text_arg1;
-          buff = Number(load_text_arg2) || 0;
-          turn = str2num_inf(load_text_arg3);
+        .case(command.buffadd, () => {
+          const id = load_text_arg1;
+          const buff = Number(load_text_arg2) || 0;
+          const turn = str2num_inf(load_text_arg3);
           chara_list[id].setSPDbuff(buff, turn);
-          break;
+        })
 
-        case command.buffminus:
-          id = load_text_arg1;
-          buff = Number(load_text_arg2) || 0;
-          turn = str2num_inf(load_text_arg3);
+        .case(command.buffminus, () => {
+          const id = load_text_arg1;
+          const buff = Number(load_text_arg2) || 0;
+          const turn = str2num_inf(load_text_arg3);
           chara_list[id].setSPDbuff(-buff, turn);
-          break;
+        })
 
-        case command.add:
-          id = load_text_arg1;
-          SPD = Number(load_text_arg2);
-          buff = Number(load_text_arg3) || 0;
+        .case(command.add, () => {
+          const id = load_text_arg1;
+          const SPD = Number(load_text_arg2);
+          const buff = Number(load_text_arg3) || 0;
           chara_list[id] = new chara(id, SPD, buff);
           TL.addChara(id, chara_list[id].initOrderValue());
-          break;
+        })
 
-        case command.move:
-        case command.action:
+        .case([command.move, command.action], () => {
+          let id, LoadFactor;
           if (load_text_command === command.move) {
             LoadFactor = Number(load_text_arg1);
             id = load_text_arg2;
@@ -1884,7 +1885,7 @@ import CodeMirror from "codemirror";
             LoadFactor = Number(load_text_arg2);
           }
 
-          canMoveWithout1stChara = load_text_arg3 === "true";
+          const canMoveWithout1stChara = load_text_arg3 === "true";
           if (count_ttk_ls[id]) {
             add_ttk(define.getCharge(LoadFactor, false));
           }
@@ -1894,7 +1895,7 @@ import CodeMirror from "codemirror";
             canMoveWithout1stChara
           );
           chara_list[id].nextTurn();
-          break;
+        })
 
         // case command.action:
         //   id = load_text_arg1;
@@ -1909,25 +1910,24 @@ import CodeMirror from "codemirror";
         //   );
         //   break;
 
-        case command.order:
-          id = load_text_arg1;
-          ordervalue = Number(load_text_arg2);
+        .case(command.order, () => {
+          const id = load_text_arg1;
+          const ordervalue = Number(load_text_arg2);
           // const canMoveWithout1stChara_act = load_text_arg3 === "true";
 
           TL.move(ordervalue, id, false);
           chara_list[id].nextTurn();
+        })
 
-          break;
-
-        case command.switch:
-          to = load_text_arg1;
-          from = load_text_arg2;
-          SPD = Number(load_text_arg3);
-          buff = Number(load_text_arg4) || 0;
+        .case(command.switch, () => {
+          const to = load_text_arg1;
+          const from = load_text_arg2;
+          const SPD = Number(load_text_arg3);
+          const buff = Number(load_text_arg4) || 0;
           // count_ttk_ls[to] = count_ttk_ls[from];
           TL.switchChara(to, from);
           chara_list[from] = new chara(from, SPD, buff);
-          break;
+        })
 
         // case "switchSupport":
         // case "swS":
@@ -1939,22 +1939,22 @@ import CodeMirror from "codemirror";
         //   chara_list[from] = new chara(from, SPD, buff);
         //   break;
 
-        case command.color:
-          color = load_text_arg1;
+        .case(command.color, () => {
+          const color = load_text_arg1;
           TL.color = color;
-          break;
+        })
 
-        case command.skillcard:
-          name = load_text_arg1;
-          spd = Number(load_text_arg2);
-          LoadFactor = Number(load_text_arg3);
-          time = Number(load_text_arg4);
+        .case(command.skillcard, () => {
+          const name = load_text_arg1;
+          const spd = Number(load_text_arg2);
+          const LoadFactor = Number(load_text_arg3);
+          const time = Number(load_text_arg4);
 
           if ([spd, LoadFactor, time].includes(NaN)) {
             throw Error("引数不足です");
           }
 
-          skillcard = new chara(name, spd, 0);
+          const skillcard = new chara(name, spd, 0);
           chara_list[name] = skillcard;
           TL.addSkillCard(
             name,
@@ -1967,19 +1967,19 @@ import CodeMirror from "codemirror";
                   : 0
               )
           );
-          break;
+        })
 
-        case command.nomove:
+        .case(command.nomove, () => {
           TL.skip();
-          break;
+        })
 
-        case command.end:
+        .case(command.end, () => {
           mode = mode_list.waiting_mode;
-          break;
+        })
 
-        default:
+        .default(() => {
           throw Error("no command found");
-      }
+        });
     }
 
     for (let i = 0; i < parsed_tldata.length; i++) {
@@ -1990,15 +1990,13 @@ import CodeMirror from "codemirror";
         const load_text_arg3 = parsed_tldata[i]?.[3];
         // const load_text_arg4 = parsed_tldata[i]?.[4];
 
-        let id, SPD, buff, LoadFactor_list, statement, ttk_ls;
-
-        switch (mode) {
-          case mode_list.init:
-            switch (load_text_command) {
-              case command.set:
-                id = load_text_arg1.toString();
-                SPD = Number(load_text_arg2);
-                buff = Number(load_text_arg3) || 0;
+        match(mode)
+          .case(mode_list.init, () => {
+            match(load_text_command)
+              .case(command.set, () => {
+                const id = load_text_arg1.toString();
+                const SPD = Number(load_text_arg2);
+                const buff = Number(load_text_arg3) || 0;
                 chara_list[id] = new chara(id, SPD, buff);
                 TL.setChara(id, chara_list[id].initOrderValue());
 
@@ -2007,85 +2005,85 @@ import CodeMirror from "codemirror";
                 } else {
                   convertedTLdata.set.push(parsed_tldata[i] as string[]);
                 }
-                break;
+              })
 
-              case command.countTTK:
-                ttk_ls = parsed_tldata[i].slice(1);
+              .case(command.countTTK, () => {
+                const ttk_ls = parsed_tldata[i].slice(1);
                 ttk_ls.forEach((v) => {
                   if (typeof v === "string") {
                     count_ttk_ls[v] = true;
                   }
                 });
-                break;
+              })
 
-              case command.countTTKuntil:
+              .case(command.countTTKuntil, () => {
                 ttk_count_until = Number(load_text_arg1) || Infinity;
-                break;
+              })
 
-              case command.start:
+              .case(command.start, () => {
                 mode = mode_list.start;
                 TL.inited();
-                break;
+              })
 
-              case command.start_sort:
+              .case(command.start_sort, () => {
                 mode = mode_list.start_sort;
                 TL.inited();
-                break;
+              })
 
-              case command.move_list:
+              .case(command.move_list, () => {
                 mode = mode_list.start_sort;
                 TL.inited();
                 i--;
-                break;
+              })
 
-              default:
+              .default(() => {
                 throw Error("need 'start'");
-            }
-            break;
-          case mode_list.start:
-            statement = parsed_tldata[i];
+              });
+          })
+
+          .case(mode_list.start, () => {
+            const statement = parsed_tldata[i];
             if (statement[0] !== command.move_list) {
               mainMode(...statement);
             } else {
               throw Error("start_sort ~ end_sort内にmove_listを書いてください");
             }
-            break;
-          case mode_list.start_sort:
-            switch (load_text_command) {
-              case command.move_list:
-                id = load_text_arg1;
-                LoadFactor_list = load_text_arg2;
+          })
+          .case(mode_list.start_sort, () => {
+            match(load_text_command)
+              .case(command.move_list, () => {
+                const id = load_text_arg1;
+                const LoadFactor_list = load_text_arg2;
                 chara_move_list[id] = LoadFactor_list as move_list[];
-                break;
+              })
 
-              case command.end_sort:
+              .case(command.end_sort, () => {
                 sorting();
                 mode = mode_list.waiting_mode;
-                break;
+              })
 
-              default:
+              .default(() => {
                 throw Error("no command found:「" + load_text_command + "」");
-            }
+              });
+          })
 
-            break;
-          case mode_list.waiting_mode:
-            switch (load_text_command) {
-              case command.start:
+          .case(mode_list.waiting_mode, () => {
+            match(load_text_command)
+              .case(command.start, () => {
                 mode = mode_list.start;
-                break;
-
-              case command.start_sort:
+              })
+              .case(command.start_sort, () => {
                 mode = mode_list.start_sort;
-                break;
+              })
 
-              default:
+              .default(() => {
                 throw Error("need 'start'");
-            }
-            break;
+              });
+          })
 
-          default:
+          .default(() => {
             throw Error("内部エラー");
-        }
+          });
       } catch (e) {
         console.error(e);
         // console.error(i + 1 + "行目にエラー", e);
@@ -2098,6 +2096,12 @@ import CodeMirror from "codemirror";
       }
     }
 
+    if (mode === mode_list.init) {
+      TL.inited();
+      mode = mode_list.start_sort;
+    }
+
+    // @ts-ignore
     if (mode === mode_list.start_sort) {
       sorting();
     }
