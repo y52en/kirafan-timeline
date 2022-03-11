@@ -12,6 +12,7 @@ import {
   type_chara_move_list,
   type_convertedTLdata,
   type_count_ttk_ls,
+  type_tableData_json,
 } from "../types";
 import { timeline, chara } from "./timeline";
 
@@ -224,7 +225,6 @@ function mainMode(
     .case(command.order, () => {
       const id = load_text_arg1;
       const ordervalue = Number(load_text_arg2);
-      // const canMoveWithout1stChara_act = load_text_arg3 === "true";
 
       TL.move(ordervalue, id, false);
       chara_list[id].nextTurn();
@@ -327,8 +327,8 @@ export function execTL(parsed_tldata: AST[]): execTL_result {
       const load_text_arg3 = parsed_tldata[i]?.[3];
       // const load_text_arg4 = parsed_tldata[i]?.[4];
 
-      match(mode)
-        .case(mode_list.init, () => {
+      match<mode_list>(mode)
+        .case([mode_list.init], () => {
           match(load_text_command)
             .case(command.set, () => {
               const id = load_text_arg1.toString();
@@ -454,5 +454,54 @@ export function execTL(parsed_tldata: AST[]): execTL_result {
     convertedTLdata,
     chara_list,
     count_ttk_ls,
+  };
+}
+
+export function convertOutput(
+  chara_list: type_chara_list,
+  TL: timeline
+): {
+  chara_array: string[];
+  outputTL: type_tableData_json;
+} {
+  const chara_array: string[] = [];
+  for (const i in chara_list) {
+    chara_array.push(i);
+  }
+
+  const outputTL: Array<Array<string | number | undefined>> = Array.from(
+    new Array(Object.keys(chara_list).length),
+    () => new Array(TL.current.length).fill(undefined)
+  );
+
+  TL.current.forEach((i, index) => {
+    const chara_id = i.id;
+    const OrderValue = i.timeline_OrderValue;
+    const charaPlace = chara_array.indexOf(chara_id);
+
+    outputTL[charaPlace][index] = OrderValue;
+  });
+  TL.switchData.forEach((x) => {
+    const [place, from_id, to_id] = x;
+    const from_charaPlace = chara_array.indexOf(from_id);
+    const to_charaPlace = chara_array.indexOf(to_id);
+    let arrow_str = "";
+    if (from_charaPlace < to_charaPlace) {
+      arrow_str = "↓↓";
+    } else {
+      arrow_str = "↑↑";
+    }
+
+    outputTL[from_charaPlace][place] = arrow_str;
+  });
+
+  TL.cardData.forEach((x) => {
+    const charaPlace = chara_array.indexOf(x[1]);
+    outputTL[charaPlace][x[0]] = "→";
+  });
+
+  return {
+    outputTL,
+    chara_array,
   };
 }

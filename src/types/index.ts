@@ -130,7 +130,7 @@ export interface TL_chara {
   type: TL_type.chara;
 }
 
-export type card_event = (id: string, OrderValue: number, time: number) => any;
+export type card_event = (id: string, OrderValue: number, time: number) => void;
 
 export interface TL_skillcard {
   OrderValue: number;
@@ -148,11 +148,6 @@ export interface buff {
 
 export type TL_obj = TL_chara | TL_skillcard;
 
-// export const enum editor_mode {
-//   default,
-//   python,
-// }
-
 export const enum editor_mode {
   python = "python",
   default = "kirafan-timeline",
@@ -162,8 +157,6 @@ export interface text_parser_result {
   AST: AST[];
   type: editor_mode;
 }
-
-
 
 export const enum mode_list {
   init,
@@ -197,9 +190,29 @@ export interface type_editor_init {
   get_value: () => string;
 }
 
-export type type_tableData = [Array<Array<number | string | undefined>>, string[]];
-
+export type type_tableData = [
+  Array<Array<number | string | undefined>>,
+  string[]
+];
 
 export type type_tableData_json = (string | number | undefined)[][];
 
 export type type_tl_comment = [string, string, number, string][];
+
+export type update_data = (
+  json: type_tableData_json,
+  charalist: string[],
+  convertedTLdata: type_convertedTLdata,
+  comment: type_tl_comment,
+  now_place: number
+) => void;
+
+export interface obj_update_data {
+  json: type_tableData_json;
+  charalist: string[];
+  convertedTLdata: type_convertedTLdata;
+  comment: type_tl_comment;
+  now_place: number;
+  TL_input: string;
+  firstchara: string;
+}

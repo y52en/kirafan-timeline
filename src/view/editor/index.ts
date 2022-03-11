@@ -58,7 +58,6 @@ export function init(
     ],
     [state.move_list]: [
       {
-        // regex: /([^\s]+)\s*(\[)/,
         regex: /(?:([^[\s]+)(\s*)(\[))/,
         next: state.move_list_arg2,
         token: [token.operator, token.none, token.age],
@@ -131,9 +130,6 @@ export function init(
     ],
     meta: {
       dontIndentStates: [state.comment],
-      // electricInput: /^\s*\}$/,
-      // blockCommentStart: "/*",
-      // blockCommentEnd: "*/",
       lineComment: "#",
       fold: "brace",
     },
@@ -168,7 +164,6 @@ export function init(
       ["<", ">"],
     ];
 
-    // if (!lib.isPC()) return;
     bracket.forEach(([open, close]) => {
       if (e.key === open) {
         insertString(cm, close);

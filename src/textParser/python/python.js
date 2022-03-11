@@ -144,11 +144,6 @@ json.dumps(_output)
 async function main(code) {
   try {
     return await asyncRun(py_script(code), {});
-    // if (results) {
-    //   console.log("pyodideWorker return results: ", JSON.parse(results));
-    // } else if (error) {
-    //   console.log("pyodideWorker error: ", error);
-    // }
   } catch (e) {
     console.log(
       `Error in pyodideWorker at ${e.filename}, Line: ${e.lineno}, ${e.message}`

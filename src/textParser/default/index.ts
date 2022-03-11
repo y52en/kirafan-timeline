@@ -70,11 +70,6 @@ class parser_lexicallyAnalyze2AST {
           i_toErrMsg.pop();
           break;
         }
-        // else if (i + 1 === t.timeline_parsed.length) {
-        //   throw Error("[]")
-
-        //   break;
-        // }
         output.push(t.timeline_parsed[i]);
       }
     }
@@ -288,9 +283,6 @@ class parser_lexicallyAnalyze2AST {
   getCommandListInList(): AST_command {
     const endType = lexicallyAnalyzeStr.braceR;
     const output: (string | command)[] = [];
-    // if (this.now_val_type === endType) {
-    //   return output;
-    // }
 
     let i = 0;
     loop: while (true) {
@@ -466,14 +458,12 @@ class parser_lexicallyAnalyze {
   constructor(timeline_str: string) {
     this.timeline_str = timeline_str;
     this.timeline_parsed = [];
-    // .replaceAll(/#.*/g, "").replaceAll(/\\(\n|$)/g, "") + "\n";
     this._now_str = "";
     this.i_nowloadstr = 0;
   }
 
   parse(): lexicallyAnalyzed[] {
     this.timeline_parsed = this.lexicalAnalysis();
-    // this.Normalize();
     return this.timeline_parsed;
   }
 
@@ -520,8 +510,6 @@ class parser_lexicallyAnalyze {
               break;
             }
           }
-          // push();
-          // changeType("comment");
           loop_continue();
         })
         .case("{", () => {

@@ -1,5 +1,3 @@
-// import lib from "./lib";
-
 function getCharge(load: number, isCard: boolean): number {
   const switch_db = (
     db: [number, number][],
@@ -62,16 +60,13 @@ function getCharge(load: number, isCard: boolean): number {
 
   const db = isCard ? db_skill_card : db_skill;
 
-  //   console.log(lib.makeTable([], db_skill).outerHTML);
-  //   console.log(lib.makeTable([], db_skill_card).outerHTML);
-
   const charge = db.find((x) => x[0] === load);
   if (charge) {
     return charge[1];
   }
   return 0;
 }
-// getCharge(100, true);
+
 export default {
   getCharge,
 };

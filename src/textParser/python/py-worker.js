@@ -15,19 +15,11 @@ function restartWorker() {
 }
 
 function clearTimer() {
-  // Object.keys(timer).forEach((key) => { 
-  //   clearInterval(timer[key]);
-  //   delete timer[key];
-  // })
   clearInterval(timer);
   timer = undefined;
 }
 
-// const callbacks = {};
 let callbacks_latest = undefined;
-// set setInterval id
-// if onmassaged, clearInterval
-// const timer = {};
 let timer = undefined;
 const force_end = 3000;
 
@@ -43,10 +35,7 @@ function setmsg() {
     }
     if (id === timer) {
       const onSuccess = callbacks_latest;
-      // delete callbacks[id];
-      // clearInterval(timer[id]);
       clearInterval(timer);
-      // delete timer[id];
       timer = undefined;
       onSuccess(data);
     }
@@ -79,14 +68,12 @@ const asyncRun = (() => {
     // the id could be generated more carefully
     id = (id + 1) % Number.MAX_SAFE_INTEGER;
     return new Promise((onSuccess) => {
-      // callbacks[id] = onSuccess;
       callbacks_latest = onSuccess;
       waitInit().then(() => {
         if (timer) { 
           clearInterval(timer);
           timer = undefined;
         }
-        // timer[id] = setTimeout(() => {
         
         timer = setTimeout(() => {
           restartWorker();
@@ -96,7 +83,6 @@ const asyncRun = (() => {
           ...context,
           python: script,
           id:timer,
-          // id,
         });
       });
     });

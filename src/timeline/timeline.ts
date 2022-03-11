@@ -51,46 +51,7 @@ export class timeline {
     }
   }
 
-  // //古いコードのままになっている
-  // move_stun(id, OrderValue) {
-  //   let movechara_nowPlace = this.placeToChara(id);
-  //   this.current[movechara_nowPlace].timeline_OrderValue += OrderValue;
-  //   let place_to_moved = () => {
-  //     if (movechara_nowPlace + 1 === this.current.length) {
-  //       return movechara_nowPlace + 1;
-  //     }
-  //     for (let i = movechara_nowPlace + 1; i < this.current.length; i++) {
-  //       if (
-  //         this.current[i].timeline_OrderValue >=
-  //         this.current[movechara_nowPlace].timeline_OrderValue
-  //       ) {
-  //         return i;
-  //       }
-  //     }
-  //     return i + 1;
-  //   };
-  //   this.current.splice(
-  //     place_to_moved(),
-  //     0,
-  //     this.current[movechara_nowPlace]
-  //   );
-  //   this.current.splice(movechara_nowPlace, 1);
-
-  //   this.nextturn();
-  // }
-
-  // 逆走の実装方法が思いつかない
-  // move_ttk(ordervalue){
-  //   // this.setColor(this.ID_of_firstChara(), this.place_of_currentTimeline);
-  //   const first_OV = this.OrderValue_of_firstChara()
-
-  //   ordervalue.forEach(x => {
-  //     this.current[this.place_of_currentTimeline]
-  //   })
-  // }
-
   setChara(id: string, initOrderValue: number): void {
-    // this.current.push({ id: id, timeline_OrderValue: initOrderValue });
     this.pushChara(id, initOrderValue);
   }
 
@@ -219,7 +180,7 @@ export class timeline {
     return this.current[this.place_of_currentTimeline];
   }
 
-  set firstChara(_) {
+  set firstChara(_: TL_obj) {
     throw Error("firstCharaにはセットできません");
   }
 
@@ -272,7 +233,6 @@ export class timeline {
 export class chara {
   id: string;
   SPD: number;
-  // SPD_buff: number;
   _SPD_buff: buff[];
   LoadFactorReduce: number;
 

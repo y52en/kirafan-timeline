@@ -1,5 +1,5 @@
 import python from "./python";
-import {command,AST,commandStr2Enum, mvls_mode} from "../../types";
+import { command, AST, commandStr2Enum, mvls_mode } from "../../types";
 function transfer(arr: any): AST[] {
   return arr.map((x: any) => {
     const output = [];
@@ -50,9 +50,18 @@ function transfer(arr: any): AST[] {
 }
 
 export default async function parse(text: string): Promise<AST[]> {
+  // XXX:文字列更新する関数なり渡すようにする
+  // const err = document.getElementById("error");
+  // const info = document.getElementById("info");
+
+  const loading_python = document.getElementById("loading_python");
+  const executing_python = document.getElementById("executing_python");
+  if (!loading_python || !executing_python) {
+    throw Error("DOMエラー");
+  }
   const timer = setTimeout(() => {
-    err.innerHTML = "";
-    info.innerHTML = "";
+    // err.innerHTML = "";
+    // info.innerHTML = "";
 
     loading_python.classList.remove("hide");
   }, 1500);
@@ -61,8 +70,8 @@ export default async function parse(text: string): Promise<AST[]> {
   loading_python.classList.add("hide");
 
   const timer2 = setTimeout(() => {
-    err.innerHTML = "";
-    info.innerHTML = "";
+    // err.innerHTML = "";
+    // info.innerHTML = "";
 
     executing_python.classList.remove("hide");
   }, 1500);
@@ -74,9 +83,5 @@ export default async function parse(text: string): Promise<AST[]> {
   }
 
   const tl_json = JSON.parse(results);
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // ts-ignore
-  // const tl_json = JSON.parse(execPy(tmp)?.replaceAll("'", '"'));
   return transfer(tl_json);
 }

@@ -1,5 +1,6 @@
 import lib, { OperateURL } from "../../lib";
 import {
+  obj_update_data,
   type_convertedTLdata,
   type_tableData_json,
   type_tl_comment,
@@ -11,11 +12,14 @@ export function init(
   charalist: string[],
   convertedTLdata: type_convertedTLdata,
   comment: type_tl_comment,
-  now_place: number
-): void {
+  now_place: number,
+  firstchara: string
+): (data: obj_update_data) => void {
   const elm_copyTL = document.getElementById("copyTL");
   const elm_jumpTwitter = document.getElementById("jumpTwitter");
   const elm_unzipMoveList = document.getElementById("unzipMoveList");
+  const elm_csvDownload = document.getElementById("csvDownload");
+  const elm_copy_ConvertedTL = document.getElementById("copy_ConvertedTL");
 
   const elm_pop11 = document.getElementById("pop11") as HTMLInputElement | null;
 
@@ -25,14 +29,13 @@ export function init(
 
   if (
     !(
-      // elm_textarea &&
-      (
-        elm_copyTL &&
-        elm_jumpTwitter &&
-        elm_unzipMoveList &&
-        elm_Set_onbeforeunload &&
-        elm_pop11
-      )
+      elm_copyTL &&
+      elm_jumpTwitter &&
+      elm_unzipMoveList &&
+      elm_Set_onbeforeunload &&
+      elm_pop11 &&
+      elm_csvDownload &&
+      elm_copy_ConvertedTL
     )
   ) {
     throw lib.undefinedErr;
@@ -53,39 +56,51 @@ export function init(
     }
   };
 
-  elm_copyTL.onclick = copyDataAsURL;
-  updateData(json, charalist, convertedTLdata, comment, now_place);
   elm_jumpTwitter.onclick = () => {
     window.open(
       "https://twitter.com/Y52en/status/1402239605978517505?s=20",
       "_blank"
     );
   };
-    elm_unzipMoveList.onclick = () => {
-      console.log('1 :>> ', 1);
+  elm_unzipMoveList.onclick = () => {
     elm_pop11.checked = true;
   };
-}
 
-export function updateData(
-  json: type_tableData_json,
-  charalist: string[],
-  convertedTLdata: type_convertedTLdata,
-  comment: type_tl_comment,
+  const _url = new OperateURL(undefined, false);
+  const update_data = (data: obj_update_data) => {
+    let TL_input;
+    ({
+      json,
+      charalist,
+      comment,
+      convertedTLdata,
+      now_place,
+      TL_input,
+      firstchara,
+    } = data);
+    _url.setParam("TL", TL_input);
+    outputAsTable(json, charalist, comment, now_place);
+    printConvertedTL(convertedTLdata);
 
-  now_place: number
-) {
-  const elm_csvDownload = document.getElementById("csvDownload");
-  const elm_log_convertedTL = document.getElementById("log_convertedTL");
-  const elm_copy_ConvertedTL = document.getElementById("copy_ConvertedTL");
-  if (!(elm_csvDownload && elm_log_convertedTL && elm_copy_ConvertedTL)) {
-    throw lib.undefinedErr;
-  }
+    updateInfo(now_place, firstchara);
+  };
+
+  elm_copyTL.onclick = () => copyDataAsURL(_url.href);
 
   elm_csvDownload.onclick = () => outputAsCSV(json, charalist);
-  elm_log_convertedTL.onclick = () => printConvertedTL(convertedTLdata);
+  printConvertedTL(convertedTLdata);
   elm_copy_ConvertedTL.onclick = () => copyConvertedTL(convertedTLdata);
   outputAsTable(json, charalist, comment, now_place);
+  updateInfo(now_place, firstchara);
+
+  return update_data;
+}
+
+function updateInfo(now_place: number, firstchara: string) {
+  const elm_firstchara = document.getElementById("firstchara");
+  if (elm_firstchara) elm_firstchara.innerText = firstchara;
+  const elm_now_place = document.getElementById("now_place");
+  if (elm_now_place) elm_now_place.innerText = String(now_place);
 }
 
 function save() {
@@ -112,6 +127,9 @@ function outputAsTable(
   const output = lib.htmltag("thead");
   const inner_tr = lib.htmltag("tr");
 
+  if (json[0]?.length == undefined) {
+    return;
+  }
   for (let i = 0; i <= json[0].length; i++) {
     let tmp;
     if (i === now_place) {
@@ -196,9 +214,8 @@ function makeCSVfile_download(csv: string, fileName = "timeline.csv") {
   URL.revokeObjectURL(blobUrl);
 }
 
-function copyDataAsURL() {
-  const url = new OperateURL(location.href);
-  lib.textCopy(url.href);
+function copyDataAsURL(url: string) {
+  lib.textCopy(url);
   const copyed = document.getElementById("copyed");
   if (copyed) {
     copyed.style.display = "block";
