@@ -22,7 +22,8 @@
     }
     if (isIE()) {
       // alert("IE未対応です。Chromeなどのブラウザを使用してください。\n対応ブラウザ:Chrome,Firefox,Safari,Edge")
-      document.write('<script src="https://polyfill.io/v3/polyfill.min.js?features=String.prototype.replaceAll%2CURL%2CURLSearchParams%2CArray.from%2CArray.prototype.fill%2CArray.prototype.find%2CObject.fromEntries%2CObject.entries"><\/script>')
+      document.write('<script src="https://unpkg.com/regenerator-runtime@0.13.9/runtime.js"><\/script>');
+      document.write('<script src="https://polyfill.io/v3/polyfill.min.js?features=es7%2Ces6%2Ces5%2Ces2022%2Ces2021%2Ces2020%2Ces2018%2Ces2019%2Ces2017%2Ces2016%2Ces2015%2Cdom4%2CURL%2CURLSearchParams"><\/script>')
       document.write('<script src="./js/ie11.js"/><\/script>')
     }
   </script>
@@ -150,46 +151,8 @@
     ()内のものは省略できる(バフなど) <br />
     <br />
 
-    <strong>#[comment]<br /></strong>
-    #から始まるものは行末まで無視されます(コメントに使用)<br />
-    命令の最後に書いてもよい<br />
-    ショートカットは「Ctrl + /」 <br />
-    例: <br />
-    move 125 enemy <br />
-    #ここからデバフを入れる <br />
-    例: <br />
-    move 125 momo #とっておき<br />
-    <br />
-
-    <strong>set [name] [SPD] ([buff(%)]) <br /></strong>
-    開始(start)前にフィールドに出すキャラを設定<br />
-    SPDの優先度の高いキャラから先に書く<br />
-    nameにスペースを含めるのは禁止 <br />
-    <br />
-
-    <strong>start</strong><br />
-    メインモード切り替え <br />
-    setを書き終わったら記入<br />
-    <br />
-
-    <strong>end</strong><br />
-    メインモードモード終了<br />
-    その後ろにstart、start_sortを書くことでまた別のモードに切り替えられる<br />
-    <br />
-
-    <strong>move [硬直(%)] [name]</strong><br />
-    行動 <br />
-    先頭のキャラ以外をnameに記入した場合errorを吐く <br />
-    moveの代わりにmでも可<br />
-    <br />
-
-    <strong>action [name] [硬直(%)] </strong><br />
-    行動 <br />
-    moveと引数の順番が異なる以外同じ <br />
-    actionの代わりにacでも可<br />
-    <br />
-
-    <strong>start_sort</strong><br />
+    <span id="readme"></span>
+    <!-- <strong>start_sort</strong><br />
     ソートモード<br />
     end_sortを記入すると誰かのmove_listで書かれた硬直リストがなくなるまで行動する
     <br />
@@ -200,109 +163,7 @@
     ソートモード終了<br />
     これを書かないとソートされない <br />
     その後ろにstart、start_sortを書くことでまた別のモードに切り替えられる<br />
-    <br />
-
-    <strong>move_list [name]
-      [[硬直(%)],[交代後のname,SPD,(buff)],[硬直(%)],{command,argments1,argments2...}...]</strong><br />
-    行動リスト <br />
-    move_list nagi [40,{buffset,nagi,24},100,[ren,141,100],100] <br />
-    のように書く <br />
-    スペースを空けるのは厳禁 <br />
-    内側にある[]は途中で交代することを示す <br />
-    {}でコマンドを使用可能 <br />
-    &lt;&gt;で硬直値を直接入力可能 <br />
-    move_listの代わりにmv_lsでも可<br />
-    <br />
-
-    <br />
-
-    <strong>
-      ----ここからほとんどデバッグしていないので正しく動かない可能性大----
-      <br />
-    </strong>
-    <br />
-    <strong> buffset [name] [buff(%)] ([turn]) </strong><br />
-    <strong> buffadd [name] [buff(%)] ([turn])</strong><br />
-    <strong> buffminus [name] [buff(%)] ([turn])</strong><br />
-    バフ設定 <br />
-    それぞれ b,b+,b-と省略可 <br />
-    <br />
-
-    <strong> switch [from_name] [to_name] [SPD] ([buff]) </strong><br />
-    from_nameに交代前のキャラ名、to_nameに交代後のキャラ名を記入<br />
-    swと省略可 <br />
-    <!-- 
-      <strong> switchSupport [from_name] [to_name] [SPD] ([buff]) </strong><br />
-      switchのサポート/フレンド版 <br>
-      from_nameに交代前のキャラ名、to_nameに交代後のキャラ名を記入<br />
-      swSと省略可 <br /> -->
-    <br />
-
-    <strong> order [name] [name] [SPD]</strong><br />
-    硬直地直接入力 <br />
-
-    <br />
-
-    <strong> skillcard [name] [SPD] [硬直] [回数]</strong><br />
-    スキルカード <br />
-    <br />
-
-    <strong> ttk [name] [name] [name] ...</strong><br />
-    <strong> ttk_until [n行目]</strong><br />
-    とっておきカウント <br />
-    ttkは引数にプレイヤーのキャラ、スキルカードの名前を書きます <br />
-    ttk_untilは引数に何行目までカウントしたいか書きます <br />
-    <br />
-    使用しているテーブル(以下にないものは0として計算)<br />
-
-    スキル<br />
-    <!-- prettier-ignore -->
-    <table class="normal-table"><thead><th>硬直</th><th>チャージ</th></thead><tbody><tr><td>0</td><td>5</td></tr><tr><td>10</td><td>0</td></tr><tr><td>35</td><td>17</td></tr><tr><td>40</td><td>8</td></tr><tr><td>45</td><td>2</td></tr><tr><td>50</td><td>5</td></tr><tr><td>55</td><td>8</td></tr><tr><td>60</td><td>8</td></tr><tr><td>65</td><td>8</td></tr><tr><td>67.5</td><td>17</td></tr><tr><td>70</td><td>17</td></tr><tr><td>75</td><td>17</td></tr><tr><td>80</td><td>5</td></tr><tr><td>100</td><td>17</td></tr><tr><td>110</td><td>22</td></tr><tr><td>120</td><td>8</td></tr><tr><td>125</td><td>0</td></tr><tr><td>130</td><td>10</td></tr><tr><td>135</td><td>17</td></tr><tr><td>140</td><td>8</td></tr><tr><td>145</td><td>8</td></tr><tr><td>150</td><td>17</td></tr><tr><td>155</td><td>8</td></tr><tr><td>165</td><td>10</td></tr><tr><td>170</td><td>17</td></tr><tr><td>190</td><td>17</td></tr><tr><td>200</td><td>17</td></tr></tbody></table>
-    
-    <br />
-    スキルカード<br />
-    <table class="normal-table"><thead><th>硬直</th><th>チャージ</th></thead><tbody><tr><td>75</td><td>5</td></tr><tr><td>80</td><td>22</td></tr><tr><td>100</td><td>22</td></tr></tbody></table>
-    <br />
-
-    <strong>color [色]</strong> <br />
-    r red<br />
-    g green<br />
-    b blue<br />
-    p purple<br />
-    s silver<br />
-    y yellow<br />
-    o orange<br />
-    c copper<br />
-    d dark<br />
-
-    <strong>#python#</strong> <br />
-    一番最初に#python#を入れるとpythonとして入力できます <br />
-    <textarea cols="30" rows="10">
-#python#
-set("syaro",144)
-set("media",124)
-
-start_sort()
-
-mv_ls(syaro,[m.command(bp,syaro,-200),10,99,m.order(10.66)])
-mv_ls(media,[d-80,80,69,m.order(c-14.5),["I",140],60])
-
-end_sort()
-    </textarea>
-    各コマンドは関数になっているのでそれを呼び出すと反映されます<br />
-    交代はそのままlistで書き、硬直値入力はm.order,コマンド入力はm.commandです<br />
-    注意点として、m.commandの第一引数はfunctionを渡します<br />
-    <br />
-    一部のコマンドの略称が変わります<br />
-    bs = buffset<br />
-    bp = buffadd<br />
-    bm = buffminus<br />
-    <br />
-    色を付ける場合、色-数字としてください<br />
-    b-40<br />
-    m.order(b-40)<br />
-
-    
+    <br /> -->
 
     <br />
     <br />
@@ -320,8 +181,6 @@ set yuzuko 131
 ttk aikawa kurumi yuzuko hiro hideri heal
 ttk_until 34
 
-start_sort
-
 mv_ls enemy [{skillcard,dmg3000,224,1100,1},400*3,g400,r500,400,p200,{nomove}]
 
 mv_ls aikawa [40,70,[hiro,130],70,70,40,40,[kurumi,123],35,40,b125]
@@ -330,8 +189,6 @@ mv_ls kurumi [[hideri,135],40,70,70,o40,[aikawa,123],70,[hideri,135],70,70,b125]
 
 mv_ls yuzuko [{sc,heal,131,100,5},g40,s40,{b+,yuzuko,22.4,3},100,70,70,100,s40,{b+,yuzuko,22.4,3},g40,b125]
 
-
-end_sort
 </textarea>
   </div><br>
   広告<br>

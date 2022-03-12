@@ -1,5 +1,5 @@
 import define from "../define";
-import { match } from "../lib";
+import { match, state } from "../lib";
 import {
   AST,
   AST_command,
@@ -12,6 +12,7 @@ import {
   type_chara_move_list,
   type_convertedTLdata,
   type_count_ttk_ls,
+  type_state,
   type_tableData_json,
 } from "../types";
 import { timeline, chara } from "./timeline";
@@ -23,7 +24,7 @@ function sorting(
   mode: mode_list,
   count_ttk_ls: Readonly<type_count_ttk_ls>,
   chara_list: type_chara_list,
-  ttk_count_until: number,
+  ttk_count_until: type_state<number>,
   call_add_ttk: (n: number) => void
 ) {
   let info = undefined;
@@ -140,7 +141,7 @@ function mainMode(
   mode: mode_list,
   count_ttk_ls: Readonly<type_count_ttk_ls>,
   chara_list: type_chara_list,
-  ttk_count_until: number,
+  ttk_count_until: type_state<number>,
   call_add_ttk: (ttk: number) => void,
   ...arg: AST_command
 ) {
@@ -152,7 +153,8 @@ function mainMode(
     load_text_arg4,
   ] = arg;
   const add_ttk = (n: number) => {
-    if (TL.place_of_currentTimeline < ttk_count_until) {
+    const ttk_until = ttk_count_until.get();
+    if (TL.place_of_currentTimeline < ttk_until) {
       call_add_ttk(n);
     }
   };
@@ -277,6 +279,11 @@ function mainMode(
       mode = mode_list.waiting_mode;
     })
 
+    .case(command.ttk_stop, () => {
+      ttk_count_until.set(TL.place_of_currentTimeline);
+
+    })
+
     .default(() => {
       throw Error("no command found");
     });
@@ -296,7 +303,7 @@ export function execTL(parsed_tldata: AST[]): execTL_result {
   const count_ttk_ls: type_count_ttk_ls = {};
 
   let ttk = 0;
-  let ttk_count_until = Infinity;
+  const ttk_count_until = state(Infinity);
 
   let mode = mode_list.init;
 
@@ -354,7 +361,7 @@ export function execTL(parsed_tldata: AST[]): execTL_result {
             })
 
             .case(command.countTTKuntil, () => {
-              ttk_count_until = Number(load_text_arg1) || Infinity;
+              ttk_count_until.set( Number(load_text_arg1) || Infinity );
             })
 
             .case(command.start, () => {

@@ -1,4 +1,5 @@
 import clonedeep from "lodash/cloneDeep";
+import { type_state } from "./types";
 
 const undefinedErr = Error("undefined");
 
@@ -193,6 +194,16 @@ class OperateURL {
 // }
 
 
+function state<T>(val: T): type_state<T> {
+  let _val = val;
+  return {
+    get: () => _val,
+    set: (newVal: T) => {
+      _val = newVal;
+    },
+  };
+}
+
 // XXX:どう直したらいいかわからない
 const _export = {
   undefinedErr,
@@ -207,6 +218,7 @@ const _export = {
   unreachable,
   match,
   OperateURL,
+  state,
 };
 
 export {
@@ -222,5 +234,6 @@ export {
   unreachable,
   match,
   OperateURL,
+  state,
 };
 export default _export;

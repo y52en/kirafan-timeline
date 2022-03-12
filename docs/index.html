@@ -22,7 +22,8 @@
     }
     if (isIE()) {
       // alert("IE未対応です。Chromeなどのブラウザを使用してください。\n対応ブラウザ:Chrome,Firefox,Safari,Edge")
-      document.write('<script src="https://polyfill.io/v3/polyfill.min.js?features=String.prototype.replaceAll%2CURL%2CURLSearchParams%2CArray.from%2CArray.prototype.fill%2CArray.prototype.find%2CObject.fromEntries%2CObject.entries"><\/script>')
+      document.write('<script src="https://unpkg.com/regenerator-runtime@0.13.9/runtime.js"><\/script>');
+      document.write('<script src="https://polyfill.io/v3/polyfill.min.js?features=es7%2Ces6%2Ces5%2Ces2022%2Ces2021%2Ces2020%2Ces2018%2Ces2019%2Ces2017%2Ces2016%2Ces2015%2Cdom4%2CURL%2CURLSearchParams"><\/script>')
       document.write('<script src="./js/ie11.js"/><\/script>')
     }
   </script>

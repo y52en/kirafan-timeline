@@ -20,6 +20,7 @@ export enum command {
   color,
   add,
   nomove,
+  ttk_stop,
 }
 
 export const commandStr2Enum = (() => {
@@ -44,6 +45,7 @@ export const commandStr2Enum = (() => {
     "color",
     "add",
     "nomove",
+    "ttk_stop",
   ];
   command_list.forEach((x) => {
     // @ts-ignore
@@ -215,4 +217,9 @@ export interface obj_update_data {
   now_place: number;
   TL_input: string;
   firstchara: string;
+}
+
+export interface type_state<T> {
+  get: () => T;
+  set: (val: T) => void;
 }
