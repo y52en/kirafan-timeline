@@ -6,7 +6,6 @@ import {
   command,
   move_list,
   mvls_mode,
-  AST_mvls,
   AST_command,
   command_array,
 } from "../../types";
@@ -673,26 +672,11 @@ class parser_lexicallyAnalyze {
 
     let i = 0;
     let berore_i = 0;
-    const parsed = (type: lexicallyAnalyzeStr, value: string) => {
-      const tmp = berore_i;
-      berore_i = i;
-      return {
-        type,
-        value,
-        addtional_info: {
-          where: [tmp, i] as [number, number],
-        },
-      };
-    };
 
     loop: for (i = 0; i < string.length; i++) {
       const char = string[i];
 
       let val: lexicallyAnalyzed | { value: string } = { value: char };
-
-      const skip = () => {
-        berore_i = i;
-      };
 
       const changeType = (type: lexicallyAnalyzeStr) => {
         const tmp = berore_i;

@@ -33,7 +33,6 @@ function sorting(
   let input;
 
   const _mainMode = (_arg: AST_command) => {
-    const arg = _arg.value;
     ({ TL, convertedTLdata, mode } = mainMode(
       TL,
       convertedTLdata,
