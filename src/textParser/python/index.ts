@@ -34,6 +34,10 @@ function transfer(arr: any): AST[] {
                 elem.value[j] = String(elem.value[j]);
               }
             }
+            elem.addtional_info = {
+
+            }
+            elem.addtional_info.where = [0,0];
             return elem;
           });
           output.push(tmp);
@@ -45,7 +49,16 @@ function transfer(arr: any): AST[] {
       }
     }
 
-    return output as AST;
+    return {
+      value: output,
+      addtional_info: {
+        where:[0,0]
+      },
+      option: {
+        
+      },
+      mv_ls: output[0] === command.move_list,
+    } as AST;
   }) as AST[];
 }
 

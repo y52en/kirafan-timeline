@@ -82,11 +82,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           var l,
               c,
               u = this,
-              h = s(u, e),
-              d = u.getLine(e.line);
+              d = s(u, e),
+              h = u.getLine(e.line);
 
-          if (null != d && (l = e, c = d, !/\bstring\b/.test(u.getTokenTypeAt(r(l.line, 0))) || /^[\'\"\`]/.test(c))) {
-            var f = a.lineComment || h.lineComment;
+          if (null != h && (l = e, c = h, !/\bstring\b/.test(u.getTokenTypeAt(r(l.line, 0))) || /^[\'\"\`]/.test(c))) {
+            var f = a.lineComment || d.lineComment;
 
             if (f) {
               var p = Math.min(0 != i.ch || i.line == e.line ? i.line + 1 : i.line, u.lastLine() + 1),
@@ -108,32 +108,32 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   (g || n.test(u.getLine(i))) && u.replaceRange(f + m, r(i, 0));
                 }
               });
-            } else (a.blockCommentStart || h.blockCommentStart) && (a.fullLines = !0, u.blockComment(e, i, a));
+            } else (a.blockCommentStart || d.blockCommentStart) && (a.fullLines = !0, u.blockComment(e, i, a));
           }
         }), e.defineExtension("blockComment", function (e, o, a) {
           a || (a = t);
           var l = this,
               c = s(l, e),
               u = a.blockCommentStart || c.blockCommentStart,
-              h = a.blockCommentEnd || c.blockCommentEnd;
+              d = a.blockCommentEnd || c.blockCommentEnd;
 
-          if (u && h) {
+          if (u && d) {
             if (!/\bcomment\b/.test(l.getTokenTypeAt(r(e.line, 0)))) {
-              var d = Math.min(o.line, l.lastLine());
-              d != e.line && 0 == o.ch && n.test(l.getLine(d)) && --d;
+              var h = Math.min(o.line, l.lastLine());
+              h != e.line && 0 == o.ch && n.test(l.getLine(h)) && --h;
               var f = null == a.padding ? " " : a.padding;
-              e.line > d || l.operation(function () {
+              e.line > h || l.operation(function () {
                 if (0 != a.fullLines) {
-                  var t = n.test(l.getLine(d));
-                  l.replaceRange(f + h, r(d)), l.replaceRange(u + f, r(e.line, 0));
+                  var t = n.test(l.getLine(h));
+                  l.replaceRange(f + d, r(h)), l.replaceRange(u + f, r(e.line, 0));
                   var s = a.blockCommentLead || c.blockCommentLead;
-                  if (null != s) for (var p = e.line + 1; p <= d; ++p) {
-                    (p != d || t) && l.replaceRange(s + f, r(p, 0));
+                  if (null != s) for (var p = e.line + 1; p <= h; ++p) {
+                    (p != h || t) && l.replaceRange(s + f, r(p, 0));
                   }
                 } else {
                   var m = 0 == i(l.getCursor("to"), o),
                       g = !l.somethingSelected();
-                  l.replaceRange(h, o), m && l.setSelection(g ? o : l.getCursor("from"), o), l.replaceRange(u, e);
+                  l.replaceRange(d, o), m && l.setSelection(g ? o : l.getCursor("from"), o), l.replaceRange(u, e);
                 }
               });
             }
@@ -144,25 +144,25 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               l = this,
               c = s(l, e),
               u = Math.min(0 != i.ch || i.line == e.line ? i.line : i.line - 1, l.lastLine()),
-              h = Math.min(e.line, u),
-              d = o.lineComment || c.lineComment,
+              d = Math.min(e.line, u),
+              h = o.lineComment || c.lineComment,
               f = [],
               p = null == o.padding ? " " : o.padding;
 
-          e: if (d) {
-            for (var m = h; m <= u; ++m) {
+          e: if (h) {
+            for (var m = d; m <= u; ++m) {
               var g = l.getLine(m),
-                  v = g.indexOf(d);
+                  v = g.indexOf(h);
               if (v > -1 && !/comment/.test(l.getTokenTypeAt(r(m, v + 1))) && (v = -1), -1 == v && n.test(g)) break e;
               if (v > -1 && n.test(g.slice(0, v))) break e;
               f.push(g);
             }
 
             if (l.operation(function () {
-              for (var e = h; e <= u; ++e) {
-                var t = f[e - h],
-                    n = t.indexOf(d),
-                    i = n + d.length;
+              for (var e = d; e <= u; ++e) {
+                var t = f[e - d],
+                    n = t.indexOf(h),
+                    i = n + h.length;
                 n < 0 || (t.slice(i, i + p.length) == p && (i += p.length), a = !0, l.replaceRange("", r(e, n), r(e, i)));
               }
             }), a) return !0;
@@ -172,16 +172,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               b = o.blockCommentEnd || c.blockCommentEnd;
           if (!y || !b) return !1;
           var x = o.blockCommentLead || c.blockCommentLead,
-              w = l.getLine(h),
+              w = l.getLine(d),
               C = w.indexOf(y);
           if (-1 == C) return !1;
 
-          var k = u == h ? w : l.getLine(u),
-              S = k.indexOf(b, u == h ? C + y.length : 0),
-              T = r(h, C + 1),
-              _ = r(u, S + 1);
+          var k = u == d ? w : l.getLine(u),
+              S = k.indexOf(b, u == d ? C + y.length : 0),
+              _ = r(d, C + 1),
+              T = r(u, S + 1);
 
-          if (-1 == S || !/comment/.test(l.getTokenTypeAt(T)) || !/comment/.test(l.getTokenTypeAt(_)) || l.getRange(T, _, "\n").indexOf(b) > -1) return !1;
+          if (-1 == S || !/comment/.test(l.getTokenTypeAt(_)) || !/comment/.test(l.getTokenTypeAt(T)) || l.getRange(_, T, "\n").indexOf(b) > -1) return !1;
           var M = w.lastIndexOf(y, e.ch),
               L = -1 == M ? -1 : w.slice(0, e.ch).indexOf(b, M + y.length);
           if (-1 != M && -1 != L && L + b.length != e.ch) return !1;
@@ -190,7 +190,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return M = -1 == L || -1 == O ? -1 : i.ch + O, (-1 == L || -1 == M || M == i.ch) && (l.operation(function () {
             l.replaceRange("", r(u, S - (p && k.slice(S - p.length, S) == p ? p.length : 0)), r(u, S + b.length));
             var e = C + y.length;
-            if (p && w.slice(e, e + p.length) == p && (e += p.length), l.replaceRange("", r(h, C), r(h, e)), x) for (var t = h + 1; t <= u; ++t) {
+            if (p && w.slice(e, e + p.length) == p && (e += p.length), l.replaceRange("", r(d, C), r(d, e)), x) for (var t = d + 1; t <= u; ++t) {
               var i = l.getLine(t),
                   o = i.indexOf(x);
 
@@ -232,8 +232,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             }
 
             for (l = s.length - 1; l >= 0; l--) {
-              var h = s[l].head;
-              t.replaceRange("", n(h.line, h.ch - 1), n(h.line, h.ch + 1), "+delete");
+              var d = s[l].head;
+              t.replaceRange("", n(d.line, d.ch - 1), n(d.line, d.ch + 1), "+delete");
             }
           },
           Enter: function Enter(t) {
@@ -276,7 +276,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   u = s.indexOf(i);
               if (-1 == u) return e.Pass;
 
-              for (var d, f = r(o, "closeBefore"), p = r(o, "triples"), m = s.charAt(u + 1) == i, g = t.listSelections(), v = u % 2 == 0, y = 0; y < g.length; y++) {
+              for (var h, f = r(o, "closeBefore"), p = r(o, "triples"), m = s.charAt(u + 1) == i, g = t.listSelections(), v = u % 2 == 0, y = 0; y < g.length; y++) {
                 var b,
                     x = g[y],
                     w = x.head,
@@ -293,19 +293,20 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                     if (!v || !(0 === C.length || /\s/.test(C) || f.indexOf(C) > -1)) return e.Pass;
                     b = "both";
                   }
-                } else b = m && h(t, w) ? "both" : p.indexOf(i) >= 0 && t.getRange(w, n(w.line, w.ch + 3)) == i + i + i ? "skipThree" : "skip";
+                } else b = m && d(t, w) ? "both" : p.indexOf(i) >= 0 && t.getRange(w, n(w.line, w.ch + 3)) == i + i + i ? "skipThree" : "skip";
 
-                if (d) {
-                  if (d != b) return e.Pass;
-                } else d = b;
+                if (h) {
+                  if (h != b) return e.Pass;
+                } else h = b;
               }
 
               var S = u % 2 ? s.charAt(u - 1) : i,
-                  T = u % 2 ? i : s.charAt(u + 1);
+                  _ = u % 2 ? i : s.charAt(u + 1);
+
               t.operation(function () {
-                if ("skip" == d) l(t, 1);else if ("skipThree" == d) l(t, 3);else if ("surround" == d) {
+                if ("skip" == h) l(t, 1);else if ("skipThree" == h) l(t, 3);else if ("surround" == h) {
                   for (var e = t.getSelections(), n = 0; n < e.length; n++) {
-                    e[n] = S + e[n] + T;
+                    e[n] = S + e[n] + _;
                   }
 
                   for (t.replaceSelections(e, "around"), e = t.listSelections().slice(), n = 0; n < e.length; n++) {
@@ -313,7 +314,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   }
 
                   t.setSelections(e);
-                } else "both" == d ? (t.replaceSelection(S + T, null), t.triggerElectric(S + T), l(t, -1)) : "addFour" == d && (t.replaceSelection(S + S + S + S, "before"), l(t, 1));
+                } else "both" == h ? (t.replaceSelection(S + _, null), t.triggerElectric(S + _), l(t, -1)) : "addFour" == h && (t.replaceSelection(S + S + S + S, "before"), l(t, 1));
               });
             }(i, t);
           };
@@ -356,7 +357,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return 2 == r.length ? r : null;
         }
 
-        function h(e, t) {
+        function d(e, t) {
           var r = e.getTokenAt(n(t.line, t.ch + 1));
           return /\bstring/.test(r.type) && r.start == t.ch && (0 == t.ch || !/\bstring/.test(e.getTokenTypeAt(t)));
         }
@@ -451,11 +452,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           var u = t.cm.options.theme;
           c.className = "CodeMirror-hints " + u, this.selectedHint = n.selectedHint || 0;
 
-          for (var h = n.list, d = 0; d < h.length; ++d) {
+          for (var d = n.list, h = 0; h < d.length; ++h) {
             var f = c.appendChild(a.createElement("li")),
-                p = h[d],
-                m = "CodeMirror-hint" + (d != this.selectedHint ? "" : " CodeMirror-hint-active");
-            null != p.className && (m = p.className + " " + m), f.className = m, d == this.selectedHint && f.setAttribute("aria-selected", "true"), f.id = this.id + "-" + d, f.setAttribute("role", "option"), p.render ? p.render(f, n, p) : f.appendChild(a.createTextNode(p.displayText || i(p))), f.hintId = d;
+                p = d[h],
+                m = "CodeMirror-hint" + (h != this.selectedHint ? "" : " CodeMirror-hint-active");
+            null != p.className && (m = p.className + " " + m), f.className = m, h == this.selectedHint && f.setAttribute("aria-selected", "true"), f.id = this.id + "-" + h, f.setAttribute("role", "option"), p.render ? p.render(f, n, p) : f.appendChild(a.createTextNode(p.displayText || i(p))), f.hintId = h;
           }
 
           var g = t.options.container || a.body,
@@ -469,15 +470,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           if (g !== a.body) {
             var k = -1 !== ["absolute", "relative", "fixed"].indexOf(l.getComputedStyle(g).position) ? g : g.offsetParent,
                 S = k.getBoundingClientRect(),
-                T = a.body.getBoundingClientRect();
-            w = S.left - T.left - k.scrollLeft, C = S.top - T.top - k.scrollTop;
+                _ = a.body.getBoundingClientRect();
+
+            w = S.left - _.left - k.scrollLeft, C = S.top - _.top - k.scrollTop;
           }
 
           c.style.left = y - w + "px", c.style.top = b - C + "px";
-
-          var _ = l.innerWidth || Math.max(a.body.offsetWidth, a.documentElement.offsetWidth),
+          var T = l.innerWidth || Math.max(a.body.offsetWidth, a.documentElement.offsetWidth),
               M = l.innerHeight || Math.max(a.body.offsetHeight, a.documentElement.offsetHeight);
-
           g.appendChild(c), s.getInputField().setAttribute("aria-autocomplete", "list"), s.getInputField().setAttribute("aria-owns", this.id), s.getInputField().setAttribute("aria-activedescendant", this.id + "-" + this.selectedHint);
           var L,
               O = t.options.moveOnOverlap ? c.getBoundingClientRect() : new DOMRect(),
@@ -495,8 +495,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }
 
           var D,
-              P = O.right - _;
-          if (A && (P += s.display.nativeBarWidth), P > 0 && (O.right - O.left > _ && (c.style.width = _ - 5 + "px", P -= O.right - O.left - _), c.style.left = (y = v.left - P - w) + "px"), A) for (var I = c.firstChild; I; I = I.nextSibling) {
+              P = O.right - T;
+          if (A && (P += s.display.nativeBarWidth), P > 0 && (O.right - O.left > T && (c.style.width = T - 5 + "px", P -= O.right - O.left - T), c.style.left = (y = v.left - P - w) + "px"), A) for (var I = c.firstChild; I; I = I.nextSibling) {
             I.style.paddingRight = s.display.nativeBarWidth + "px";
           }
           s.addKeyMap(this.keyMap = function (e, t) {
@@ -556,7 +556,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             menuSize: function menuSize() {
               return r.screenAmount();
             },
-            length: h.length,
+            length: d.length,
             close: function close() {
               t.close();
             },
@@ -590,7 +590,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             }, 20);
           });
           var W = this.getSelectedHintRange();
-          return 0 === W.from && 0 === W.to || this.scrollToActive(), e.signal(n, "select", h[this.selectedHint], c.childNodes[this.selectedHint]), !0;
+          return 0 === W.from && 0 === W.to || this.scrollToActive(), e.signal(n, "select", d[this.selectedHint], c.childNodes[this.selectedHint]), !0;
         }
 
         function a(e, t, n, r) {
@@ -806,24 +806,24 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
             for (var l = e[r.state], c = 0; c < l.length; c++) {
               var u = l[c],
-                  h = (!u.data.sol || n.sol()) && n.match(u.regex);
+                  d = (!u.data.sol || n.sol()) && n.match(u.regex);
 
-              if (h) {
+              if (d) {
                 u.data.next ? r.state = u.data.next : u.data.push ? ((r.stack || (r.stack = [])).push(r.state), r.state = u.data.push) : u.data.pop && r.stack && r.stack.length && (r.state = r.stack.pop()), u.data.mode && s(t, r, u.data.mode, u.token), u.data.indent && r.indent.push(n.indentation() + t.indentUnit), u.data.dedent && r.indent.pop();
-                var d = u.token;
+                var h = u.token;
 
-                if (d && d.apply && (d = d(h)), h.length > 2 && u.token && "string" != typeof u.token) {
-                  for (var f = 2; f < h.length; f++) {
-                    h[f] && (r.pending || (r.pending = [])).push({
-                      text: h[f],
+                if (h && h.apply && (h = h(d)), d.length > 2 && u.token && "string" != typeof u.token) {
+                  for (var f = 2; f < d.length; f++) {
+                    d[f] && (r.pending || (r.pending = [])).push({
+                      text: d[f],
                       token: u.token[f - 1]
                     });
                   }
 
-                  return n.backUp(h[0].length - (h[1] ? h[1].length : 0)), d[0];
+                  return n.backUp(d[0].length - (d[1] ? d[1].length : 0)), h[0];
                 }
 
-                return d && d.join ? d[0] : d;
+                return h && h.join ? h[0] : h;
               }
             }
 
@@ -913,9 +913,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               c = !1;
 
           for (var u in o) {
-            if (u != l && o.hasOwnProperty(u)) for (var h = s[u] = [], d = o[u], f = 0; f < d.length; f++) {
-              var p = d[f];
-              h.push(new r(p, o)), (p.indent || p.dedent) && (c = !0);
+            if (u != l && o.hasOwnProperty(u)) for (var d = s[u] = [], h = o[u], f = 0; f < h.length; f++) {
+              var p = h[f];
+              d.push(new r(p, o)), (p.indent || p.dedent) && (c = !0);
             }
           }
 
@@ -981,27 +981,27 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             l = !o && /WebKit\//.test(e),
             c = l && /Qt\/\d+\.\d+/.test(e),
             u = !o && /Chrome\//.test(e),
-            h = /Opera\//.test(e),
-            d = /Apple Computer/.test(navigator.vendor),
+            d = /Opera\//.test(e),
+            h = /Apple Computer/.test(navigator.vendor),
             f = /Mac OS X 1\d\D([8-9]|\d\d)\D/.test(e),
             p = /PhantomJS/.test(e),
-            m = d && (/Mobile\/\w+/.test(e) || navigator.maxTouchPoints > 2),
+            m = h && (/Mobile\/\w+/.test(e) || navigator.maxTouchPoints > 2),
             g = /Android/.test(e),
             v = m || g || /webOS|BlackBerry|Opera Mini|Opera Mobi|IEMobile/i.test(e),
             y = m || /Mac/.test(t),
             b = /\bCrOS\b/.test(e),
             x = /win/i.test(t),
-            w = h && e.match(/Version\/(\d*\.\d*)/);
-        w && (w = Number(w[1])), w && w >= 15 && (h = !1, l = !0);
-        var C = y && (c || h && (null == w || w < 12.11)),
+            w = d && e.match(/Version\/(\d*\.\d*)/);
+        w && (w = Number(w[1])), w && w >= 15 && (d = !1, l = !0);
+        var C = y && (c || d && (null == w || w < 12.11)),
             k = n || s && a >= 9;
 
         function S(e) {
           return new RegExp("(^|\\s)" + e + "(?:$|\\s)\\s*");
         }
 
-        var T,
-            _ = function _(e, t) {
+        var _,
+            T = function T(e, t) {
           var n = e.className,
               r = S(t).exec(n);
 
@@ -1073,7 +1073,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return t;
         }
 
-        T = document.createRange ? function (e, t, n, r) {
+        _ = document.createRange ? function (e, t, n, r) {
           var i = document.createRange();
           return i.setEnd(r || e, n), i.setStart(e, t), i;
         } : function (e, t, n) {
@@ -1271,36 +1271,36 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 c = "ltr" == a ? "L" : "R";
             if (0 == s.length || "ltr" == a && !e.test(s)) return !1;
 
-            for (var u = s.length, h = [], d = 0; d < u; ++d) {
-              h.push((l = s.charCodeAt(d)) <= 247 ? "bbbbbbbbbtstwsbbbbbbbbbbbbbbssstwNN%%%NNNNNN,N,N1111111111NNNNNNNLLLLLLLLLLLLLLLLLLLLLLLLLLNNNNNNLLLLLLLLLLLLLLLLLLLLLLLLLLNNNNbbbbbbsbbbbbbbbbbbbbbbbbbbbbbbbbb,N%%%%NNNNLNNNNN%%11NLNNN1LNNNNNLLLLLLLLLLLLLLLLLLLLLLLNLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLN".charAt(l) : 1424 <= l && l <= 1524 ? "R" : 1536 <= l && l <= 1785 ? "nnnnnnNNr%%r,rNNmmmmmmmmmmmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmmmmmmmmmmmmmmmmmmmmnnnnnnnnnn%nnrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmmmmmmnNmmmmmmrrmmNmmmmrr1111111111".charAt(l - 1536) : 1774 <= l && l <= 2220 ? "r" : 8192 <= l && l <= 8203 ? "w" : 8204 == l ? "b" : "L");
+            for (var u = s.length, d = [], h = 0; h < u; ++h) {
+              d.push((l = s.charCodeAt(h)) <= 247 ? "bbbbbbbbbtstwsbbbbbbbbbbbbbbssstwNN%%%NNNNNN,N,N1111111111NNNNNNNLLLLLLLLLLLLLLLLLLLLLLLLLLNNNNNNLLLLLLLLLLLLLLLLLLLLLLLLLLNNNNbbbbbbsbbbbbbbbbbbbbbbbbbbbbbbbbb,N%%%%NNNNLNNNNN%%11NLNNN1LNNNNNLLLLLLLLLLLLLLLLLLLLLLLNLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLN".charAt(l) : 1424 <= l && l <= 1524 ? "R" : 1536 <= l && l <= 1785 ? "nnnnnnNNr%%r,rNNmmmmmmmmmmmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmmmmmmmmmmmmmmmmmmmmnnnnnnnnnn%nnrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmmmmmmnNmmmmmmrrmmNmmmmrr1111111111".charAt(l - 1536) : 1774 <= l && l <= 2220 ? "r" : 8192 <= l && l <= 8203 ? "w" : 8204 == l ? "b" : "L");
             }
 
             for (var f = 0, p = c; f < u; ++f) {
-              var m = h[f];
-              "m" == m ? h[f] = p : p = m;
+              var m = d[f];
+              "m" == m ? d[f] = p : p = m;
             }
 
             for (var g = 0, v = c; g < u; ++g) {
-              var y = h[g];
-              "1" == y && "r" == v ? h[g] = "n" : n.test(y) && (v = y, "r" == y && (h[g] = "R"));
+              var y = d[g];
+              "1" == y && "r" == v ? d[g] = "n" : n.test(y) && (v = y, "r" == y && (d[g] = "R"));
             }
 
-            for (var b = 1, x = h[0]; b < u - 1; ++b) {
-              var w = h[b];
-              "+" == w && "1" == x && "1" == h[b + 1] ? h[b] = "1" : "," != w || x != h[b + 1] || "1" != x && "n" != x || (h[b] = x), x = w;
+            for (var b = 1, x = d[0]; b < u - 1; ++b) {
+              var w = d[b];
+              "+" == w && "1" == x && "1" == d[b + 1] ? d[b] = "1" : "," != w || x != d[b + 1] || "1" != x && "n" != x || (d[b] = x), x = w;
             }
 
             for (var C = 0; C < u; ++C) {
-              var k = h[C];
-              if ("," == k) h[C] = "N";else if ("%" == k) {
+              var k = d[C];
+              if ("," == k) d[C] = "N";else if ("%" == k) {
                 var S = void 0;
 
-                for (S = C + 1; S < u && "%" == h[S]; ++S) {
+                for (S = C + 1; S < u && "%" == d[S]; ++S) {
                   ;
                 }
 
-                for (var T = C && "!" == h[C - 1] || S < u && "1" == h[S] ? "1" : "N", _ = C; _ < S; ++_) {
-                  h[_] = T;
+                for (var _ = C && "!" == d[C - 1] || S < u && "1" == d[S] ? "1" : "N", T = C; T < S; ++T) {
+                  d[T] = _;
                 }
 
                 C = S - 1;
@@ -1308,20 +1308,20 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             }
 
             for (var M = 0, L = c; M < u; ++M) {
-              var O = h[M];
-              "L" == L && "1" == O ? h[M] = "L" : n.test(O) && (L = O);
+              var O = d[M];
+              "L" == L && "1" == O ? d[M] = "L" : n.test(O) && (L = O);
             }
 
             for (var A = 0; A < u; ++A) {
-              if (t.test(h[A])) {
+              if (t.test(d[A])) {
                 var N = void 0;
 
-                for (N = A + 1; N < u && t.test(h[N]); ++N) {
+                for (N = A + 1; N < u && t.test(d[N]); ++N) {
                   ;
                 }
 
-                for (var E = "L" == (A ? h[A - 1] : c), D = E == ("L" == (N < u ? h[N] : c)) ? E ? "L" : "R" : c, P = A; P < N; ++P) {
-                  h[P] = D;
+                for (var E = "L" == (A ? d[A - 1] : c), D = E == ("L" == (N < u ? d[N] : c)) ? E ? "L" : "R" : c, P = A; P < N; ++P) {
+                  d[P] = D;
                 }
 
                 A = N - 1;
@@ -1329,10 +1329,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             }
 
             for (var I, W = [], H = 0; H < u;) {
-              if (r.test(h[H])) {
+              if (r.test(d[H])) {
                 var F = H;
 
-                for (++H; H < u && r.test(h[H]); ++H) {
+                for (++H; H < u && r.test(d[H]); ++H) {
                   ;
                 }
 
@@ -1342,16 +1342,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                     j = W.length,
                     R = "rtl" == a ? 1 : 0;
 
-                for (++H; H < u && "L" != h[H]; ++H) {
+                for (++H; H < u && "L" != d[H]; ++H) {
                   ;
                 }
 
                 for (var B = z; B < H;) {
-                  if (i.test(h[B])) {
+                  if (i.test(d[B])) {
                     z < B && (W.splice(j, 0, new o(1, z, B)), j += R);
                     var V = B;
 
-                    for (++B; B < H && i.test(h[B]); ++B) {
+                    for (++B; B < H && i.test(d[B]); ++B) {
                       ;
                     }
 
@@ -1373,14 +1373,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         var ue = [],
-            he = function he(e, t, n) {
+            de = function de(e, t, n) {
           if (e.addEventListener) e.addEventListener(t, n, !1);else if (e.attachEvent) e.attachEvent("on" + t, n);else {
             var r = e._handlers || (e._handlers = {});
             r[t] = (r[t] || ue).concat(n);
           }
         };
 
-        function de(e, t) {
+        function he(e, t) {
           return e._handlers && e._handlers[t] || ue;
         }
 
@@ -1397,7 +1397,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         function pe(e, t) {
-          var n = de(e, t);
+          var n = he(e, t);
           if (n.length) for (var r = Array.prototype.slice.call(arguments, 2), i = 0; i < n.length; ++i) {
             n[i].apply(null, r);
           }
@@ -1420,12 +1420,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         function ve(e, t) {
-          return de(e, t).length > 0;
+          return he(e, t).length > 0;
         }
 
         function ye(e) {
           e.prototype.on = function (e, t) {
-            he(this, e, t);
+            de(this, e, t);
           }, e.prototype.off = function (e, t) {
             fe(this, e, t);
           };
@@ -1456,8 +1456,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return null == t && (1 & e.button ? t = 1 : 2 & e.button ? t = 3 : 4 & e.button && (t = 2)), y && e.ctrlKey && 1 == t && (t = 3), t;
         }
 
-        var Te,
-            _e,
+        var _e,
+            Te,
             Me = function () {
           if (s && a < 9) return !1;
           var e = O("div");
@@ -1465,21 +1465,23 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }();
 
         function Le(e) {
-          if (null == Te) {
+          if (null == _e) {
             var t = O("span", "​");
-            L(e, O("span", [t, document.createTextNode("x")])), 0 != e.firstChild.offsetHeight && (Te = t.offsetWidth <= 1 && t.offsetHeight > 2 && !(s && a < 8));
+            L(e, O("span", [t, document.createTextNode("x")])), 0 != e.firstChild.offsetHeight && (_e = t.offsetWidth <= 1 && t.offsetHeight > 2 && !(s && a < 8));
           }
 
-          var n = Te ? O("span", "​") : O("span", " ", null, "display: inline-block; width: 1px; margin-right: -1px");
+          var n = _e ? O("span", "​") : O("span", " ", null, "display: inline-block; width: 1px; margin-right: -1px");
           return n.setAttribute("cm-text", ""), n;
         }
 
         function Oe(e) {
-          if (null != _e) return _e;
+          if (null != Te) return Te;
+
           var t = L(e, document.createTextNode("AخA")),
-              n = T(t, 0, 1).getBoundingClientRect(),
-              r = T(t, 1, 2).getBoundingClientRect();
-          return M(e), !(!n || n.left == n.right) && (_e = r.right - n.right < 3);
+              n = _(t, 0, 1).getBoundingClientRect(),
+              r = _(t, 1, 2).getBoundingClientRect();
+
+          return M(e), !(!n || n.left == n.right) && (Te = r.right - n.right < 3);
         }
 
         var Ae,
@@ -1802,7 +1804,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           this.state = t, this.doc = e, this.line = n, this.maxLookAhead = r || 0, this.baseTokens = null, this.baseTokenPos = 1;
         };
 
-        function ht(e, t, n, r) {
+        function dt(e, t, n, r) {
           var i = [e.state.modeGen],
               o = {};
           xt(e, t.text, e.doc.mode, n, function (e, t) {
@@ -1835,11 +1837,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           };
         }
 
-        function dt(e, t, n) {
+        function ht(e, t, n) {
           if (!t.styles || t.styles[0] != e.state.modeGen) {
             var r = ft(e, Ye(t)),
                 i = t.text.length > e.options.maxHighlightLength && Be(e.doc.mode, r.state),
-                o = ht(e, t, r);
+                o = dt(e, t, r);
             i && (r.state = i), t.stateAfter = r.save(!i), t.styles = o.styles, o.classes ? t.styleClasses = o.classes : t.styleClasses && (t.styleClasses = null), n === e.doc.highlightFrontier && (e.doc.modeFrontier = Math.max(e.doc.modeFrontier, ++e.doc.highlightFrontier));
           }
 
@@ -1962,28 +1964,28 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           var l,
               c = 0,
               u = null,
-              h = new Ke(t, e.options.tabSize, r),
-              d = e.options.addModeClass && [null];
+              d = new Ke(t, e.options.tabSize, r),
+              h = e.options.addModeClass && [null];
 
-          for ("" == t && bt(mt(n, r.state), o); !h.eol();) {
-            if (h.pos > e.options.maxHighlightLength ? (a = !1, s && pt(e, t, r, h.pos), h.pos = t.length, l = null) : l = bt(gt(n, h, r.state, d), o), d) {
-              var f = d[0].name;
+          for ("" == t && bt(mt(n, r.state), o); !d.eol();) {
+            if (d.pos > e.options.maxHighlightLength ? (a = !1, s && pt(e, t, r, d.pos), d.pos = t.length, l = null) : l = bt(gt(n, d, r.state, h), o), h) {
+              var f = h[0].name;
               f && (l = "m-" + (l ? f + " " + l : f));
             }
 
             if (!a || u != l) {
-              for (; c < h.start;) {
-                i(c = Math.min(h.start, c + 5e3), u);
+              for (; c < d.start;) {
+                i(c = Math.min(d.start, c + 5e3), u);
               }
 
               u = l;
             }
 
-            h.start = h.pos;
+            d.start = d.pos;
           }
 
-          for (; c < h.pos;) {
-            var p = Math.min(h.pos, c + 5e3);
+          for (; c < d.pos;) {
+            var p = Math.min(d.pos, c + 5e3);
             i(p, u), c = p;
           }
         }
@@ -2002,7 +2004,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }
         }
 
-        function Tt(e, t) {
+        function _t(e, t) {
           for (var n, r = 0; r < e.length; ++r) {
             e[r] != t && (n || (n = [])).push(e[r]);
           }
@@ -2010,7 +2012,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return n;
         }
 
-        function _t(e, t) {
+        function Tt(e, t) {
           if (t.full) return null;
           var n = Je(e, t.from.line) && Ge(e, t.from.line).markedSpans,
               r = Je(e, t.to.line) && Ge(e, t.to.line).markedSpans;
@@ -2048,12 +2050,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               c = 1 == t.text.length,
               u = X(t.text).length + (c ? i : 0);
 
-          if (a) for (var h = 0; h < a.length; ++h) {
-            var d = a[h];
+          if (a) for (var d = 0; d < a.length; ++d) {
+            var h = a[d];
 
-            if (null == d.to) {
-              var f = St(l, d.marker);
-              f ? c && (d.to = null == f.to ? null : f.to + u) : d.to = i;
+            if (null == h.to) {
+              var f = St(l, h.marker);
+              f ? c && (h.to = null == f.to ? null : f.to + u) : h.to = i;
             }
           }
           if (l) for (var p = 0; p < l.length; ++p) {
@@ -2164,8 +2166,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             if (l.marker.collapsed) {
               var c = l.marker.find(0),
                   u = tt(c.from, n) || At(l.marker) - At(i),
-                  h = tt(c.to, r) || Nt(l.marker) - Nt(i);
-              if (!(u >= 0 && h <= 0 || u <= 0 && h >= 0) && (u <= 0 && (l.marker.inclusiveRight && i.inclusiveLeft ? tt(c.to, n) >= 0 : tt(c.to, n) > 0) || u >= 0 && (l.marker.inclusiveRight && i.inclusiveLeft ? tt(c.from, r) <= 0 : tt(c.from, r) < 0))) return !0;
+                  d = tt(c.to, r) || Nt(l.marker) - Nt(i);
+              if (!(u >= 0 && d <= 0 || u <= 0 && d >= 0) && (u <= 0 && (l.marker.inclusiveRight && i.inclusiveLeft ? tt(c.to, n) >= 0 : tt(c.to, n) > 0) || u >= 0 && (l.marker.inclusiveRight && i.inclusiveLeft ? tt(c.from, r) <= 0 : tt(c.from, r) < 0))) return !0;
             }
           }
         }
@@ -2299,7 +2301,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           for (var i = 0; i <= (t.rest ? t.rest.length : 0); i++) {
             var o = i ? t.rest[i - 1] : t.line,
                 s = void 0;
-            r.pos = 0, r.addToken = Qt, Oe(e.display.measure) && (s = ce(o, e.doc.direction)) && (r.addToken = en(r.addToken, s)), r.map = [], nn(o, r, dt(e, o, t != e.display.externalMeasured && Ye(o))), o.styleClasses && (o.styleClasses.bgClass && (r.bgClass = P(o.styleClasses.bgClass, r.bgClass || "")), o.styleClasses.textClass && (r.textClass = P(o.styleClasses.textClass, r.textClass || ""))), 0 == r.map.length && r.map.push(0, 0, r.content.appendChild(Le(e.display.measure))), 0 == i ? (t.measure.map = r.map, t.measure.cache = {}) : ((t.measure.maps || (t.measure.maps = [])).push(r.map), (t.measure.caches || (t.measure.caches = [])).push({}));
+            r.pos = 0, r.addToken = Qt, Oe(e.display.measure) && (s = ce(o, e.doc.direction)) && (r.addToken = en(r.addToken, s)), r.map = [], nn(o, r, ht(e, o, t != e.display.externalMeasured && Ye(o))), o.styleClasses && (o.styleClasses.bgClass && (r.bgClass = P(o.styleClasses.bgClass, r.bgClass || "")), o.styleClasses.textClass && (r.textClass = P(o.styleClasses.textClass, r.textClass || ""))), 0 == r.map.length && r.map.push(0, 0, r.content.appendChild(Le(e.display.measure))), 0 == i ? (t.measure.map = r.map, t.measure.cache = {}) : ((t.measure.maps || (t.measure.maps = [])).push(r.map), (t.measure.caches || (t.measure.caches = [])).push({}));
           }
 
           if (l) {
@@ -2328,15 +2330,15 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
               return r;
             }(t, e.trailingSpace) : t,
-                h = e.cm.state.specialChars,
-                d = !1;
+                d = e.cm.state.specialChars,
+                h = !1;
 
-            if (h.test(t)) {
+            if (d.test(t)) {
               c = document.createDocumentFragment();
 
               for (var f = 0;;) {
-                h.lastIndex = f;
-                var p = h.exec(t),
+                d.lastIndex = f;
+                var p = d.exec(t),
                     m = p ? p.index - f : t.length - f;
 
                 if (m) {
@@ -2356,9 +2358,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
                 e.map.push(e.pos, e.pos + 1, v), e.pos++;
               }
-            } else e.col += t.length, c = document.createTextNode(u), e.map.push(e.pos, e.pos + t.length, c), s && a < 9 && (d = !0), e.pos += t.length;
+            } else e.col += t.length, c = document.createTextNode(u), e.map.push(e.pos, e.pos + t.length, c), s && a < 9 && (h = !0), e.pos += t.length;
 
-            if (e.trailingSpace = 32 == u.charCodeAt(t.length - 1), n || r || i || d || o || l) {
+            if (e.trailingSpace = 32 == u.charCodeAt(t.length - 1), n || r || i || h || o || l) {
               var x = n || "";
               r && (x += r), i && (x += i);
               var w = O("span", [c], x, o);
@@ -2377,12 +2379,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             i = i ? i + " cm-force-border" : "cm-force-border";
 
             for (var c = n.pos, u = c + r.length;;) {
-              for (var h = void 0, d = 0; d < t.length && !((h = t[d]).to > c && h.from <= c); d++) {
+              for (var d = void 0, h = 0; h < t.length && !((d = t[h]).to > c && d.from <= c); h++) {
                 ;
               }
 
-              if (h.to >= u) return e(n, r, i, o, s, a, l);
-              e(n, r.slice(0, h.to - c), i, o, null, a, l), o = null, r = r.slice(h.to - c), c = h.to;
+              if (d.to >= u) return e(n, r, i, o, s, a, l);
+              e(n, r.slice(0, d.to - c), i, o, null, a, l), o = null, r = r.slice(d.to - c), c = d.to;
             }
           };
         }
@@ -2396,47 +2398,47 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           var r = e.markedSpans,
               i = e.text,
               o = 0;
-          if (r) for (var s, a, l, c, u, h, d, f = i.length, p = 0, m = 1, g = "", v = 0;;) {
+          if (r) for (var s, a, l, c, u, d, h, f = i.length, p = 0, m = 1, g = "", v = 0;;) {
             if (v == p) {
-              l = c = u = a = "", d = null, h = null, v = 1 / 0;
+              l = c = u = a = "", h = null, d = null, v = 1 / 0;
 
               for (var y = [], b = void 0, x = 0; x < r.length; ++x) {
                 var w = r[x],
                     C = w.marker;
                 if ("bookmark" == C.type && w.from == p && C.widgetNode) y.push(C);else if (w.from <= p && (null == w.to || w.to > p || C.collapsed && w.to == p && w.from == p)) {
-                  if (null != w.to && w.to != p && v > w.to && (v = w.to, c = ""), C.className && (l += " " + C.className), C.css && (a = (a ? a + ";" : "") + C.css), C.startStyle && w.from == p && (u += " " + C.startStyle), C.endStyle && w.to == v && (b || (b = [])).push(C.endStyle, w.to), C.title && ((d || (d = {})).title = C.title), C.attributes) for (var k in C.attributes) {
-                    (d || (d = {}))[k] = C.attributes[k];
+                  if (null != w.to && w.to != p && v > w.to && (v = w.to, c = ""), C.className && (l += " " + C.className), C.css && (a = (a ? a + ";" : "") + C.css), C.startStyle && w.from == p && (u += " " + C.startStyle), C.endStyle && w.to == v && (b || (b = [])).push(C.endStyle, w.to), C.title && ((h || (h = {})).title = C.title), C.attributes) for (var k in C.attributes) {
+                    (h || (h = {}))[k] = C.attributes[k];
                   }
-                  C.collapsed && (!h || Et(h.marker, C) < 0) && (h = w);
+                  C.collapsed && (!d || Et(d.marker, C) < 0) && (d = w);
                 } else w.from > p && v > w.from && (v = w.from);
               }
 
               if (b) for (var S = 0; S < b.length; S += 2) {
                 b[S + 1] == v && (c += " " + b[S]);
               }
-              if (!h || h.from == p) for (var T = 0; T < y.length; ++T) {
-                tn(t, 0, y[T]);
+              if (!d || d.from == p) for (var _ = 0; _ < y.length; ++_) {
+                tn(t, 0, y[_]);
               }
 
-              if (h && (h.from || 0) == p) {
-                if (tn(t, (null == h.to ? f + 1 : h.to) - p, h.marker, null == h.from), null == h.to) return;
-                h.to == p && (h = !1);
+              if (d && (d.from || 0) == p) {
+                if (tn(t, (null == d.to ? f + 1 : d.to) - p, d.marker, null == d.from), null == d.to) return;
+                d.to == p && (d = !1);
               }
             }
 
             if (p >= f) break;
 
-            for (var _ = Math.min(f, v);;) {
+            for (var T = Math.min(f, v);;) {
               if (g) {
                 var M = p + g.length;
 
-                if (!h) {
-                  var L = M > _ ? g.slice(0, _ - p) : g;
-                  t.addToken(t, L, s ? s + l : l, u, p + L.length == v ? c : "", a, d);
+                if (!d) {
+                  var L = M > T ? g.slice(0, T - p) : g;
+                  t.addToken(t, L, s ? s + l : l, u, p + L.length == v ? c : "", a, h);
                 }
 
-                if (M >= _) {
-                  g = g.slice(_ - p), p = _;
+                if (M >= T) {
+                  g = g.slice(T - p), p = T;
                   break;
                 }
 
@@ -2473,7 +2475,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         var an = null;
 
         function ln(e, t) {
-          var n = de(e, t);
+          var n = he(e, t);
 
           if (n.length) {
             var r,
@@ -2508,18 +2510,18 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           t.changes = null;
         }
 
-        function hn(e) {
+        function dn(e) {
           return e.node == e.text && (e.node = O("div", null, null, "position: relative"), e.text.parentNode && e.text.parentNode.replaceChild(e.node, e.text), e.node.appendChild(e.text), s && a < 8 && (e.node.style.zIndex = 2)), e.node;
         }
 
-        function dn(e, t) {
+        function hn(e, t) {
           var n = e.display.externalMeasured;
           return n && n.line == t.line ? (e.display.externalMeasured = null, t.measure = n.measure, n.built) : qt(e, t);
         }
 
         function fn(e, t) {
           var n = t.text.className,
-              r = dn(e, t);
+              r = hn(e, t);
           t.text == t.node && (t.node = r.pre), t.text.parentNode.replaceChild(r.pre, t.text), t.text = r.pre, r.bgClass != t.bgClass || r.textClass != t.textClass ? (t.bgClass = r.bgClass, t.textClass = r.textClass, pn(e, t)) : n && (t.text.className = n);
         }
 
@@ -2527,24 +2529,24 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           (function (e, t) {
             var n = t.bgClass ? t.bgClass + " " + (t.line.bgClass || "") : t.line.bgClass;
             if (n && (n += " CodeMirror-linebackground"), t.background) n ? t.background.className = n : (t.background.parentNode.removeChild(t.background), t.background = null);else if (n) {
-              var r = hn(t);
+              var r = dn(t);
               t.background = r.insertBefore(O("div", null, n), r.firstChild), e.display.input.setUneditable(t.background);
             }
-          })(e, t), t.line.wrapClass ? hn(t).className = t.line.wrapClass : t.node != t.text && (t.node.className = "");
+          })(e, t), t.line.wrapClass ? dn(t).className = t.line.wrapClass : t.node != t.text && (t.node.className = "");
           var n = t.textClass ? t.textClass + " " + (t.line.textClass || "") : t.line.textClass;
           t.text.className = n || "";
         }
 
         function mn(e, t, n, r) {
           if (t.gutter && (t.node.removeChild(t.gutter), t.gutter = null), t.gutterBackground && (t.node.removeChild(t.gutterBackground), t.gutterBackground = null), t.line.gutterClass) {
-            var i = hn(t);
+            var i = dn(t);
             t.gutterBackground = O("div", null, "CodeMirror-gutter-background " + t.line.gutterClass, "left: " + (e.options.fixedGutter ? r.fixedPos : -r.gutterTotalWidth) + "px; width: " + r.gutterTotalWidth + "px"), e.display.input.setUneditable(t.gutterBackground), i.insertBefore(t.gutterBackground, t.text);
           }
 
           var o = t.line.gutterMarkers;
 
           if (e.options.lineNumbers || o) {
-            var s = hn(t),
+            var s = dn(t),
                 a = t.gutter = O("div", null, "CodeMirror-gutter-wrapper", "left: " + (e.options.fixedGutter ? r.fixedPos : -r.gutterTotalWidth) + "px");
             if (a.setAttribute("aria-hidden", "true"), e.display.input.setUneditable(a), s.insertBefore(a, t.text), t.line.gutterClass && (a.className += " " + t.line.gutterClass), !e.options.lineNumbers || o && o["CodeMirror-linenumbers"] || (t.lineNumber = a.appendChild(O("div", Qe(e.options, n), "CodeMirror-linenumber CodeMirror-gutter-elt", "left: " + r.gutterLeft["CodeMirror-linenumbers"] + "px; width: " + e.display.lineNumInnerWidth + "px"))), o) for (var l = 0; l < e.display.gutterSpecs.length; ++l) {
               var c = e.display.gutterSpecs[l].className,
@@ -2565,7 +2567,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         function vn(e, t, n, r) {
-          var i = dn(e, t);
+          var i = hn(e, t);
           return t.text = t.node = i.pre, i.bgClass && (t.bgClass = i.bgClass), i.textClass && (t.textClass = i.textClass), pn(e, t), mn(e, t, n, r), yn(e, t, r), t.node;
         }
 
@@ -2576,7 +2578,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         function bn(e, t, n, r, i) {
-          if (t.widgets) for (var o = hn(n), s = 0, a = t.widgets; s < a.length; ++s) {
+          if (t.widgets) for (var o = dn(n), s = 0, a = t.widgets; s < a.length; ++s) {
             var l = a[s],
                 c = O("div", [l.node], "CodeMirror-linewidget" + (l.className ? " " + l.className : ""));
             l.handleMouseEvents || c.setAttribute("cm-ignore-events", "true"), xn(l, c, n, r), e.display.input.setUneditable(c), i && l.above ? o.insertBefore(c, n.gutter || n.text) : o.appendChild(c), ln(l, "redraw");
@@ -2620,7 +2622,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return e.mover.offsetHeight - e.lineSpace.offsetHeight;
         }
 
-        function Tn(e) {
+        function _n(e) {
           if (e.cachedPaddingH) return e.cachedPaddingH;
           var t = L(e.measure, O("pre", "x", "CodeMirror-line-like")),
               n = window.getComputedStyle ? window.getComputedStyle(t) : t.currentStyle,
@@ -2631,16 +2633,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return isNaN(r.left) || isNaN(r.right) || (e.cachedPaddingH = r), r;
         }
 
-        function _n(e) {
+        function Tn(e) {
           return 50 - e.display.nativeBarWidth;
         }
 
         function Mn(e) {
-          return e.display.scroller.clientWidth - _n(e) - e.display.barWidth;
+          return e.display.scroller.clientWidth - Tn(e) - e.display.barWidth;
         }
 
         function Ln(e) {
-          return e.display.scroller.clientHeight - _n(e) - e.display.barHeight;
+          return e.display.scroller.clientHeight - Tn(e) - e.display.barHeight;
         }
 
         function On(e, t, n) {
@@ -2728,10 +2730,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 l = o.node,
                 c = o.start,
                 u = o.end,
-                h = o.collapse;
+                d = o.collapse;
 
             if (3 == l.nodeType) {
-              for (var d = 0; d < 4; d++) {
+              for (var h = 0; h < 4; h++) {
                 for (; c && re(t.line.text.charAt(o.coverStart + c));) {
                   --c;
                 }
@@ -2740,16 +2742,18 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   ++u;
                 }
 
-                if ((i = s && a < 9 && 0 == c && u == o.coverEnd - o.coverStart ? l.parentNode.getBoundingClientRect() : Hn(T(l, c, u).getClientRects(), r)).left || i.right || 0 == c) break;
-                u = c, c -= 1, h = "right";
+                if ((i = s && a < 9 && 0 == c && u == o.coverEnd - o.coverStart ? l.parentNode.getBoundingClientRect() : Hn(_(l, c, u).getClientRects(), r)).left || i.right || 0 == c) break;
+                u = c, c -= 1, d = "right";
               }
 
               s && a < 11 && (i = function (e, t) {
                 if (!window.screen || null == screen.logicalXDPI || screen.logicalXDPI == screen.deviceXDPI || !function (e) {
                   if (null != Pe) return Pe;
+
                   var t = L(e, O("span", "x")),
                       n = t.getBoundingClientRect(),
-                      r = T(t, 0, 1).getBoundingClientRect();
+                      r = _(t, 0, 1).getBoundingClientRect();
+
                   return Pe = Math.abs(n.left - r.left) > 1;
                 }(e)) return t;
                 var n = screen.logicalXDPI / screen.deviceXDPI,
@@ -2763,7 +2767,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               }(e.display.measure, i));
             } else {
               var f;
-              c > 0 && (h = r = "right"), i = e.options.lineWrapping && (f = l.getClientRects()).length > 1 ? f["right" == r ? f.length - 1 : 0] : l.getBoundingClientRect();
+              c > 0 && (d = r = "right"), i = e.options.lineWrapping && (f = l.getClientRects()).length > 1 ? f["right" == r ? f.length - 1 : 0] : l.getBoundingClientRect();
             }
 
             if (s && a < 9 && !c && (!i || !i.left && !i.right)) {
@@ -2783,8 +2787,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             var x = b ? y[b - 1] : 0,
                 w = y[b],
                 C = {
-              left: ("right" == h ? i.right : i.left) - t.rect.left,
-              right: ("left" == h ? i.left : i.right) - t.rect.left,
+              left: ("right" == d ? i.right : i.left) - t.rect.left,
+              right: ("left" == d ? i.left : i.right) - t.rect.left,
               top: x,
               bottom: w
             };
@@ -2928,10 +2932,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             return s(n ? e - 1 : e, 1 == a[t].level != n);
           }
 
-          var h = ae(a, l, c),
-              d = se,
-              f = u(l, h, "before" == c);
-          return null != d && (f.other = u(l, d, "before" != c)), f;
+          var d = ae(a, l, c),
+              h = se,
+              f = u(l, d, "before" == c);
+          return null != h && (f.other = u(l, h, "before" != c)), f;
         }
 
         function Xn(e, t) {
@@ -3002,11 +3006,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               u = ce(t, e.doc.direction);
 
           if (u) {
-            var h = (e.options.lineWrapping ? nr : tr)(e, t, n, o, u, r, i);
-            a = (c = 1 != h.level) ? h.from : h.to - 1, l = c ? h.to : h.from - 1;
+            var d = (e.options.lineWrapping ? nr : tr)(e, t, n, o, u, r, i);
+            a = (c = 1 != d.level) ? d.from : d.to - 1, l = c ? d.to : d.from - 1;
           }
 
-          var d,
+          var h,
               f,
               p = null,
               m = null,
@@ -3019,14 +3023,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           if (m) {
             var y = r - m.left < m.right - r,
                 b = y == c;
-            g = p + (b ? 0 : 1), f = b ? "after" : "before", d = y ? m.left : m.right;
+            g = p + (b ? 0 : 1), f = b ? "after" : "before", h = y ? m.left : m.right;
           } else {
             c || g != l && g != a || g++, f = 0 == g ? "after" : g == t.text.length ? "before" : Dn(e, o, g - (c ? 1 : 0)).bottom + s <= i == c ? "after" : "before";
             var x = $n(e, et(n, g, f), "line", t, o);
-            d = x.left, v = i < x.top ? -1 : i >= x.bottom ? 1 : 0;
+            h = x.left, v = i < x.top ? -1 : i >= x.bottom ? 1 : 0;
           }
 
-          return Zn(n, g = ie(t.text, g, 1), f, v, r - d);
+          return Zn(n, g = ie(t.text, g, 1), f, v, r - h);
         }
 
         function tr(e, t, n, r, i, o, s) {
@@ -3052,13 +3056,13 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               c = a.end;
           /\s/.test(t.text.charAt(c - 1)) && c--;
 
-          for (var u = null, h = null, d = 0; d < i.length; d++) {
-            var f = i[d];
+          for (var u = null, d = null, h = 0; h < i.length; h++) {
+            var f = i[h];
 
             if (!(f.from >= c || f.to <= l)) {
               var p = Dn(e, r, 1 != f.level ? Math.min(c, f.to) - 1 : Math.max(l, f.from)).right,
                   m = p < o ? o - p + 1e9 : p - o;
-              (!u || h > m) && (u = f, h = m);
+              (!u || d > m) && (u = f, d = m);
             }
           }
 
@@ -3161,7 +3165,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
           if (r && c.xRel > 0 && (l = Ge(e.doc, c.line).text).length == c.ch) {
             var u = F(l, l.length, e.options.tabSize) - l.length;
-            c = et(c.line, Math.max(0, Math.round((o - Tn(e.display).left) / ir(e.display)) - u));
+            c = et(c.line, Math.max(0, Math.round((o - _n(e.display).left) / ir(e.display)) - u));
           }
 
           return c;
@@ -3176,7 +3180,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }
         }
 
-        function hr(e, t, n, r) {
+        function dr(e, t, n, r) {
           null == t && (t = e.doc.first), null == n && (n = e.doc.first + e.doc.size), r || (r = 0);
           var i = e.display;
           if (r && n < i.viewTo && (null == i.updateLineNumbers || i.updateLineNumbers > t) && (i.updateLineNumbers = t), e.curOp.viewChanged = !0, t >= i.viewTo) Ct && zt(e.doc, t) < i.viewTo && fr(e);else if (n <= i.viewFrom) Ct && jt(e.doc, n + r) > i.viewFrom ? fr(e) : (i.viewFrom += r, i.viewTo += r);else if (t <= i.viewFrom && n >= i.viewTo) fr(e);else if (t <= i.viewFrom) {
@@ -3194,7 +3198,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           c && (n < c.lineN ? c.lineN += r : t < c.lineN + c.size && (i.externalMeasured = null));
         }
 
-        function dr(e, t, n) {
+        function hr(e, t, n) {
           e.curOp.viewChanged = !0;
           var r = e.display,
               i = e.display.externalMeasured;
@@ -3312,7 +3316,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           var r = e.display,
               i = e.doc,
               o = document.createDocumentFragment(),
-              s = Tn(e.display),
+              s = _n(e.display),
               a = s.left,
               l = Math.max(r.sizerWidth, Mn(e) - r.sizer.offsetLeft) - s.right,
               c = "ltr" == i.direction;
@@ -3321,23 +3325,23 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             t < 0 && (t = 0), t = Math.round(t), r = Math.round(r), o.appendChild(O("div", null, "CodeMirror-selected", "position: absolute; left: " + e + "px;\n                             top: " + t + "px; width: " + (null == n ? l - e : n) + "px;\n                             height: " + (r - t) + "px"));
           }
 
-          function h(t, n, r) {
+          function d(t, n, r) {
             var o,
                 s,
-                h = Ge(i, t),
-                d = h.text.length;
+                d = Ge(i, t),
+                h = d.text.length;
 
             function f(n, r) {
-              return Gn(e, et(t, n), "div", h, r);
+              return Gn(e, et(t, n), "div", d, r);
             }
 
             function p(t, n, r) {
-              var i = Jn(e, h, null, t),
+              var i = Jn(e, d, null, t),
                   o = "ltr" == n == ("after" == r) ? "left" : "right";
-              return f("after" == r ? i.begin : i.end - (/\s/.test(h.text.charAt(i.end - 1)) ? 2 : 1), o)[o];
+              return f("after" == r ? i.begin : i.end - (/\s/.test(d.text.charAt(i.end - 1)) ? 2 : 1), o)[o];
             }
 
-            var m = ce(h, i.direction);
+            var m = ce(d, i.direction);
             return function (e, t, n, r) {
               if (!e) return r(t, n, "ltr", 0);
 
@@ -3347,24 +3351,24 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               }
 
               i || r(t, n, "ltr");
-            }(m, n || 0, null == r ? d : r, function (e, t, i, h) {
+            }(m, n || 0, null == r ? h : r, function (e, t, i, d) {
               var g = "ltr" == i,
                   v = f(e, g ? "left" : "right"),
                   y = f(t - 1, g ? "right" : "left"),
                   b = null == n && 0 == e,
-                  x = null == r && t == d,
-                  w = 0 == h,
-                  C = !m || h == m.length - 1;
+                  x = null == r && t == h,
+                  w = 0 == d,
+                  C = !m || d == m.length - 1;
 
               if (y.top - v.top <= 3) {
                 var k = (c ? x : b) && C,
                     S = (c ? b : x) && w ? a : (g ? v : y).left,
-                    T = k ? l : (g ? y : v).right;
-                u(S, v.top, T - S, v.bottom);
-              } else {
-                var _, M, L, O;
+                    _ = k ? l : (g ? y : v).right;
 
-                g ? (_ = c && b && w ? a : v.left, M = c ? l : p(e, i, "before"), L = c ? a : p(t, i, "after"), O = c && x && C ? l : y.right) : (_ = c ? p(e, i, "before") : a, M = !c && b && w ? l : v.right, L = !c && x && C ? a : y.left, O = c ? p(t, i, "after") : l), u(_, v.top, M - _, v.bottom), v.bottom < y.top && u(a, v.bottom, null, y.top), u(L, y.top, O - L, y.bottom);
+                u(S, v.top, _ - S, v.bottom);
+              } else {
+                var T, M, L, O;
+                g ? (T = c && b && w ? a : v.left, M = c ? l : p(e, i, "before"), L = c ? a : p(t, i, "after"), O = c && x && C ? l : y.right) : (T = c ? p(e, i, "before") : a, M = !c && b && w ? l : v.right, L = !c && x && C ? a : y.left, O = c ? p(t, i, "after") : l), u(T, v.top, M - T, v.bottom), v.bottom < y.top && u(a, v.bottom, null, y.top), u(L, y.top, O - L, y.bottom);
               }
 
               (!o || br(v, o) < 0) && (o = v), br(y, o) < 0 && (o = y), (!s || br(v, s) < 0) && (s = v), br(y, s) < 0 && (s = y);
@@ -3374,14 +3378,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             };
           }
 
-          var d = t.from(),
+          var h = t.from(),
               f = t.to();
-          if (d.line == f.line) h(d.line, d.ch, f.ch);else {
-            var p = Ge(i, d.line),
+          if (h.line == f.line) d(h.line, h.ch, f.ch);else {
+            var p = Ge(i, h.line),
                 m = Ge(i, f.line),
                 g = Ft(p) == Ft(m),
-                v = h(d.line, d.ch, g ? p.text.length + 1 : null).end,
-                y = h(f.line, g ? 0 : null, f.ch).start;
+                v = d(h.line, h.ch, g ? p.text.length + 1 : null).end,
+                y = d(f.line, g ? 0 : null, f.ch).start;
             g && (v.top < y.top - 2 ? (u(v.right, v.top, null, v.bottom), u(a, y.top, y.left, y.bottom)) : u(v.right, v.top, y.left - v.right, v.bottom)), v.bottom < y.top && u(a, v.bottom, null, y.top);
           }
           n.appendChild(o);
@@ -3393,7 +3397,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             clearInterval(t.blinker);
             var n = !0;
             t.cursorDiv.style.visibility = "", e.options.cursorBlinkRate > 0 ? t.blinker = setInterval(function () {
-              e.hasFocus() || Tr(e), t.cursorDiv.style.visibility = (n = !n) ? "" : "hidden";
+              e.hasFocus() || _r(e), t.cursorDiv.style.visibility = (n = !n) ? "" : "hidden";
             }, e.options.cursorBlinkRate) : e.options.cursorBlinkRate < 0 && (t.cursorDiv.style.visibility = "hidden");
           }
         }
@@ -3404,7 +3408,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
         function kr(e) {
           e.state.delayingBlurEvent = !0, setTimeout(function () {
-            e.state.delayingBlurEvent && (e.state.delayingBlurEvent = !1, e.state.focused && Tr(e));
+            e.state.delayingBlurEvent && (e.state.delayingBlurEvent = !1, e.state.focused && _r(e));
           }, 100);
         }
 
@@ -3414,35 +3418,35 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }, 20)), e.display.input.receivedFocus()), wr(e));
         }
 
-        function Tr(e, t) {
-          e.state.delayingBlurEvent || (e.state.focused && (pe(e, "blur", e, t), e.state.focused = !1, _(e.display.wrapper, "CodeMirror-focused")), clearInterval(e.display.blinker), setTimeout(function () {
+        function _r(e, t) {
+          e.state.delayingBlurEvent || (e.state.focused && (pe(e, "blur", e, t), e.state.focused = !1, T(e.display.wrapper, "CodeMirror-focused")), clearInterval(e.display.blinker), setTimeout(function () {
             e.state.focused || (e.display.shift = !1);
           }, 150));
         }
 
-        function _r(e) {
+        function Tr(e) {
           for (var t = e.display, n = t.lineDiv.offsetTop, r = Math.max(0, t.scroller.getBoundingClientRect().top), i = t.lineDiv.getBoundingClientRect().top, o = 0, l = 0; l < t.view.length; l++) {
             var c = t.view[l],
                 u = e.options.lineWrapping,
-                h = void 0,
-                d = 0;
+                d = void 0,
+                h = 0;
 
             if (!c.hidden) {
               if (i += c.line.height, s && a < 8) {
                 var f = c.node.offsetTop + c.node.offsetHeight;
-                h = f - n, n = f;
+                d = f - n, n = f;
               } else {
                 var p = c.node.getBoundingClientRect();
-                h = p.bottom - p.top, !u && c.text.firstChild && (d = c.text.firstChild.getBoundingClientRect().right - p.left - 1);
+                d = p.bottom - p.top, !u && c.text.firstChild && (h = c.text.firstChild.getBoundingClientRect().right - p.left - 1);
               }
 
-              var m = c.line.height - h;
-              if ((m > .005 || m < -.005) && (i < r && (o -= m), Ze(c.line, h), Mr(c.line), c.rest)) for (var g = 0; g < c.rest.length; g++) {
+              var m = c.line.height - d;
+              if ((m > .005 || m < -.005) && (i < r && (o -= m), Ze(c.line, d), Mr(c.line), c.rest)) for (var g = 0; g < c.rest.length; g++) {
                 Mr(c.rest[g]);
               }
 
-              if (d > e.display.sizerWidth) {
-                var v = Math.ceil(d / ir(e.display));
+              if (h > e.display.sizerWidth) {
+                var v = Math.ceil(h / ir(e.display));
                 v > e.display.maxLineLength && (e.display.maxLineLength = v, e.display.maxLine = c.line, e.display.maxLineChanged = !0);
               }
             }
@@ -3493,11 +3497,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             var u = Math.min(t.top, (c ? a : t.bottom) - o);
             u != i && (s.scrollTop = u);
           }
-          var h = e.options.fixedGutter ? 0 : n.gutters.offsetWidth,
-              d = e.curOp && null != e.curOp.scrollLeft ? e.curOp.scrollLeft : n.scroller.scrollLeft - h,
+          var d = e.options.fixedGutter ? 0 : n.gutters.offsetWidth,
+              h = e.curOp && null != e.curOp.scrollLeft ? e.curOp.scrollLeft : n.scroller.scrollLeft - d,
               f = Mn(e) - n.gutters.offsetWidth,
               p = t.right - t.left > f;
-          return p && (t.right = t.left + f), t.left < 10 ? s.scrollLeft = 0 : t.left < d ? s.scrollLeft = Math.max(0, t.left + h - (p ? 0 : 10)) : t.right > f + d - 3 && (s.scrollLeft = t.right + (p ? 0 : 10) - f), s;
+          return p && (t.right = t.left + f), t.left < 10 ? s.scrollLeft = 0 : t.left < h ? s.scrollLeft = Math.max(0, t.left + d - (p ? 0 : 10)) : t.right > f + h - 3 && (s.scrollLeft = t.right + (p ? 0 : 10) - f), s;
         }
 
         function Ar(e, t) {
@@ -3544,7 +3548,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         function Hr(e, t, n, r) {
-          t = Math.max(0, Math.min(t, e.display.scroller.scrollWidth - e.display.scroller.clientWidth)), (n ? t == e.doc.scrollLeft : Math.abs(e.doc.scrollLeft - t) < 2) && !r || (e.doc.scrollLeft = t, hi(e), e.display.scroller.scrollLeft != t && (e.display.scroller.scrollLeft = t), e.display.scrollbars.setScrollLeft(t));
+          t = Math.max(0, Math.min(t, e.display.scroller.scrollWidth - e.display.scroller.clientWidth)), (n ? t == e.doc.scrollLeft : Math.abs(e.doc.scrollLeft - t) < 2) && !r || (e.doc.scrollLeft = t, di(e), e.display.scroller.scrollLeft != t && (e.display.scroller.scrollLeft = t), e.display.scrollbars.setScrollLeft(t));
         }
 
         function Fr(e) {
@@ -3559,7 +3563,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             viewWidth: t.wrapper.clientWidth,
             barLeft: e.options.fixedGutter ? n : 0,
             docHeight: r,
-            scrollHeight: r + _n(e) + t.barHeight,
+            scrollHeight: r + Tn(e) + t.barHeight,
             nativeBarWidth: t.nativeBarWidth,
             gutterWidth: n
           };
@@ -3569,9 +3573,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           this.cm = n;
           var r = this.vert = O("div", [O("div", null, null, "min-width: 1px")], "CodeMirror-vscrollbar"),
               i = this.horiz = O("div", [O("div", null, null, "height: 100%; min-height: 1px")], "CodeMirror-hscrollbar");
-          r.tabIndex = i.tabIndex = -1, e(r), e(i), he(r, "scroll", function () {
+          r.tabIndex = i.tabIndex = -1, e(r), e(i), de(r, "scroll", function () {
             r.clientHeight && t(r.scrollTop, "vertical");
-          }), he(i, "scroll", function () {
+          }), de(i, "scroll", function () {
             i.clientWidth && t(i.scrollLeft, "horizontal");
           }), this.checkedZeroWidth = !1, s && a < 8 && (this.horiz.style.minHeight = this.vert.style.minWidth = "18px");
         };
@@ -3623,7 +3627,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           Br(e, t);
 
           for (var i = 0; i < 4 && n != e.display.barWidth || r != e.display.barHeight; i++) {
-            n != e.display.barWidth && e.options.lineWrapping && _r(e), Br(e, Fr(e)), n = e.display.barWidth, r = e.display.barHeight;
+            n != e.display.barWidth && e.options.lineWrapping && Tr(e), Br(e, Fr(e)), n = e.display.barWidth, r = e.display.barHeight;
           }
         }
 
@@ -3645,8 +3649,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         };
 
         function Ur(e) {
-          e.display.scrollbars && (e.display.scrollbars.clear(), e.display.scrollbars.addClass && _(e.display.wrapper, e.display.scrollbars.addClass)), e.display.scrollbars = new Vr[e.options.scrollbarStyle](function (t) {
-            e.display.wrapper.insertBefore(t, e.display.scrollbarFiller), he(t, "mousedown", function () {
+          e.display.scrollbars && (e.display.scrollbars.clear(), e.display.scrollbars.addClass && T(e.display.wrapper, e.display.scrollbars.addClass)), e.display.scrollbars = new Vr[e.options.scrollbarStyle](function (t) {
+            e.display.wrapper.insertBefore(t, e.display.scrollbarFiller), de(t, "mousedown", function () {
               e.state.focused && setTimeout(function () {
                 return e.display.input.focus();
               }, 0);
@@ -3743,7 +3747,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               n = t.display;
           (function (e) {
             var t = e.display;
-            !t.scrollbarsClipped && t.scroller.offsetWidth && (t.nativeBarWidth = t.scroller.offsetWidth - t.scroller.clientWidth, t.heightForcer.style.height = _n(e) + "px", t.sizer.style.marginBottom = -t.nativeBarWidth + "px", t.sizer.style.borderRightWidth = _n(e) + "px", t.scrollbarsClipped = !0);
+            !t.scrollbarsClipped && t.scroller.offsetWidth && (t.nativeBarWidth = t.scroller.offsetWidth - t.scroller.clientWidth, t.heightForcer.style.height = Tn(e) + "px", t.sizer.style.marginBottom = -t.nativeBarWidth + "px", t.sizer.style.borderRightWidth = Tn(e) + "px", t.scrollbarsClipped = !0);
           })(t), e.updateMaxLine && Kt(t), e.mustUpdate = e.viewChanged || e.forceUpdate || null != e.scrollTop || e.scrollToPos && (e.scrollToPos.from.line < n.viewFrom || e.scrollToPos.to.line >= n.viewTo) || n.maxLineChanged && t.options.lineWrapping, e.update = e.mustUpdate && new oi(t, e.mustUpdate && {
             top: e.scrollTop,
             ensure: e.scrollToPos
@@ -3757,7 +3761,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         function Yr(e) {
           var t = e.cm,
               n = t.display;
-          e.updatedDisplay && _r(t), e.barMeasure = Fr(t), n.maxLineChanged && !t.options.lineWrapping && (e.adjustWidthTo = An(t, n.maxLine, n.maxLine.text.length).left + 3, t.display.sizerWidth = e.adjustWidthTo, e.barMeasure.scrollWidth = Math.max(n.scroller.clientWidth, n.sizer.offsetLeft + e.adjustWidthTo + _n(t) + t.display.barWidth), e.maxScrollLeft = Math.max(0, n.sizer.offsetLeft + e.adjustWidthTo - Mn(t))), (e.updatedDisplay || e.selectionChanged) && (e.preparedSelection = n.input.prepareSelection());
+          e.updatedDisplay && Tr(t), e.barMeasure = Fr(t), n.maxLineChanged && !t.options.lineWrapping && (e.adjustWidthTo = An(t, n.maxLine, n.maxLine.text.length).left + 3, t.display.sizerWidth = e.adjustWidthTo, e.barMeasure.scrollWidth = Math.max(n.scroller.clientWidth, n.sizer.offsetLeft + e.adjustWidthTo + Tn(t) + t.display.barWidth), e.maxScrollLeft = Math.max(0, n.sizer.offsetLeft + e.adjustWidthTo - Mn(t))), (e.updatedDisplay || e.selectionChanged) && (e.preparedSelection = n.input.prepareSelection());
         }
 
         function qr(e) {
@@ -3778,7 +3782,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   i = null;
 
               if (t.top + r.top < 0 ? i = !0 : t.bottom + r.top > (window.innerHeight || document.documentElement.clientHeight) && (i = !1), null != i && !p) {
-                var o = O("div", "​", null, "position: absolute;\n                         top: " + (t.top - n.viewOffset - kn(e.display)) + "px;\n                         height: " + (t.bottom - t.top + _n(e) + n.barHeight) + "px;\n                         left: " + t.left + "px; width: " + Math.max(2, t.right - t.left) + "px;");
+                var o = O("div", "​", null, "position: absolute;\n                         top: " + (t.top - n.viewOffset - kn(e.display)) + "px;\n                         height: " + (t.bottom - t.top + Tn(e) + n.barHeight) + "px;\n                         left: " + t.left + "px; width: " + Math.max(2, t.right - t.left) + "px;");
                 e.display.lineSpace.appendChild(o), o.scrollIntoView(i), e.display.lineSpace.removeChild(o);
               }
             }
@@ -3797,8 +3801,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 bottom: Math.max(a.bottom, l.bottom) + r
               }),
                   u = e.doc.scrollTop,
-                  h = e.doc.scrollLeft;
-              if (null != c.scrollTop && (Ir(e, c.scrollTop), Math.abs(e.doc.scrollTop - u) > 1 && (s = !0)), null != c.scrollLeft && (Hr(e, c.scrollLeft), Math.abs(e.doc.scrollLeft - h) > 1 && (s = !0)), !s) break;
+                  d = e.doc.scrollLeft;
+              if (null != c.scrollTop && (Ir(e, c.scrollTop), Math.abs(e.doc.scrollTop - u) > 1 && (s = !0)), null != c.scrollLeft && (Hr(e, c.scrollLeft), Math.abs(e.doc.scrollLeft - d) > 1 && (s = !0)), !s) break;
             }
 
             return i;
@@ -3880,23 +3884,23 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               if (r.line >= e.display.viewFrom) {
                 var s = o.styles,
                     a = o.text.length > e.options.maxHighlightLength ? Be(t.mode, r.state) : null,
-                    l = ht(e, o, r, !0);
+                    l = dt(e, o, r, !0);
                 a && (r.state = a), o.styles = l.styles;
                 var c = o.styleClasses,
                     u = l.classes;
                 u ? o.styleClasses = u : c && (o.styleClasses = null);
 
-                for (var h = !s || s.length != o.styles.length || c != u && (!c || !u || c.bgClass != u.bgClass || c.textClass != u.textClass), d = 0; !h && d < s.length; ++d) {
-                  h = s[d] != o.styles[d];
+                for (var d = !s || s.length != o.styles.length || c != u && (!c || !u || c.bgClass != u.bgClass || c.textClass != u.textClass), h = 0; !d && h < s.length; ++h) {
+                  d = s[h] != o.styles[h];
                 }
 
-                h && i.push(r.line), o.stateAfter = r.save(), r.nextLine();
+                d && i.push(r.line), o.stateAfter = r.save(), r.nextLine();
               } else o.text.length <= e.options.maxHighlightLength && pt(e, o.text, r), o.stateAfter = r.line % 5 == 0 ? r.save() : null, r.nextLine();
 
               if (+new Date() > n) return ri(e, e.options.workDelay), !0;
             }), t.highlightFrontier = r.line, t.modeFrontier = Math.max(t.modeFrontier, r.line), i.length && Qr(e, function () {
               for (var t = 0; t < i.length; t++) {
-                dr(e, i[t], "text");
+                hr(e, i[t], "text");
               }
             });
           }
@@ -3912,7 +3916,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               r = e.doc;
           if (t.editorIsHidden) return fr(e), !1;
           if (!t.force && t.visible.from >= n.viewFrom && t.visible.to <= n.viewTo && (null == n.updateLineNumbers || n.updateLineNumbers >= n.viewTo) && n.renderedView == n.view && 0 == mr(e)) return !1;
-          di(e) && (fr(e), t.dims = or(e));
+          hi(e) && (fr(e), t.dims = or(e));
           var i = r.first + r.size,
               o = Math.max(t.visible.from - e.options.viewportMargin, r.first),
               s = Math.min(i, t.visible.to + e.options.viewportMargin);
@@ -3952,20 +3956,20 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               return l && y && e.display.currentWheelTarget == t ? t.style.display = "none" : t.parentNode.removeChild(t), n;
             }
 
-            for (var c = r.view, u = r.viewFrom, h = 0; h < c.length; h++) {
-              var d = c[h];
-              if (d.hidden) ;else if (d.node && d.node.parentNode == o) {
-                for (; s != d.node;) {
+            for (var c = r.view, u = r.viewFrom, d = 0; d < c.length; d++) {
+              var h = c[d];
+              if (h.hidden) ;else if (h.node && h.node.parentNode == o) {
+                for (; s != h.node;) {
                   s = a(s);
                 }
 
-                var f = i && null != t && t <= u && d.lineNumber;
-                d.changes && (j(d.changes, "gutter") > -1 && (f = !1), un(e, d, u, n)), f && (M(d.lineNumber), d.lineNumber.appendChild(document.createTextNode(Qe(e.options, u)))), s = d.node.nextSibling;
+                var f = i && null != t && t <= u && h.lineNumber;
+                h.changes && (j(h.changes, "gutter") > -1 && (f = !1), un(e, h, u, n)), f && (M(h.lineNumber), h.lineNumber.appendChild(document.createTextNode(Qe(e.options, u)))), s = h.node.nextSibling;
               } else {
-                var p = vn(e, d, u, n);
+                var p = vn(e, h, u, n);
                 o.insertBefore(p, s);
               }
-              u += d.size;
+              u += h.size;
             }
 
             for (; s;) {
@@ -3986,9 +3990,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               top: Math.min(e.doc.height + Sn(e.display) - Ln(e), n.top)
             }), t.visible = Lr(e.display, e.doc, n), t.visible.from >= e.display.viewFrom && t.visible.to <= e.display.viewTo) break;
             if (!si(e, t)) break;
-
-            _r(e);
-
+            Tr(e);
             var i = Fr(e);
             gr(e), Rr(e, i), ui(e, i), t.force = !1;
           }
@@ -4000,7 +4002,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           var n = new oi(e, t);
 
           if (si(e, n)) {
-            _r(e), ai(e, n);
+            Tr(e), ai(e, n);
             var r = Fr(e);
             gr(e), Rr(e, r), ui(e, r), n.finish();
           }
@@ -4012,10 +4014,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         function ui(e, t) {
-          e.display.sizer.style.minHeight = t.docHeight + "px", e.display.heightForcer.style.top = t.docHeight + "px", e.display.gutters.style.height = t.docHeight + e.display.barHeight + _n(e) + "px";
+          e.display.sizer.style.minHeight = t.docHeight + "px", e.display.heightForcer.style.top = t.docHeight + "px", e.display.gutters.style.height = t.docHeight + e.display.barHeight + Tn(e) + "px";
         }
 
-        function hi(e) {
+        function di(e) {
           var t = e.display,
               n = t.view;
 
@@ -4034,7 +4036,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }
         }
 
-        function di(e) {
+        function hi(e) {
           if (!e.options.lineNumbers) return !1;
           var t = e.doc,
               n = Qe(e.options, t.first + t.size - 1),
@@ -4089,7 +4091,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         function mi(e) {
-          pi(e.display), hr(e), hi(e);
+          pi(e.display), dr(e), di(e);
         }
 
         function gi(e, t, r, i) {
@@ -4132,9 +4134,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           var a = e.display,
               c = a.scroller,
               u = c.scrollWidth > c.clientWidth,
-              d = c.scrollHeight > c.clientHeight;
+              h = c.scrollHeight > c.clientHeight;
 
-          if (i && u || o && d) {
+          if (i && u || o && h) {
             if (o && y && l) e: for (var f = t.target, p = a.view; f != c; f = f.parentNode) {
               for (var m = 0; m < p.length; m++) {
                 if (p[m].node == f) {
@@ -4143,7 +4145,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 }
               }
             }
-            if (i && !n && !h && null != s) return o && d && Ir(e, Math.max(0, c.scrollTop + o * s)), Hr(e, Math.max(0, c.scrollLeft + i * s)), (!o || o && d) && be(t), void (a.wheelStartX = null);
+            if (i && !n && !d && null != s) return o && h && Ir(e, Math.max(0, c.scrollTop + o * s)), Hr(e, Math.max(0, c.scrollLeft + i * s)), (!o || o && h) && be(t), void (a.wheelStartX = null);
 
             if (o && null != s) {
               var g = o * s,
@@ -4166,7 +4168,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }
         }
 
-        s ? yi = -.53 : n ? yi = 15 : u ? yi = -.7 : d && (yi = -1 / 3);
+        s ? yi = -.53 : n ? yi = 15 : u ? yi = -.7 : h && (yi = -1 / 3);
 
         var Ci = function Ci(e, t) {
           this.ranges = e, this.primIndex = t;
@@ -4227,28 +4229,28 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             if (r && !s.empty() ? l > 0 : l >= 0) {
               var c = ot(a.from(), s.from()),
                   u = it(a.to(), s.to()),
-                  h = a.empty() ? s.from() == s.head : a.from() == a.head;
-              o <= n && --n, t.splice(--o, 2, new ki(h ? u : c, h ? c : u));
+                  d = a.empty() ? s.from() == s.head : a.from() == a.head;
+              o <= n && --n, t.splice(--o, 2, new ki(d ? u : c, d ? c : u));
             }
           }
 
           return new Ci(t, n);
         }
 
-        function Ti(e, t) {
+        function _i(e, t) {
           return new Ci([new ki(e, t || e)], 0);
         }
 
-        function _i(e) {
+        function Ti(e) {
           return e.text ? et(e.from.line + e.text.length - 1, X(e.text).length + (1 == e.text.length ? e.from.ch : 0)) : e.to;
         }
 
         function Mi(e, t) {
           if (tt(e, t.from) < 0) return e;
-          if (tt(e, t.to) <= 0) return _i(t);
+          if (tt(e, t.to) <= 0) return Ti(t);
           var n = e.line + t.text.length - (t.to.line - t.from.line) - 1,
               r = e.ch;
-          return e.line == t.to.line && (r += _i(t).ch - t.to.ch), et(n, r);
+          return e.line == t.to.line && (r += Ti(t).ch - t.to.ch), et(n, r);
         }
 
         function Li(e, t) {
@@ -4271,7 +4273,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         function Ni(e) {
           e.doc.iter(function (e) {
             e.stateAfter && (e.stateAfter = null), e.styles && (e.styles = null);
-          }), e.doc.modeFrontier = e.doc.highlightFrontier = e.doc.first, ri(e, 100), e.state.modeGen++, e.curOp && hr(e);
+          }), e.doc.modeFrontier = e.doc.highlightFrontier = e.doc.first, ri(e, 100), e.state.modeGen++, e.curOp && dr(e);
         }
 
         function Ei(e, t) {
@@ -4303,20 +4305,20 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               l = t.to,
               c = t.text,
               u = Ge(e, a.line),
-              h = Ge(e, l.line),
-              d = X(c),
+              d = Ge(e, l.line),
+              h = X(c),
               f = i(c.length - 1),
               p = l.line - a.line;
           if (t.full) e.insert(0, s(0, c.length)), e.remove(c.length, e.size - c.length);else if (Ei(e, t)) {
             var m = s(0, c.length - 1);
-            o(h, h.text, f), p && e.remove(a.line, p), m.length && e.insert(a.line, m);
-          } else if (u == h) {
-            if (1 == c.length) o(u, u.text.slice(0, a.ch) + d + u.text.slice(l.ch), f);else {
+            o(d, d.text, f), p && e.remove(a.line, p), m.length && e.insert(a.line, m);
+          } else if (u == d) {
+            if (1 == c.length) o(u, u.text.slice(0, a.ch) + h + u.text.slice(l.ch), f);else {
               var g = s(1, c.length - 1);
-              g.push(new Gt(d + u.text.slice(l.ch), f, r)), o(u, u.text.slice(0, a.ch) + c[0], i(0)), e.insert(a.line + 1, g);
+              g.push(new Gt(h + u.text.slice(l.ch), f, r)), o(u, u.text.slice(0, a.ch) + c[0], i(0)), e.insert(a.line + 1, g);
             }
-          } else if (1 == c.length) o(u, u.text.slice(0, a.ch) + c[0] + h.text.slice(l.ch), i(0)), e.remove(a.line + 1, p);else {
-            o(u, u.text.slice(0, a.ch) + c[0], i(0)), o(h, d + h.text.slice(l.ch), f);
+          } else if (1 == c.length) o(u, u.text.slice(0, a.ch) + c[0] + d.text.slice(l.ch), i(0)), e.remove(a.line + 1, p);else {
+            o(u, u.text.slice(0, a.ch) + c[0], i(0)), o(d, h + d.text.slice(l.ch), f);
             var v = s(1, c.length - 1);
             p > 1 && e.remove(a.line + 1, p - 1), e.insert(a.line + 1, v);
           }
@@ -4338,11 +4340,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
         function Ii(e, t) {
           if (t.cm) throw new Error("This document is already in use.");
-          e.doc = t, t.cm = e, lr(e), Ai(e), Wi(e), e.options.direction = t.direction, e.options.lineWrapping || Kt(e), e.options.mode = t.modeOption, hr(e);
+          e.doc = t, t.cm = e, lr(e), Ai(e), Wi(e), e.options.direction = t.direction, e.options.lineWrapping || Kt(e), e.options.mode = t.modeOption, dr(e);
         }
 
         function Wi(e) {
-          ("rtl" == e.doc.direction ? D : _)(e.display.lineDiv, "CodeMirror-rtl");
+          ("rtl" == e.doc.direction ? D : T)(e.display.lineDiv, "CodeMirror-rtl");
         }
 
         function Hi(e) {
@@ -4352,7 +4354,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         function Fi(e, t) {
           var n = {
             from: rt(t.from),
-            to: _i(t),
+            to: Ti(t),
             text: $e(e, t.from, t.to)
           };
           return Vi(e, n, t.from.line, t.to.line + 1), Pi(e, function (e) {
@@ -4374,7 +4376,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               a = +new Date();
           if ((i.lastOp == r || i.lastOrigin == t.origin && t.origin && ("+" == t.origin.charAt(0) && i.lastModTime > a - (e.cm ? e.cm.options.historyEventDelay : 500) || "*" == t.origin.charAt(0))) && (o = function (e, t) {
             return t ? (zi(e.done), X(e.done)) : e.done.length && !X(e.done).ranges ? X(e.done) : e.done.length > 1 && !e.done[e.done.length - 2].ranges ? (e.done.pop(), X(e.done)) : void 0;
-          }(i, i.lastOp == r))) s = X(o.changes), 0 == tt(t.from, t.to) && 0 == tt(t.from, s.to) ? s.to = _i(t) : o.changes.push(Fi(e, t));else {
+          }(i, i.lastOp == r))) s = X(o.changes), 0 == tt(t.from, t.to) && 0 == tt(t.from, s.to) ? s.to = Ti(t) : o.changes.push(Fi(e, t));else {
             var l = X(i.done);
 
             for (l && l.ranges || Bi(e.sel, i.done), o = {
@@ -4430,7 +4432,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
             return r;
           }(e, t),
-              r = _t(e, t);
+              r = Tt(e, t);
 
           if (!n) return r;
           if (!r) return n;
@@ -4467,8 +4469,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   from: c.from,
                   to: c.to,
                   text: c.text
-                }), t) for (var h in c) {
-                  (u = h.match(/^spans_(\d+)$/)) && j(t, Number(u[1])) > -1 && (X(a)[h] = c[h], delete c[h]);
+                }), t) for (var d in c) {
+                  (u = d.match(/^spans_(\d+)$/)) && j(t, Number(u[1])) > -1 && (X(a)[d] = c[d], delete c[d]);
                 }
               }
             }
@@ -4510,7 +4512,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         function qi(e, t, n, r) {
-          Qi(e, Ti(t, n), r);
+          Qi(e, _i(t, n), r);
         }
 
         function Ji(e, t, n) {
@@ -4583,9 +4585,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               if (!l.atomic) continue;
 
               if (n) {
-                var h = l.find(r < 0 ? 1 : -1),
-                    d = void 0;
-                if ((r < 0 ? u : c) && (h = so(e, h, -r, h && h.line == t.line ? o : null)), h && h.line == t.line && (d = tt(h, n)) && (r < 0 ? d < 0 : d > 0)) return io(e, h, t, r, i);
+                var d = l.find(r < 0 ? 1 : -1),
+                    h = void 0;
+                if ((r < 0 ? u : c) && (d = so(e, d, -r, d && d.line == t.line ? o : null)), d && d.line == t.line && (h = tt(d, n)) && (r < 0 ? h < 0 : h > 0)) return io(e, d, t, r, i);
               }
 
               var f = l.find(r < 0 ? -1 : 1);
@@ -4654,12 +4656,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
                   if (!(tt(c.to, a.from) < 0 || tt(c.from, a.to) > 0)) {
                     var u = [l, 1],
-                        h = tt(c.from, a.from),
-                        d = tt(c.to, a.to);
-                    (h < 0 || !s.inclusiveLeft && !h) && u.push({
+                        d = tt(c.from, a.from),
+                        h = tt(c.to, a.to);
+                    (d < 0 || !s.inclusiveLeft && !d) && u.push({
                       from: c.from,
                       to: a.from
-                    }), (d > 0 || !s.inclusiveRight && !d) && u.push({
+                    }), (h > 0 || !s.inclusiveRight && !h) && u.push({
                       from: a.to,
                       to: c.to
                     }), i.splice.apply(i, u), l += u.length - 3;
@@ -4684,10 +4686,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         function uo(e, t) {
           if (1 != t.text.length || "" != t.text[0] || 0 != tt(t.from, t.to)) {
             var n = Li(e, t);
-            ji(e, t, n, e.cm ? e.cm.curOp.id : NaN), po(e, t, n, _t(e, t));
+            ji(e, t, n, e.cm ? e.cm.curOp.id : NaN), po(e, t, n, Tt(e, t));
             var r = [];
             Pi(e, function (e, n) {
-              n || -1 != j(r, e.history) || (yo(e.history, t), r.push(e.history)), po(e, t, null, _t(e, t));
+              n || -1 != j(r, e.history) || (yo(e.history, t), r.push(e.history)), po(e, t, null, Tt(e, t));
             });
           }
         }
@@ -4719,21 +4721,21 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 generation: o.generation
               }), o.generation = i.generation || ++o.maxGeneration;
 
-              for (var h = ve(e, "beforeChange") || e.cm && ve(e.cm, "beforeChange"), d = function d(n) {
+              for (var d = ve(e, "beforeChange") || e.cm && ve(e.cm, "beforeChange"), h = function h(n) {
                 var r = i.changes[n];
-                if (r.origin = t, h && !lo(e, r, !1)) return a.length = 0, {};
+                if (r.origin = t, d && !lo(e, r, !1)) return a.length = 0, {};
                 u.push(Fi(e, r));
                 var o = n ? Li(e, r) : X(a);
                 po(e, r, o, Ki(e, r)), !n && e.cm && e.cm.scrollIntoView({
                   from: r.from,
-                  to: _i(r)
+                  to: Ti(r)
                 });
                 var s = [];
                 Pi(e, function (e, t) {
                   t || -1 != j(s, e.history) || (yo(e.history, r), s.push(e.history)), po(e, r, null, Ki(e, r));
                 });
               }, f = i.changes.length - 1; f >= 0; --f) {
-                var p = d(f);
+                var p = h(f);
                 if (p) return p.v;
               }
             }
@@ -4744,10 +4746,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           if (0 != t && (e.first += t, e.sel = new Ci(Z(e.sel.ranges, function (e) {
             return new ki(et(e.anchor.line + t, e.anchor.ch), et(e.head.line + t, e.head.ch));
           }), e.sel.primIndex), e.cm)) {
-            hr(e.cm, e.first, e.first - t, t);
+            dr(e.cm, e.first, e.first - t, t);
 
             for (var n = e.cm.display, r = n.viewFrom; r < n.viewTo; r++) {
-              dr(e.cm, r, "gutter");
+              hr(e.cm, r, "gutter");
             }
           }
         }
@@ -4798,19 +4800,19 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 }
               }(r, o.line), ri(e, 400);
               var c = t.text.length - (s.line - o.line) - 1;
-              t.full ? hr(e) : o.line != s.line || 1 != t.text.length || Ei(e.doc, t) ? hr(e, o.line, s.line + 1, c) : dr(e, o.line, "text");
+              t.full ? dr(e) : o.line != s.line || 1 != t.text.length || Ei(e.doc, t) ? dr(e, o.line, s.line + 1, c) : hr(e, o.line, "text");
               var u = ve(e, "changes"),
-                  h = ve(e, "change");
+                  d = ve(e, "change");
 
-              if (h || u) {
-                var d = {
+              if (d || u) {
+                var h = {
                   from: o,
                   to: s,
                   text: t.text,
                   removed: t.removed,
                   origin: t.origin
                 };
-                h && ln(e, "change", e, d), u && (e.curOp.changeObjs || (e.curOp.changeObjs = [])).push(d);
+                d && ln(e, "change", e, h), u && (e.curOp.changeObjs || (e.curOp.changeObjs = [])).push(h);
               }
 
               e.display.selForContextMenu = null;
@@ -4867,7 +4869,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         function bo(e, t, n, r) {
           var i = t,
               o = t;
-          return "number" == typeof t ? o = Ge(e, st(e, t)) : i = Ye(t), null == i ? null : (r(o, i) && e.cm && dr(e.cm, i, n), o);
+          return "number" == typeof t ? o = Ge(e, st(e, t)) : i = Ye(t), null == i ? null : (r(o, i) && e.cm && hr(e.cm, i, n), o);
         }
 
         function xo(e) {
@@ -5038,7 +5040,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             t.length || (n.widgets = null);
             var o = wn(this);
             Ze(n, Math.max(0, n.height - o)), e && (Qr(e, function () {
-              ko(e, n, -o), dr(e, r, "widget");
+              ko(e, n, -o), hr(e, r, "widget");
             }), ln(e, "lineWidgetCleared", e, this, r));
           }
         }, Co.prototype.changed = function () {
@@ -5054,18 +5056,18 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }, ye(Co);
 
         var So = 0,
-            To = function To(e, t) {
+            _o = function _o(e, t) {
           this.lines = [], this.type = t, this.doc = e, this.id = ++So;
         };
 
-        function _o(e, t, n, r, i) {
+        function To(e, t, n, r, i) {
           if (r && r.shared) return function (e, t, n, r, i) {
             (r = H(r)).shared = !1;
-            var o = [_o(e, t, n, r, i)],
+            var o = [To(e, t, n, r, i)],
                 s = o[0],
                 a = r.widgetNode;
             return Pi(e, function (e) {
-              a && (r.widgetNode = a.cloneNode(!0)), o.push(_o(e, at(e, t), at(e, n), r, i));
+              a && (r.widgetNode = a.cloneNode(!0)), o.push(To(e, at(e, t), at(e, n), r, i));
 
               for (var l = 0; l < e.linked.length; ++l) {
                 if (e.linked[l].isParent) return;
@@ -5074,8 +5076,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               s = X(o);
             }), new Mo(o, s);
           }(e, t, n, r, i);
-          if (e.cm && !e.cm.curOp) return ei(e.cm, _o)(e, t, n, r, i);
-          var o = new To(e, i),
+          if (e.cm && !e.cm.curOp) return ei(e.cm, To)(e, t, n, r, i);
+          var o = new _o(e, i),
               s = tt(t, n);
           if (r && H(r, o, !1), s > 0 || 0 == s && !1 !== o.clearWhenEmpty) return o;
 
@@ -5100,11 +5102,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             }(r, new kt(o, l == t.line ? t.ch : null, l == n.line ? n.ch : null), e.cm && e.cm.curOp), ++l;
           }), o.collapsed && e.iter(t.line, n.line + 1, function (t) {
             Rt(e, t) && Ze(t, 0);
-          }), o.clearOnEnter && he(o, "beforeCursorEnter", function () {
+          }), o.clearOnEnter && de(o, "beforeCursorEnter", function () {
             return o.clear();
           }), o.readOnly && (wt = !0, (e.history.done.length || e.history.undone.length) && e.clearHistory()), o.collapsed && (o.id = ++So, o.atomic = !0), c) {
-            if (a && (c.curOp.updateMaxLine = !0), o.collapsed) hr(c, t.line, n.line + 1);else if (o.className || o.startStyle || o.endStyle || o.css || o.attributes || o.title) for (var u = t.line; u <= n.line; u++) {
-              dr(c, u, "text");
+            if (a && (c.curOp.updateMaxLine = !0), o.collapsed) dr(c, t.line, n.line + 1);else if (o.className || o.startStyle || o.endStyle || o.css || o.attributes || o.title) for (var u = t.line; u <= n.line; u++) {
+              hr(c, u, "text");
             }
             o.atomic && no(c.doc), ln(c, "markerAdded", c, o);
           }
@@ -5112,7 +5114,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           return o;
         }
 
-        To.prototype.clear = function () {
+        _o.prototype.clear = function () {
           if (!this.explicitlyCleared) {
             var e = this.doc.cm,
                 t = e && !e.curOp;
@@ -5125,7 +5127,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             for (var r = null, i = null, o = 0; o < this.lines.length; ++o) {
               var s = this.lines[o],
                   a = St(s.markedSpans, this);
-              e && !this.collapsed ? dr(e, Ye(s), "text") : e && (null != a.to && (i = Ye(s)), null != a.from && (r = Ye(s))), s.markedSpans = Tt(s.markedSpans, a), null == a.from && this.collapsed && !Rt(this.doc, s) && e && Ze(s, rr(e.display));
+              e && !this.collapsed ? hr(e, Ye(s), "text") : e && (null != a.to && (i = Ye(s)), null != a.from && (r = Ye(s))), s.markedSpans = _t(s.markedSpans, a), null == a.from && this.collapsed && !Rt(this.doc, s) && e && Ze(s, rr(e.display));
             }
 
             if (e && this.collapsed && !e.options.lineWrapping) for (var l = 0; l < this.lines.length; ++l) {
@@ -5133,9 +5135,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   u = Ut(c);
               u > e.display.maxLineLength && (e.display.maxLine = c, e.display.maxLineLength = u, e.display.maxLineChanged = !0);
             }
-            null != r && e && this.collapsed && hr(e, r, i + 1), this.lines.length = 0, this.explicitlyCleared = !0, this.atomic && this.doc.cantEdit && (this.doc.cantEdit = !1, e && no(e.doc)), e && ln(e, "markerCleared", e, this, r, i), t && $r(e), this.parent && this.parent.clear();
+            null != r && e && this.collapsed && dr(e, r, i + 1), this.lines.length = 0, this.explicitlyCleared = !0, this.atomic && this.doc.cantEdit && (this.doc.cantEdit = !1, e && no(e.doc)), e && ln(e, "markerCleared", e, this, r, i), t && $r(e), this.parent && this.parent.clear();
           }
-        }, To.prototype.find = function (e, t) {
+        }, _o.prototype.find = function (e, t) {
           var n, r;
           null == e && "bookmark" == this.type && (e = 1);
 
@@ -5150,7 +5152,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             from: n,
             to: r
           };
-        }, To.prototype.changed = function () {
+        }, _o.prototype.changed = function () {
           var e = this,
               t = this.find(-1, !0),
               n = this,
@@ -5169,19 +5171,19 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
             ln(r, "markerChanged", r, e);
           });
-        }, To.prototype.attachLine = function (e) {
+        }, _o.prototype.attachLine = function (e) {
           if (!this.lines.length && this.doc.cm) {
             var t = this.doc.cm.curOp;
             t.maybeHiddenMarkers && -1 != j(t.maybeHiddenMarkers, this) || (t.maybeUnhiddenMarkers || (t.maybeUnhiddenMarkers = [])).push(this);
           }
 
           this.lines.push(e);
-        }, To.prototype.detachLine = function (e) {
+        }, _o.prototype.detachLine = function (e) {
           if (this.lines.splice(j(this.lines, e), 1), !this.lines.length && this.doc.cm) {
             var t = this.doc.cm.curOp;
             (t.maybeHiddenMarkers || (t.maybeHiddenMarkers = [])).push(this);
           }
-        }, ye(To);
+        }, ye(_o);
 
         var Mo = function Mo(e, t) {
           this.markers = e, this.primary = t;
@@ -5233,11 +5235,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           if (!(this instanceof No)) return new No(e, t, n, r, i);
           null == n && (n = 0), wo.call(this, [new xo([new Gt("", null)])]), this.first = n, this.scrollTop = this.scrollLeft = 0, this.cantEdit = !1, this.cleanGeneration = 1, this.modeFrontier = this.highlightFrontier = n;
           var o = et(n, 0);
-          this.sel = Ti(o), this.history = new Hi(null), this.id = ++Ao, this.modeOption = t, this.lineSep = r, this.direction = "rtl" == i ? "rtl" : "ltr", this.extend = !1, "string" == typeof e && (e = this.splitLines(e)), Di(this, {
+          this.sel = _i(o), this.history = new Hi(null), this.id = ++Ao, this.modeOption = t, this.lineSep = r, this.direction = "rtl" == i ? "rtl" : "ltr", this.extend = !1, "string" == typeof e && (e = this.splitLines(e)), Di(this, {
             from: o,
             to: o,
             text: e
-          }), Qi(this, Ti(o), B);
+          }), Qi(this, _i(o), B);
         };
 
         No.prototype = q(wo.prototype, {
@@ -5268,7 +5270,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               text: this.splitLines(e),
               origin: "setValue",
               full: !0
-            }, !0), this.cm && Er(this.cm, 0, 0), Qi(this, Ti(t), B);
+            }, !0), this.cm && Er(this.cm, 0, 0), Qi(this, _i(t), B);
           }),
           replaceRange: function replaceRange(e, t, n, r) {
             mo(this, e, t = at(this, t), n = n ? at(this, n) : t, r);
@@ -5378,12 +5380,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               for (var r = [], i = et(e.first, 0), o = i, s = 0; s < t.length; s++) {
                 var a = t[s],
                     l = Oi(a.from, i, o),
-                    c = Oi(_i(a), i, o);
+                    c = Oi(Ti(a), i, o);
 
                 if (i = a.to, o = c, "around" == n) {
                   var u = e.sel.ranges[s],
-                      h = tt(u.head, u.anchor) < 0;
-                  r[s] = new ki(h ? c : l, h ? l : c);
+                      d = tt(u.head, u.anchor) < 0;
+                  r[s] = new ki(d ? c : l, d ? l : c);
                 } else r[s] = new ki(l, l);
               }
 
@@ -5530,7 +5532,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             e.clear();
           },
           markText: function markText(e, t, n) {
-            return _o(this, at(this, e), at(this, t), n, n && n.type || "range");
+            return To(this, at(this, e), at(this, t), n, n && n.type || "range");
           },
           setBookmark: function setBookmark(e, t) {
             var n = {
@@ -5540,7 +5542,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               shared: t && t.shared,
               handleMouseEvents: t && t.handleMouseEvents
             };
-            return _o(this, e = at(this, e), e, n, "bookmark");
+            return To(this, e = at(this, e), e, n, "bookmark");
           },
           findMarksAt: function findMarksAt(e) {
             var t = [],
@@ -5616,8 +5618,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                     s = e.clipPos(i.to);
 
                 if (tt(o, s)) {
-                  var a = _o(e, o, s, r.primary, r.primary.type);
-
+                  var a = To(e, o, s, r.primary, r.primary.type);
                   r.markers.push(a), a.parent = r;
                 }
               }
@@ -5658,7 +5659,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             "rtl" != e && (e = "ltr"), e != this.direction && (this.direction = e, this.iter(function (e) {
               return e.order = null;
             }), this.cm && Qr(t = this.cm, function () {
-              Wi(t), hr(t);
+              Wi(t), dr(t);
             }));
           })
         }), No.prototype.eachLine = No.prototype.iter;
@@ -5681,7 +5682,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   }).join(t.doc.lineSeparator())),
                   origin: "paste"
                 };
-                co(t.doc, e), Ji(t.doc, Ti(at(t.doc, n), at(t.doc, _i(e))));
+                co(t.doc, e), Ji(t.doc, _i(at(t.doc, n), at(t.doc, Ti(e))));
               })();
             }, c = function c(e, n) {
               if (t.options.allowDropFileTypes && -1 == j(t.options.allowDropFileTypes, e.type)) l();else {
@@ -5701,14 +5702,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               }, 20);
 
               try {
-                var h = e.dataTransfer.getData("Text");
+                var d = e.dataTransfer.getData("Text");
 
-                if (h) {
-                  var d;
-                  if (t.state.draggingText && !t.state.draggingText.copy && (d = t.listSelections()), eo(t.doc, Ti(n, n)), d) for (var f = 0; f < d.length; ++f) {
-                    mo(t.doc, "", d[f].anchor, d[f].head, "drag");
+                if (d) {
+                  var h;
+                  if (t.state.draggingText && !t.state.draggingText.copy && (h = t.listSelections()), eo(t.doc, _i(n, n)), h) for (var f = 0; f < h.length; ++f) {
+                    mo(t.doc, "", h[f].anchor, h[f].head, "drag");
                   }
-                  t.replaceSelection(h, "around", "paste"), t.display.input.focus();
+                  t.replaceSelection(d, "around", "paste"), t.display.input.focus();
                 }
               } catch (e) {}
             }
@@ -5738,12 +5739,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
         function Ho() {
           var e;
-          Wo || (he(window, "resize", function () {
+          Wo || (de(window, "resize", function () {
             null == e && (e = setTimeout(function () {
               e = null, Io(Fo);
             }, 100));
-          }), he(window, "blur", function () {
-            return Io(Tr);
+          }), de(window, "blur", function () {
+            return Io(_r);
           }), Wo = !0);
         }
 
@@ -5904,7 +5905,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         function Zo(e, t) {
-          if (h && 34 == e.keyCode && e.char) return !1;
+          if (d && 34 == e.keyCode && e.char) return !1;
           var n = zo[e.keyCode];
           return null != n && !e.altGraphKey && (3 == e.keyCode && e.code && (n = e.code), Xo(n, e, t));
         }
@@ -6413,31 +6414,31 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             var r = e.keyCode;
             t.display.shift = 16 == r || e.shiftKey;
             var i = ls(t, e);
-            h && (cs = i ? r : null, i || 88 != r || De || !(y ? e.metaKey : e.ctrlKey) || t.replaceSelection("", null, "cut")), n && !y && !i && 46 == r && e.shiftKey && !e.ctrlKey && document.execCommand && document.execCommand("cut"), 18 != r || /\bCodeMirror-crosshair\b/.test(t.display.lineDiv.className) || function (e) {
+            d && (cs = i ? r : null, i || 88 != r || De || !(y ? e.metaKey : e.ctrlKey) || t.replaceSelection("", null, "cut")), n && !y && !i && 46 == r && e.shiftKey && !e.ctrlKey && document.execCommand && document.execCommand("cut"), 18 != r || /\bCodeMirror-crosshair\b/.test(t.display.lineDiv.className) || function (e) {
               var t = e.display.lineDiv;
 
               function n(e) {
-                18 != e.keyCode && e.altKey || (_(t, "CodeMirror-crosshair"), fe(document, "keyup", n), fe(document, "mouseover", n));
+                18 != e.keyCode && e.altKey || (T(t, "CodeMirror-crosshair"), fe(document, "keyup", n), fe(document, "mouseover", n));
               }
 
-              D(t, "CodeMirror-crosshair"), he(document, "keyup", n), he(document, "mouseover", n);
+              D(t, "CodeMirror-crosshair"), de(document, "keyup", n), de(document, "mouseover", n);
             }(t);
           }
         }
 
-        function hs(e) {
+        function ds(e) {
           16 == e.keyCode && (this.doc.sel.shift = !1), me(this, e);
         }
 
-        function ds(e) {
+        function hs(e) {
           var t = this;
 
           if (!(e.target && e.target != t.display.input.getField() || Cn(t.display, e) || me(t, e) || e.ctrlKey && !e.altKey || y && e.metaKey)) {
             var n = e.keyCode,
                 r = e.charCode;
-            if (h && n == cs) return cs = null, void be(e);
+            if (d && n == cs) return cs = null, void be(e);
 
-            if (!h || e.which && !(e.which < 10) || !ls(t, e)) {
+            if (!d || e.which && !(e.which < 10) || !ls(t, e)) {
               var i = String.fromCharCode(null == r ? n : r);
               "\b" != i && (function (e, t, n) {
                 return ss(e, "'" + n + "'", t, function (t) {
@@ -6501,7 +6502,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 var i = e.display,
                     o = !1,
                     c = ei(e, function (t) {
-                  l && (i.scroller.draggable = !1), e.state.draggingText = !1, e.state.delayingBlurEvent && (e.hasFocus() ? e.state.delayingBlurEvent = !1 : kr(e)), fe(i.wrapper.ownerDocument, "mouseup", c), fe(i.wrapper.ownerDocument, "mousemove", u), fe(i.scroller, "dragstart", h), fe(i.scroller, "drop", c), o || (be(t), r.addNew || Xi(e.doc, n, null, null, r.extend), l && !d || s && 9 == a ? setTimeout(function () {
+                  l && (i.scroller.draggable = !1), e.state.draggingText = !1, e.state.delayingBlurEvent && (e.hasFocus() ? e.state.delayingBlurEvent = !1 : kr(e)), fe(i.wrapper.ownerDocument, "mouseup", c), fe(i.wrapper.ownerDocument, "mousemove", u), fe(i.scroller, "dragstart", d), fe(i.scroller, "drop", c), o || (be(t), r.addNew || Xi(e.doc, n, null, null, r.extend), l && !h || s && 9 == a ? setTimeout(function () {
                     i.wrapper.ownerDocument.body.focus({
                       preventScroll: !0
                     }), i.input.focus();
@@ -6510,11 +6511,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                     u = function u(e) {
                   o = o || Math.abs(t.clientX - e.clientX) + Math.abs(t.clientY - e.clientY) >= 10;
                 },
-                    h = function h() {
+                    d = function d() {
                   return o = !0;
                 };
 
-                l && (i.scroller.draggable = !0), e.state.draggingText = c, c.copy = !r.moveOnDrag, he(i.wrapper.ownerDocument, "mouseup", c), he(i.wrapper.ownerDocument, "mousemove", u), he(i.scroller, "dragstart", h), he(i.scroller, "drop", c), e.state.delayingBlurEvent = !0, setTimeout(function () {
+                l && (i.scroller.draggable = !0), e.state.draggingText = c, c.copy = !r.moveOnDrag, de(i.wrapper.ownerDocument, "mouseup", c), de(i.wrapper.ownerDocument, "mousemove", u), de(i.scroller, "dragstart", d), de(i.scroller, "drop", c), e.state.delayingBlurEvent = !0, setTimeout(function () {
                   return i.input.focus();
                 }, 20), i.scroller.dragDrop && i.scroller.dragDrop();
               }(e, r, t, o) : function (e, t, n, r) {
@@ -6527,8 +6528,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                     c = o.sel,
                     u = c.ranges;
                 if (r.addNew && !r.extend ? (l = o.sel.contains(n), a = l > -1 ? u[l] : new ki(n, n)) : (a = o.sel.primary(), l = o.sel.primIndex), "rectangle" == r.unit) r.addNew || (a = new ki(n, n)), n = cr(e, t, !0, !0), l = -1;else {
-                  var h = vs(e, n, r.unit);
-                  a = r.extend ? $i(a, h.anchor, h.head, r.extend) : h;
+                  var d = vs(e, n, r.unit);
+                  a = r.extend ? $i(a, d.anchor, d.head, r.extend) : d;
                 }
                 r.addNew ? -1 == l ? (l = u.length, Qi(o, Si(e, u.concat([a]), l), {
                   scroll: !1,
@@ -6537,11 +6538,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   scroll: !1,
                   origin: "*mouse"
                 }), c = o.sel) : Yi(o, l, a, V) : (l = 0, Qi(o, new Ci([a], 0), V), c = o.sel);
-                var d = n;
+                var h = n;
 
                 function f(t) {
-                  if (0 != tt(d, t)) if (d = t, "rectangle" == r.unit) {
-                    for (var i = [], s = e.options.tabSize, u = F(Ge(o, n.line).text, n.ch, s), h = F(Ge(o, t.line).text, t.ch, s), f = Math.min(u, h), p = Math.max(u, h), m = Math.min(n.line, t.line), g = Math.min(e.lastLine(), Math.max(n.line, t.line)); m <= g; m++) {
+                  if (0 != tt(h, t)) if (h = t, "rectangle" == r.unit) {
+                    for (var i = [], s = e.options.tabSize, u = F(Ge(o, n.line).text, n.ch, s), d = F(Ge(o, t.line).text, t.ch, s), f = Math.min(u, d), p = Math.max(u, d), m = Math.min(n.line, t.line), g = Math.min(e.lastLine(), Math.max(n.line, t.line)); m <= g; m++) {
                       var v = Ge(o, m).text,
                           y = K(v, f, s);
                       f == p ? i.push(new ki(et(m, y), et(m, y))) : v.length > y && i.push(new ki(et(m, y), et(m, K(v, p, s))));
@@ -6573,12 +6574,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                       if (0 == c || c == o.length) return t;
                       if (r.line != n.line) l = (r.line - n.line) * ("ltr" == e.doc.direction ? 1 : -1) > 0;else {
                         var u = ae(o, r.ch, r.sticky),
-                            h = u - s || (r.ch - n.ch) * (1 == a.level ? -1 : 1);
-                        l = u == c - 1 || u == c ? h < 0 : h > 0;
+                            d = u - s || (r.ch - n.ch) * (1 == a.level ? -1 : 1);
+                        l = u == c - 1 || u == c ? d < 0 : d > 0;
                       }
-                      var d = o[c + (l ? -1 : 0)],
-                          f = l == (1 == d.level),
-                          p = f ? d.from : d.to,
+                      var h = o[c + (l ? -1 : 0)],
+                          f = l == (1 == h.level),
+                          p = f ? h.from : h.to,
                           m = f ? "after" : "before";
                       return n.ch == p && n.sticky == m ? t : new ki(new et(n.line, p, m), r);
                     }(e, new ki(at(o, C), b)), Qi(o, Si(e, k, l), V);
@@ -6591,7 +6592,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 function g(t) {
                   var n = ++m,
                       s = cr(e, t, !0, "rectangle" == r.unit);
-                  if (s) if (0 != tt(s, d)) {
+                  if (s) if (0 != tt(s, h)) {
                     e.curOp.focus = E(), f(s);
                     var a = Lr(i, o);
                     (s.line >= a.to || s.line < a.from) && setTimeout(ei(e, function () {
@@ -6613,7 +6614,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   0 !== e.buttons && Se(e) ? g(e) : v(e);
                 }),
                     b = ei(e, v);
-                e.state.selectingText = b, he(i.wrapper.ownerDocument, "mousemove", y), he(i.wrapper.ownerDocument, "mouseup", b);
+                e.state.selectingText = b, de(i.wrapper.ownerDocument, "mousemove", y), de(i.wrapper.ownerDocument, "mouseup", b);
               }(e, r, t, o);
             }(t, r, o, e) : ke(e) == n.scroller && be(e) : 2 == i ? (r && Xi(t.doc, r), setTimeout(function () {
               return n.input.focus();
@@ -6675,16 +6676,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             ks = {},
             Ss = {};
 
-        function Ts(e, t, n) {
+        function _s(e, t, n) {
           if (!t != !(n && n != Cs)) {
             var r = e.display.dragFunctions,
-                i = t ? he : fe;
+                i = t ? de : fe;
             i(e.display.scroller, "dragstart", r.start), i(e.display.scroller, "dragenter", r.enter), i(e.display.scroller, "dragover", r.over), i(e.display.scroller, "dragleave", r.leave), i(e.display.scroller, "drop", r.drop);
           }
         }
 
-        function _s(e) {
-          e.options.lineWrapping ? (D(e.display.wrapper, "CodeMirror-wrap"), e.display.sizer.style.minWidth = "", e.display.sizerWidth = null) : (_(e.display.wrapper, "CodeMirror-wrap"), Kt(e)), lr(e), hr(e), jn(e), setTimeout(function () {
+        function Ts(e) {
+          e.options.lineWrapping ? (D(e.display.wrapper, "CodeMirror-wrap"), e.display.sizer.style.minWidth = "", e.display.sizerWidth = null) : (T(e.display.wrapper, "CodeMirror-wrap"), Kt(e)), lr(e), dr(e), jn(e), setTimeout(function () {
             return Rr(e);
           }, 100);
         }
@@ -6717,7 +6718,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             return n.display.input.reset(!0);
           }, 20), function (e) {
             var t = e.display;
-            he(t.scroller, "mousedown", ei(e, gs)), he(t.scroller, "dblclick", s && a < 11 ? ei(e, function (t) {
+            de(t.scroller, "mousedown", ei(e, gs)), de(t.scroller, "dblclick", s && a < 11 ? ei(e, function (t) {
               if (!me(e, t)) {
                 var n = cr(e, t);
 
@@ -6729,9 +6730,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               }
             }) : function (t) {
               return me(e, t) || be(t);
-            }), he(t.scroller, "contextmenu", function (t) {
+            }), de(t.scroller, "contextmenu", function (t) {
               return xs(e, t);
-            }), he(t.input.getField(), "contextmenu", function (n) {
+            }), de(t.input.getField(), "contextmenu", function (n) {
               t.scroller.contains(n.target) || xs(e, n);
             });
             var n,
@@ -6758,7 +6759,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               return n * n + r * r > 400;
             }
 
-            he(t.scroller, "touchstart", function (i) {
+            de(t.scroller, "touchstart", function (i) {
               if (!me(e, i) && !o(i) && !bs(e, i)) {
                 t.input.ensurePolled(), clearTimeout(n);
                 var s = +new Date();
@@ -6768,9 +6769,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   prev: s - r.end <= 300 ? r : null
                 }, 1 == i.touches.length && (t.activeTouch.left = i.touches[0].pageX, t.activeTouch.top = i.touches[0].pageY);
               }
-            }), he(t.scroller, "touchmove", function () {
+            }), de(t.scroller, "touchmove", function () {
               t.activeTouch && (t.activeTouch.moved = !0);
-            }), he(t.scroller, "touchend", function (n) {
+            }), de(t.scroller, "touchend", function (n) {
               var r = t.activeTouch;
 
               if (r && !Cn(t, n) && null != r.left && !r.moved && new Date() - r.start < 300) {
@@ -6780,13 +6781,13 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               }
 
               i();
-            }), he(t.scroller, "touchcancel", i), he(t.scroller, "scroll", function () {
+            }), de(t.scroller, "touchcancel", i), de(t.scroller, "scroll", function () {
               t.scroller.clientHeight && (Ir(e, t.scroller.scrollTop), Hr(e, t.scroller.scrollLeft, !0), pe(e, "scroll", e));
-            }), he(t.scroller, "mousewheel", function (t) {
+            }), de(t.scroller, "mousewheel", function (t) {
               return wi(e, t);
-            }), he(t.scroller, "DOMMouseScroll", function (t) {
+            }), de(t.scroller, "DOMMouseScroll", function (t) {
               return wi(e, t);
-            }), he(t.wrapper, "scroll", function () {
+            }), de(t.wrapper, "scroll", function () {
               return t.wrapper.scrollTop = t.wrapper.scrollLeft = 0;
             }), t.dragFunctions = {
               enter: function enter(t) {
@@ -6804,9 +6805,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               },
               start: function start(t) {
                 return function (e, t) {
-                  if (s && (!e.state.draggingText || +new Date() - Eo < 100)) Ce(t);else if (!me(e, t) && !Cn(e.display, t) && (t.dataTransfer.setData("Text", e.getSelection()), t.dataTransfer.effectAllowed = "copyMove", t.dataTransfer.setDragImage && !d)) {
+                  if (s && (!e.state.draggingText || +new Date() - Eo < 100)) Ce(t);else if (!me(e, t) && !Cn(e.display, t) && (t.dataTransfer.setData("Text", e.getSelection()), t.dataTransfer.effectAllowed = "copyMove", t.dataTransfer.setDragImage && !h)) {
                     var n = O("img", null, null, "position: fixed; left: 0; top: 0;");
-                    n.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==", h && (n.width = n.height = 1, e.display.wrapper.appendChild(n), n._top = n.offsetTop), t.dataTransfer.setDragImage(n, 0, 0), h && n.parentNode.removeChild(n);
+                    n.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==", d && (n.width = n.height = 1, e.display.wrapper.appendChild(n), n._top = n.offsetTop), t.dataTransfer.setDragImage(n, 0, 0), d && n.parentNode.removeChild(n);
                   }
                 }(e, t);
               },
@@ -6816,20 +6817,20 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               }
             };
             var c = t.input.getField();
-            he(c, "keyup", function (t) {
-              return hs.call(e, t);
-            }), he(c, "keydown", ei(e, us)), he(c, "keypress", ei(e, ds)), he(c, "focus", function (t) {
+            de(c, "keyup", function (t) {
+              return ds.call(e, t);
+            }), de(c, "keydown", ei(e, us)), de(c, "keypress", ei(e, hs)), de(c, "focus", function (t) {
               return Sr(e, t);
-            }), he(c, "blur", function (t) {
-              return Tr(e, t);
+            }), de(c, "blur", function (t) {
+              return _r(e, t);
             });
           }(this), Ho(), Gr(this), this.curOp.forceUpdate = !0, Ii(this, r), t.autofocus && !v || this.hasFocus() ? setTimeout(function () {
             n.hasFocus() && !n.state.focused && Sr(n);
-          }, 20) : Tr(this), Ss) {
+          }, 20) : _r(this), Ss) {
             Ss.hasOwnProperty(c) && Ss[c](this, t[c], Cs);
           }
 
-          di(this), t.finishInit && t.finishInit(this);
+          hi(this), t.finishInit && t.finishInit(this);
 
           for (var u = 0; u < Ls.length; ++u) {
             Ls[u](this);
@@ -6860,12 +6861,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           } else c = 0, n = "not";
 
           "prev" == n ? c = t > o.first ? F(Ge(o, t - 1).text, null, s) : 0 : "add" == n ? c = l + e.options.indentUnit : "subtract" == n ? c = l - e.options.indentUnit : "number" == typeof n && (c = l + n), c = Math.max(0, c);
-          var h = "",
-              d = 0;
+          var d = "",
+              h = 0;
           if (e.options.indentWithTabs) for (var f = Math.floor(c / s); f; --f) {
-            d += s, h += "\t";
+            h += s, d += "\t";
           }
-          if (d < c && (h += $(c - d)), h != u) return mo(o, h, et(t, 0), et(t, u.length), "+input"), a.stateAfter = null, !0;
+          if (h < c && (d += $(c - h)), d != u) return mo(o, d, et(t, 0), et(t, u.length), "+input"), a.stateAfter = null, !0;
 
           for (var p = 0; p < o.sel.ranges.length; p++) {
             var m = o.sel.ranges[p];
@@ -6907,21 +6908,21 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             return [e];
           }));
 
-          for (var h = e.curOp.updateInput, d = r.ranges.length - 1; d >= 0; d--) {
-            var f = r.ranges[d],
+          for (var d = e.curOp.updateInput, h = r.ranges.length - 1; h >= 0; h--) {
+            var f = r.ranges[h],
                 p = f.from(),
                 m = f.to();
             f.empty() && (n && n > 0 ? p = et(p.line, p.ch - n) : e.state.overwrite && !a ? m = et(m.line, Math.min(Ge(o, m.line).text.length, m.ch + X(l).length)) : a && As && As.lineWise && As.text.join("\n") == l.join("\n") && (p = m = et(p.line, 0)));
             var g = {
               from: p,
               to: m,
-              text: c ? c[d % c.length] : l,
+              text: c ? c[h % c.length] : l,
               origin: i || (a ? "paste" : e.state.cutIncoming > s ? "cut" : "+input")
             };
             co(e.doc, g), ln(e, "inputRead", e, g);
           }
 
-          t && !a && Ps(e, t), Nr(e), e.curOp.updateInput < 2 && (e.curOp.updateInput = h), e.curOp.typing = !0, e.state.pasteIncoming = e.state.cutIncoming = -1;
+          t && !a && Ps(e, t), Nr(e), e.curOp.updateInput < 2 && (e.curOp.updateInput = d), e.curOp.typing = !0, e.state.pasteIncoming = e.state.cutIncoming = -1;
         }
 
         function Ds(e, t) {
@@ -6991,8 +6992,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             if ("codepoint" == r) {
               var u = a.text.charCodeAt(t.ch + (n > 0 ? 0 : -1));
               if (isNaN(u)) s = null;else {
-                var h = n > 0 ? u >= 55296 && u < 56320 : u >= 56320 && u < 57343;
-                s = new et(t.line, Math.max(0, Math.min(a.text.length, t.ch + n * (h ? 2 : 1))), -n);
+                var d = n > 0 ? u >= 55296 && u < 56320 : u >= 56320 && u < 57343;
+                s = new et(t.line, Math.max(0, Math.min(a.text.length, t.ch + n * (d ? 2 : 1))), -n);
               }
             } else s = i ? function (e, t, n, r) {
               var i = ce(t, e.doc.direction);
@@ -7015,12 +7016,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   u = c("before" == n.sticky ? l(n, -1) : n.ch);
 
               if ("rtl" == e.doc.direction || 1 == s.level) {
-                var h = 1 == s.level == r < 0,
-                    d = l(n, h ? 1 : -1);
+                var d = 1 == s.level == r < 0,
+                    h = l(n, d ? 1 : -1);
 
-                if (null != d && (h ? d <= s.to && d <= u.end : d >= s.from && d >= u.begin)) {
-                  var f = h ? "before" : "after";
-                  return new et(n.line, d, f);
+                if (null != h && (d ? h <= s.to && h <= u.end : h >= s.from && h >= u.begin)) {
+                  var f = d ? "before" : "after";
+                  return new et(n.line, h, f);
                 }
               }
 
@@ -7050,11 +7051,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             return !0;
           }
 
-          if ("char" == r || "codepoint" == r) c();else if ("column" == r) c(!0);else if ("word" == r || "group" == r) for (var u = null, h = "group" == r, d = e.cm && e.cm.getHelper(t, "wordChars"), f = !0; !(n < 0) || c(!f); f = !1) {
+          if ("char" == r || "codepoint" == r) c();else if ("column" == r) c(!0);else if ("word" == r || "group" == r) for (var u = null, d = "group" == r, h = e.cm && e.cm.getHelper(t, "wordChars"), f = !0; !(n < 0) || c(!f); f = !1) {
             var p = a.text.charAt(t.ch) || "\n",
-                m = ee(p, d) ? "w" : h && "\n" == p ? "n" : !h || /\s/.test(p) ? null : "p";
+                m = ee(p, h) ? "w" : d && "\n" == p ? "n" : !d || /\s/.test(p) ? null : "p";
 
-            if (!h || f || m || (m = "s"), u && u != m) {
+            if (!d || f || m || (m = "s"), u && u != m) {
               n < 0 && (n = 1, c(), t.sticky = "after");
               break;
             }
@@ -7153,23 +7154,23 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
                 if (a == t || a == n) {
                   var u = Ye(i < 0 ? e.line : e.rest[i]),
-                      h = o[s] + r;
-                  return (r < 0 || a != t) && (h = o[s + (r ? 1 : 0)]), et(u, h);
+                      d = o[s] + r;
+                  return (r < 0 || a != t) && (d = o[s + (r ? 1 : 0)]), et(u, d);
                 }
               }
             }
           }
 
-          var h = u(s, a, n);
-          if (h) return Bs(h, i);
+          var d = u(s, a, n);
+          if (d) return Bs(d, i);
 
-          for (var d = a.nextSibling, f = s ? s.nodeValue.length - n : 0; d; d = d.nextSibling) {
-            if (h = u(d, d.firstChild, 0)) return Bs(et(h.line, h.ch - f), i);
-            f += d.textContent.length;
+          for (var h = a.nextSibling, f = s ? s.nodeValue.length - n : 0; h; h = h.nextSibling) {
+            if (d = u(h, h.firstChild, 0)) return Bs(et(d.line, d.ch - f), i);
+            f += h.textContent.length;
           }
 
           for (var p = a.previousSibling, m = n; p; p = p.previousSibling) {
-            if (h = u(p, p.firstChild, -1)) return Bs(et(h.line, h.ch + m), i);
+            if (d = u(p, p.firstChild, -1)) return Bs(et(d.line, d.ch + m), i);
             m += p.textContent.length;
           }
         }
@@ -7221,27 +7222,27 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             }
           }
 
-          i.contentEditable = !0, Ws(i, r.options.spellcheck, r.options.autocorrect, r.options.autocapitalize), he(i, "paste", function (e) {
+          i.contentEditable = !0, Ws(i, r.options.spellcheck, r.options.autocorrect, r.options.autocapitalize), de(i, "paste", function (e) {
             !o(e) || me(r, e) || Ds(e, r) || a <= 11 && setTimeout(ei(r, function () {
               return t.updateFromDOM();
             }), 20);
-          }), he(i, "compositionstart", function (e) {
+          }), de(i, "compositionstart", function (e) {
             t.composing = {
               data: e.data,
               done: !1
             };
-          }), he(i, "compositionupdate", function (e) {
+          }), de(i, "compositionupdate", function (e) {
             t.composing || (t.composing = {
               data: e.data,
               done: !1
             });
-          }), he(i, "compositionend", function (e) {
+          }), de(i, "compositionend", function (e) {
             t.composing && (e.data != t.composing.data && t.readFromDOMSoon(), t.composing.done = !0);
-          }), he(i, "touchstart", function () {
+          }), de(i, "touchstart", function () {
             return n.forceCompositionEnd();
-          }), he(i, "input", function () {
+          }), de(i, "input", function () {
             t.composing || t.readFromDOMSoon();
-          }), he(i, "copy", s), he(i, "cut", s);
+          }), de(i, "copy", s), de(i, "cut", s);
         }, js.prototype.screenReaderLabelChanged = function (e) {
           e ? this.div.setAttribute("aria-label", e) : this.div.removeAttribute("aria-label");
         }, js.prototype.prepareSelection = function () {
@@ -7270,11 +7271,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   u = o.line < t.display.viewTo && Rs(t, o);
 
               if (!u) {
-                var h = l[l.length - 1].measure,
-                    d = h.maps ? h.maps[h.maps.length - 1] : h.map;
+                var d = l[l.length - 1].measure,
+                    h = d.maps ? d.maps[d.maps.length - 1] : d.map;
                 u = {
-                  node: d[d.length - 1],
-                  offset: d[d.length - 2] - d[d.length - 3]
+                  node: h[h.length - 1],
+                  offset: h[h.length - 2] - h[h.length - 3]
                 };
               }
 
@@ -7283,7 +7284,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                     p = e.rangeCount && e.getRangeAt(0);
 
                 try {
-                  f = T(c.node, c.offset, u.offset, u.node);
+                  f = _(c.node, c.offset, u.offset, u.node);
                 } catch (e) {}
 
                 f && (!n && t.state.focused ? (e.collapse(c.node, c.offset), f.collapsed || (e.removeAllRanges(), e.addRange(f))) : (e.removeAllRanges(), e.addRange(f)), p && null == e.anchorNode ? e.addRange(p) : n && this.startGracePeriod()), this.rememberSelection();
@@ -7349,7 +7350,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               var n = Vs(t, e.anchorNode, e.anchorOffset),
                   r = Vs(t, e.focusNode, e.focusOffset);
               n && r && Qr(t, function () {
-                Qi(t.doc, Ti(n, r), B), (n.bad || r.bad) && (t.curOp.selectionChanged = !0);
+                Qi(t.doc, _i(n, r), B), (n.bad || r.bad) && (t.curOp.selectionChanged = !0);
               });
             }
           }
@@ -7370,7 +7371,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               u = ur(r, a.line);
           if (u == i.view.length - 1 ? (l = i.viewTo - 1, c = i.lineDiv.lastChild) : (l = Ye(i.view[u + 1].line) - 1, c = i.view[u + 1].node.previousSibling), !n) return !1;
 
-          for (var h = r.doc.splitLines(function (e, t, n, r, i) {
+          for (var d = r.doc.splitLines(function (e, t, n, r, i) {
             var o = "",
                 s = !1,
                 a = e.doc.lineSeparator(),
@@ -7384,15 +7385,15 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               e && (c(), o += e);
             }
 
-            function h(t) {
+            function d(t) {
               if (1 == t.nodeType) {
                 var n = t.getAttribute("cm-text");
                 if (n) return void u(n);
                 var o,
-                    d = t.getAttribute("cm-marker");
+                    h = t.getAttribute("cm-marker");
 
-                if (d) {
-                  var f = e.findMarks(et(r, 0), et(i + 1, 0), (g = +d, function (e) {
+                if (h) {
+                  var f = e.findMarks(et(r, 0), et(i + 1, 0), (g = +h, function (e) {
                     return e.id == g;
                   }));
                   return void (f.length && (o = f[0].find(0)) && u($e(e.doc, o.from, o.to).join(a)));
@@ -7404,7 +7405,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 p && c();
 
                 for (var m = 0; m < t.childNodes.length; m++) {
-                  h(t.childNodes[m]);
+                  d(t.childNodes[m]);
                 }
 
                 /^(pre|p)$/i.test(t.nodeName) && (l = !0), p && (s = !0);
@@ -7413,33 +7414,33 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               var g;
             }
 
-            for (; h(t), t != n;) {
+            for (; d(t), t != n;) {
               t = t.nextSibling, l = !1;
             }
 
             return o;
-          }(r, n, c, t, l)), d = $e(r.doc, et(t, 0), et(l, Ge(r.doc, l).text.length)); h.length > 1 && d.length > 1;) {
-            if (X(h) == X(d)) h.pop(), d.pop(), l--;else {
-              if (h[0] != d[0]) break;
-              h.shift(), d.shift(), t++;
+          }(r, n, c, t, l)), h = $e(r.doc, et(t, 0), et(l, Ge(r.doc, l).text.length)); d.length > 1 && h.length > 1;) {
+            if (X(d) == X(h)) d.pop(), h.pop(), l--;else {
+              if (d[0] != h[0]) break;
+              d.shift(), h.shift(), t++;
             }
           }
 
-          for (var f = 0, p = 0, m = h[0], g = d[0], v = Math.min(m.length, g.length); f < v && m.charCodeAt(f) == g.charCodeAt(f);) {
+          for (var f = 0, p = 0, m = d[0], g = h[0], v = Math.min(m.length, g.length); f < v && m.charCodeAt(f) == g.charCodeAt(f);) {
             ++f;
           }
 
-          for (var y = X(h), b = X(d), x = Math.min(y.length - (1 == h.length ? f : 0), b.length - (1 == d.length ? f : 0)); p < x && y.charCodeAt(y.length - p - 1) == b.charCodeAt(b.length - p - 1);) {
+          for (var y = X(d), b = X(h), x = Math.min(y.length - (1 == d.length ? f : 0), b.length - (1 == h.length ? f : 0)); p < x && y.charCodeAt(y.length - p - 1) == b.charCodeAt(b.length - p - 1);) {
             ++p;
           }
 
-          if (1 == h.length && 1 == d.length && t == s.line) for (; f && f > s.ch && y.charCodeAt(y.length - p - 1) == b.charCodeAt(b.length - p - 1);) {
+          if (1 == d.length && 1 == h.length && t == s.line) for (; f && f > s.ch && y.charCodeAt(y.length - p - 1) == b.charCodeAt(b.length - p - 1);) {
             f--, p++;
           }
-          h[h.length - 1] = y.slice(0, y.length - p).replace(/^\u200b+/, ""), h[0] = h[0].slice(f).replace(/\u200b+$/, "");
+          d[d.length - 1] = y.slice(0, y.length - p).replace(/^\u200b+/, ""), d[0] = d[0].slice(f).replace(/\u200b+$/, "");
           var w = et(t, f),
-              C = et(l, d.length ? X(d).length - p : 0);
-          return h.length > 1 || h[0] || tt(w, C) ? (mo(r.doc, h, w, C, "+input"), !0) : void 0;
+              C = et(l, h.length ? X(h).length - p : 0);
+          return d.length > 1 || d[0] || tt(w, C) ? (mo(r.doc, d, w, C, "+input"), !0) : void 0;
         }, js.prototype.ensurePolled = function () {
           this.forceCompositionEnd();
         }, js.prototype.reset = function () {
@@ -7459,7 +7460,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }, js.prototype.updateFromDOM = function () {
           var e = this;
           !this.cm.isReadOnly() && this.pollContent() || Qr(this.cm, function () {
-            return hr(e.cm);
+            return dr(e.cm);
           });
         }, js.prototype.setUneditable = function (e) {
           e.contentEditable = "false";
@@ -7497,19 +7498,19 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             }
           }
 
-          e.wrapper.insertBefore(this.wrapper, e.wrapper.firstChild), m && (i.style.width = "0px"), he(i, "input", function () {
+          e.wrapper.insertBefore(this.wrapper, e.wrapper.firstChild), m && (i.style.width = "0px"), de(i, "input", function () {
             s && a >= 9 && t.hasSelection && (t.hasSelection = null), n.poll();
-          }), he(i, "paste", function (e) {
+          }), de(i, "paste", function (e) {
             me(r, e) || Ds(e, r) || (r.state.pasteIncoming = +new Date(), n.fastPoll());
-          }), he(i, "cut", o), he(i, "copy", o), he(e.scroller, "paste", function (t) {
+          }), de(i, "cut", o), de(i, "copy", o), de(e.scroller, "paste", function (t) {
             if (!Cn(e, t) && !me(r, t)) {
               if (!i.dispatchEvent) return r.state.pasteIncoming = +new Date(), void n.focus();
               var o = new Event("paste");
               o.clipboardData = t.clipboardData, i.dispatchEvent(o);
             }
-          }), he(e.lineSpace, "selectstart", function (t) {
+          }), de(e.lineSpace, "selectstart", function (t) {
             Cn(e, t) || be(t);
-          }), he(i, "compositionstart", function () {
+          }), de(i, "compositionstart", function () {
             var e = r.getCursor("from");
             n.composing && n.composing.range.clear(), n.composing = {
               start: e,
@@ -7517,7 +7518,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 className: "CodeMirror-composing"
               })
             };
-          }), he(i, "compositionend", function () {
+          }), de(i, "compositionend", function () {
             n.composing && (n.poll(), n.composing.range.clear(), n.composing = null);
           });
         }, Ks.prototype.createField = function (e) {
@@ -7613,10 +7614,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           var o = cr(n, e),
               c = r.scroller.scrollTop;
 
-          if (o && !h) {
-            n.options.resetSelectionOnContextMenu && -1 == n.doc.sel.contains(o) && ei(n, Qi)(n.doc, Ti(o), B);
+          if (o && !d) {
+            n.options.resetSelectionOnContextMenu && -1 == n.doc.sel.contains(o) && ei(n, Qi)(n.doc, _i(o), B);
             var u,
-                d = i.style.cssText,
+                h = i.style.cssText,
                 f = t.wrapper.style.cssText,
                 p = t.wrapper.offsetParent.getBoundingClientRect();
 
@@ -7627,7 +7628,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 fe(window, "mouseup", m), setTimeout(v, 20);
               };
 
-              he(window, "mouseup", m);
+              de(window, "mouseup", m);
             } else setTimeout(v, 50);
           }
 
@@ -7640,7 +7641,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }
 
           function v() {
-            if (t.contextMenuPending == v && (t.contextMenuPending = !1, t.wrapper.style.cssText = f, i.style.cssText = d, s && a < 9 && r.scrollbars.setScrollTop(r.scroller.scrollTop = c), null != i.selectionStart)) {
+            if (t.contextMenuPending == v && (t.contextMenuPending = !1, t.wrapper.style.cssText = f, i.style.cssText = h, s && a < 9 && r.scrollbars.setScrollTop(r.scroller.scrollTop = c), null != i.selectionStart)) {
               (!s || s && a < 9) && g();
 
               var e = 0,
@@ -7667,7 +7668,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }, !0), n("mode", null, function (e, t) {
             e.doc.modeOption = t, Ai(e);
           }, !0), n("indentUnit", 2, Ai, !0), n("indentWithTabs", !1), n("smartIndent", !0), n("tabSize", 4, function (e) {
-            Ni(e), jn(e), hr(e);
+            Ni(e), jn(e), dr(e);
           }, !0), n("lineSeparator", null, function (e, t) {
             if (e.doc.lineSep = t, t) {
               var n = [],
@@ -7704,7 +7705,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             var r = Yo(t),
                 i = n != Cs && Yo(n);
             i && i.detach && i.detach(e, r), r.attach && r.attach(e, i || null);
-          }), n("extraKeys", null), n("configureMouse", null), n("lineWrapping", !1, _s, !0), n("gutters", [], function (e, t) {
+          }), n("extraKeys", null), n("configureMouse", null), n("lineWrapping", !1, Ts, !0), n("gutters", [], function (e, t) {
             e.display.gutterSpecs = fi(t, e.options.lineNumbers), mi(e);
           }, !0), n("fixedGutter", !0, function (e, t) {
             e.display.gutters.style.left = t ? sr(e.display) + "px" : "0", e.refresh();
@@ -7717,12 +7718,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }, !0), n("firstLineNumber", 1, mi, !0), n("lineNumberFormatter", function (e) {
             return e;
           }, mi, !0), n("showCursorWhenSelecting", !1, gr, !0), n("resetSelectionOnContextMenu", !0), n("lineWiseCopyCut", !0), n("pasteLinesPerSelection", !0), n("selectionsMayTouch", !1), n("readOnly", !1, function (e, t) {
-            "nocursor" == t && (Tr(e), e.display.input.blur()), e.display.input.readOnlyChanged(t);
+            "nocursor" == t && (_r(e), e.display.input.blur()), e.display.input.readOnlyChanged(t);
           }), n("screenReaderLabel", null, function (e, t) {
             t = "" === t ? null : t, e.display.input.screenReaderLabelChanged(t);
           }), n("disableInput", !1, function (e, t) {
             t || e.display.input.reset();
-          }, !0), n("dragDrop", !0, Ts), n("allowDropFileTypes", null), n("cursorBlinkRate", 530), n("cursorScrollMargin", 0), n("cursorHeight", 1, gr, !0), n("singleCursorHeightPerLine", !0, gr, !0), n("workTime", 100), n("workDelay", 100), n("flattenSpans", !0, Ni, !0), n("addModeClass", !1, Ni, !0), n("pollInterval", 100), n("undoDepth", 200, function (e, t) {
+          }, !0), n("dragDrop", !0, _s), n("allowDropFileTypes", null), n("cursorBlinkRate", 530), n("cursorScrollMargin", 0), n("cursorHeight", 1, gr, !0), n("singleCursorHeightPerLine", !0, gr, !0), n("workTime", 100), n("workDelay", 100), n("flattenSpans", !0, Ni, !0), n("addModeClass", !1, Ni, !0), n("pollInterval", 100), n("undoDepth", 200, function (e, t) {
             return e.doc.history.undoDepth = t;
           }), n("historyEventDelay", 1250), n("viewportMargin", 10, function (e) {
             return e.refresh();
@@ -7776,12 +7777,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 priority: n && n.priority || 0
               }, function (e) {
                 return e.priority;
-              }), this.state.modeGen++, hr(this);
+              }), this.state.modeGen++, dr(this);
             }),
             removeOverlay: ti(function (e) {
               for (var t = this.state.overlays, n = 0; n < t.length; ++n) {
                 var r = t[n].modeSpec;
-                if (r == e || "string" == typeof e && r.name == e) return t.splice(n, 1), this.state.modeGen++, void hr(this);
+                if (r == e || "string" == typeof e && r.name == e) return t.splice(n, 1), this.state.modeGen++, void dr(this);
               }
             }),
             indentLine: ti(function (e, t, n) {
@@ -7814,7 +7815,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             getTokenTypeAt: function getTokenTypeAt(e) {
               e = at(this.doc, e);
               var t,
-                  n = dt(this, Ge(this.doc, e.line)),
+                  n = ht(this, Ge(this.doc, e.line)),
                   r = 0,
                   i = (n.length - 1) / 2,
                   o = e.ch;
@@ -7910,9 +7911,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   c = (e = $n(this, at(this.doc, e))).bottom,
                   u = e.left;
               if (t.style.position = "absolute", t.setAttribute("cm-ignore-events", "true"), this.display.input.setUneditable(t), l.sizer.appendChild(t), "over" == r) c = e.top;else if ("above" == r || "near" == r) {
-                var h = Math.max(l.wrapper.clientHeight, this.doc.height),
-                    d = Math.max(l.sizer.clientWidth, l.lineSpace.clientWidth);
-                ("above" == r || e.bottom + t.offsetHeight > h) && e.top > t.offsetHeight ? c = e.top - t.offsetHeight : e.bottom + t.offsetHeight <= h && (c = e.bottom), u + t.offsetWidth > d && (u = d - t.offsetWidth);
+                var d = Math.max(l.wrapper.clientHeight, this.doc.height),
+                    h = Math.max(l.sizer.clientWidth, l.lineSpace.clientWidth);
+                ("above" == r || e.bottom + t.offsetHeight > d) && e.top > t.offsetHeight ? c = e.top - t.offsetHeight : e.bottom + t.offsetHeight <= d && (c = e.bottom), u + t.offsetWidth > h && (u = h - t.offsetWidth);
               }
               t.style.top = c + "px", t.style.left = t.style.right = "", "right" == i ? (u = l.sizer.clientWidth - t.offsetWidth, t.style.right = "0px") : ("left" == i ? u = 0 : "middle" == i && (u = (l.sizer.clientWidth - t.offsetWidth) / 2), t.style.left = u + "px"), n && (o = this, s = {
                 left: u,
@@ -7922,8 +7923,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               }, null != (a = Or(o, s)).scrollTop && Ir(o, a.scrollTop), null != a.scrollLeft && Hr(o, a.scrollLeft));
             },
             triggerOnKeyDown: ti(us),
-            triggerOnKeyPress: ti(ds),
-            triggerOnKeyUp: hs,
+            triggerOnKeyPress: ti(hs),
+            triggerOnKeyUp: ds,
             triggerOnMouseDown: ti(gs),
             execCommand: function execCommand(e) {
               if (ts.hasOwnProperty(e)) return ts[e].call(null, this);
@@ -8015,7 +8016,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               return new ki(et(e.line, n), et(e.line, r));
             },
             toggleOverwrite: function toggleOverwrite(e) {
-              null != e && e == this.state.overwrite || ((this.state.overwrite = !this.state.overwrite) ? D(this.display.cursorDiv, "CodeMirror-overwrite") : _(this.display.cursorDiv, "CodeMirror-overwrite"), pe(this, "overwriteToggle", this, this.state.overwrite));
+              null != e && e == this.state.overwrite || ((this.state.overwrite = !this.state.overwrite) ? D(this.display.cursorDiv, "CodeMirror-overwrite") : T(this.display.cursorDiv, "CodeMirror-overwrite"), pe(this, "overwriteToggle", this, this.state.overwrite));
             },
             hasFocus: function hasFocus() {
               return this.display.input.getField() == E();
@@ -8031,8 +8032,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               return {
                 left: e.scrollLeft,
                 top: e.scrollTop,
-                height: e.scrollHeight - _n(this) - this.display.barHeight,
-                width: e.scrollWidth - _n(this) - this.display.barWidth,
+                height: e.scrollHeight - Tn(this) - this.display.barHeight,
+                width: e.scrollWidth - Tn(this) - this.display.barWidth,
                 clientHeight: Ln(this),
                 clientWidth: Mn(this)
               };
@@ -8062,7 +8063,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               this.doc.iter(i, this.display.viewTo, function (e) {
                 if (e.widgets) for (var t = 0; t < e.widgets.length; t++) {
                   if (e.widgets[t].noHScroll) {
-                    dr(n, i, "widget");
+                    hr(n, i, "widget");
                     break;
                   }
                 }
@@ -8080,7 +8081,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             },
             refresh: ti(function () {
               var e = this.display.cachedTextHeight;
-              hr(this), this.curOp.forceUpdate = !0, jn(this), Er(this, this.doc.scrollLeft, this.doc.scrollTop), ci(this.display), (null == e || Math.abs(e - rr(this.display)) > .5 || this.options.lineWrapping) && lr(this), pe(this, "refresh", this);
+              dr(this), this.curOp.forceUpdate = !0, jn(this), Er(this, this.doc.scrollLeft, this.doc.scrollTop), ci(this.display), (null == e || Math.abs(e - rr(this.display)) > .5 || this.options.lineWrapping) && lr(this), pe(this, "refresh", this);
             }),
             swapDoc: ti(function (e) {
               var t = this.doc;
@@ -8152,7 +8153,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
           var i;
 
-          if (e.form && (he(e.form, "submit", r), !t.leaveSubmitMethodAlone)) {
+          if (e.form && (de(e.form, "submit", r), !t.leaveSubmitMethodAlone)) {
             var o = e.form;
             i = o.submit;
 
@@ -8175,7 +8176,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }, t);
           return a;
         }, function (e) {
-          e.off = fe, e.on = he, e.wheelEventPixels = xi, e.Doc = No, e.splitLines = Ne, e.countColumn = F, e.findColumn = K, e.isWordChar = Q, e.Pass = R, e.signal = pe, e.Line = Gt, e.changeEnd = _i, e.scrollbarModel = Vr, e.Pos = et, e.cmpPos = tt, e.modes = Ie, e.mimeModes = We, e.resolveMode = Fe, e.getMode = ze, e.modeExtensions = je, e.extendMode = Re, e.copyState = Be, e.startState = Ue, e.innerMode = Ve, e.commands = ts, e.keyMap = Vo, e.keyName = Zo, e.isModifierKey = $o, e.lookupKey = Go, e.normalizeKeyMap = Ko, e.StringStream = Ke, e.SharedTextMarker = Mo, e.TextMarker = To, e.LineWidget = Co, e.e_preventDefault = be, e.e_stopPropagation = xe, e.e_stop = Ce, e.addClass = D, e.contains = N, e.rmClass = _, e.keyNames = zo;
+          e.off = fe, e.on = de, e.wheelEventPixels = xi, e.Doc = No, e.splitLines = Ne, e.countColumn = F, e.findColumn = K, e.isWordChar = Q, e.Pass = R, e.signal = pe, e.Line = Gt, e.changeEnd = Ti, e.scrollbarModel = Vr, e.Pos = et, e.cmpPos = tt, e.modes = Ie, e.mimeModes = We, e.resolveMode = Fe, e.getMode = ze, e.modeExtensions = je, e.extendMode = Re, e.copyState = Be, e.startState = Ue, e.innerMode = Ve, e.commands = ts, e.keyMap = Vo, e.keyName = Zo, e.isModifierKey = $o, e.lookupKey = Go, e.normalizeKeyMap = Ko, e.StringStream = Ke, e.SharedTextMarker = Mo, e.TextMarker = _o, e.LineWidget = Co, e.e_preventDefault = be, e.e_stopPropagation = xe, e.e_stop = Ce, e.addClass = D, e.contains = N, e.rmClass = T, e.keyNames = zo;
         }(Ms), Ms.version = "5.65.2", Ms;
       }();
     },
@@ -8196,11 +8197,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
 
         e.registerHelper("hintWords", "python", r.concat(i)), e.defineMode("python", function (s, a) {
-          for (var l = "error", c = a.delimiters || a.singleDelimiters || /^[\(\)\[\]\{\}@,:`=;\.\\]/, u = [a.singleOperators, a.doubleOperators, a.doubleDelimiters, a.tripleDelimiters, a.operators || /^([-+*/%\/&|^]=?|[<>=]+|\/\/=?|\*\*=?|!=|[~!@]|\.\.\.)/], h = 0; h < u.length; h++) {
-            u[h] || u.splice(h--, 1);
+          for (var l = "error", c = a.delimiters || a.singleDelimiters || /^[\(\)\[\]\{\}@,:`=;\.\\]/, u = [a.singleOperators, a.doubleOperators, a.doubleDelimiters, a.tripleDelimiters, a.operators || /^([-+*/%\/&|^]=?|[<>=]+|\/\/=?|\*\*=?|!=|[~!@]|\.\.\.)/], d = 0; d < u.length; d++) {
+            u[d] || u.splice(d--, 1);
           }
 
-          var d = a.hangingIndent || s.indentUnit,
+          var h = a.hangingIndent || s.indentUnit,
               f = r,
               p = i;
           null != a.extra_keywords && (f = f.concat(a.extra_keywords)), null != a.extra_builtins && (p = p.concat(a.extra_builtins));
@@ -8351,13 +8352,13 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               if (-1 != i && function (e, t, n) {
                 var r = e.match(/^[\s\[\{\(]*(?:#|$)/, !1) ? null : e.column() + 1;
                 t.scopes.push({
-                  offset: t.indent + d,
+                  offset: t.indent + h,
                   type: n,
                   align: r
                 });
               }(e, t, "])}".slice(i, i + 1)), -1 != (i = "])}".indexOf(r))) {
                 if (o(t).type != r) return l;
-                t.indent = t.scopes.pop().offset - d;
+                t.indent = t.scopes.pop().offset - h;
               }
             }
 
@@ -8389,7 +8390,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               if (t.tokenize != x) return t.tokenize.isString ? e.Pass : 0;
               var r = o(t),
                   i = r.type == n.charAt(0) || "py" == r.type && !t.dedent && /^(else:|elif |except |finally:)/.test(n);
-              return null != r.align ? r.align - (i ? 1 : 0) : r.offset - (i ? d : 0);
+              return null != r.align ? r.align - (i ? 1 : 0) : r.offset - (i ? h : 0);
             },
             electricInput: /^\s*([\}\]\)]|else:|elif |except |finally:)$/,
             closeBrackets: {
@@ -8607,14 +8608,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
       e.exports = function (e, t) {
         var n = o(e),
             u = !n && i(e),
-            h = !n && !u && s(e),
-            d = !n && !u && !h && l(e),
-            f = n || u || h || d,
+            d = !n && !u && s(e),
+            h = !n && !u && !d && l(e),
+            f = n || u || d || h,
             p = f ? r(e.length, String) : [],
             m = p.length;
 
         for (var g in e) {
-          !t && !c.call(e, g) || f && ("length" == g || h && ("offset" == g || "parent" == g) || d && ("buffer" == g || "byteLength" == g || "byteOffset" == g) || a(g, m)) || p.push(g);
+          !t && !c.call(e, g) || f && ("length" == g || d && ("offset" == g || "parent" == g) || h && ("buffer" == g || "byteLength" == g || "byteOffset" == g) || a(g, m)) || p.push(g);
         }
 
         return p;
@@ -8687,8 +8688,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           l = n(4626),
           c = n(278),
           u = n(8805),
-          h = n(1911),
-          d = n(8234),
+          d = n(1911),
+          h = n(8234),
           f = n(6904),
           p = n(4160),
           m = n(3824),
@@ -8701,11 +8702,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           C = n(2928),
           k = n(3674),
           S = n(1704),
-          T = "[object Arguments]",
-          _ = "[object Function]",
+          _ = "[object Arguments]",
+          T = "[object Function]",
           M = "[object Object]",
           L = {};
-      L[T] = L["[object Array]"] = L["[object ArrayBuffer]"] = L["[object DataView]"] = L["[object Boolean]"] = L["[object Date]"] = L["[object Float32Array]"] = L["[object Float64Array]"] = L["[object Int8Array]"] = L["[object Int16Array]"] = L["[object Int32Array]"] = L["[object Map]"] = L["[object Number]"] = L[M] = L["[object RegExp]"] = L["[object Set]"] = L["[object String]"] = L["[object Symbol]"] = L["[object Uint8Array]"] = L["[object Uint8ClampedArray]"] = L["[object Uint16Array]"] = L["[object Uint32Array]"] = !0, L["[object Error]"] = L[_] = L["[object WeakMap]"] = !1, e.exports = function e(t, n, O, A, N, E) {
+      L[_] = L["[object Array]"] = L["[object ArrayBuffer]"] = L["[object DataView]"] = L["[object Boolean]"] = L["[object Date]"] = L["[object Float32Array]"] = L["[object Float64Array]"] = L["[object Int8Array]"] = L["[object Int16Array]"] = L["[object Int32Array]"] = L["[object Map]"] = L["[object Number]"] = L[M] = L["[object RegExp]"] = L["[object Set]"] = L["[object String]"] = L["[object Symbol]"] = L["[object Uint8Array]"] = L["[object Uint8ClampedArray]"] = L["[object Uint16Array]"] = L["[object Uint32Array]"] = !0, L["[object Error]"] = L[T] = L["[object WeakMap]"] = !1, e.exports = function e(t, n, O, A, N, E) {
         var D,
             P = 1 & n,
             I = 2 & n,
@@ -8718,11 +8719,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           if (D = m(t), !P) return c(t, D);
         } else {
           var F = p(t),
-              z = F == _ || "[object GeneratorFunction]" == F;
+              z = F == T || "[object GeneratorFunction]" == F;
           if (b(t)) return l(t, P);
 
-          if (F == M || F == T || z && !N) {
-            if (D = I || z ? {} : v(t), !P) return I ? h(t, a(D, t)) : u(t, s(D, t));
+          if (F == M || F == _ || z && !N) {
+            if (D = I || z ? {} : v(t), !P) return I ? d(t, a(D, t)) : u(t, s(D, t));
           } else {
             if (!L[F]) return N ? t : {};
             D = g(t, F, P);
@@ -8737,7 +8738,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }) : x(t) && t.forEach(function (r, i) {
           D.set(i, e(r, n, O, i, t, E));
         });
-        var R = H ? void 0 : (W ? I ? f : d : I ? S : k)(t);
+        var R = H ? void 0 : (W ? I ? f : h : I ? S : k)(t);
         return i(R || t, function (r, i) {
           R && (r = t[i = r]), o(D, i, e(r, n, O, i, t, E));
         }), D;
@@ -8804,11 +8805,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           l = Function.prototype,
           c = Object.prototype,
           u = l.toString,
-          h = c.hasOwnProperty,
-          d = RegExp("^" + u.call(h).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$");
+          d = c.hasOwnProperty,
+          h = RegExp("^" + u.call(d).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$");
 
       e.exports = function (e) {
-        return !(!o(e) || i(e)) && (r(e) ? d : a).test(s(e));
+        return !(!o(e) || i(e)) && (r(e) ? h : a).test(s(e));
       };
     },
     9221: function _(e, t, n) {
@@ -9092,8 +9093,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           l = n(4239),
           c = n(346),
           u = "[object Map]",
-          h = "[object Promise]",
-          d = "[object Set]",
+          d = "[object Promise]",
+          h = "[object Set]",
           f = "[object WeakMap]",
           p = "[object DataView]",
           m = c(r),
@@ -9102,7 +9103,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           y = c(s),
           b = c(a),
           x = l;
-      (r && x(new r(new ArrayBuffer(1))) != p || i && x(new i()) != u || o && x(o.resolve()) != h || s && x(new s()) != d || a && x(new a()) != f) && (x = function x(e) {
+      (r && x(new r(new ArrayBuffer(1))) != p || i && x(new i()) != u || o && x(o.resolve()) != d || s && x(new s()) != h || a && x(new a()) != f) && (x = function x(e) {
         var t = l(e),
             n = "[object Object]" == t ? e.constructor : void 0,
             r = n ? c(n) : "";
@@ -9114,10 +9115,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             return u;
 
           case v:
-            return h;
+            return d;
 
           case y:
-            return d;
+            return h;
 
           case b:
             return f;
@@ -9615,9 +9616,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           var l = e[a],
               c = r.base ? l[0] + r.base : l[0],
               u = o[c] || 0,
-              h = "".concat(c, " ").concat(u);
+              d = "".concat(c, " ").concat(u);
           o[c] = u + 1;
-          var d = n(h),
+          var h = n(d),
               f = {
             css: l[1],
             media: l[2],
@@ -9625,15 +9626,15 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             supports: l[4],
             layer: l[5]
           };
-          if (-1 !== d) t[d].references++, t[d].updater(f);else {
+          if (-1 !== h) t[h].references++, t[h].updater(f);else {
             var p = i(f, r);
             r.byIndex = a, t.splice(a, 0, {
-              identifier: h,
+              identifier: d,
               updater: p,
               references: 1
             });
           }
-          s.push(h);
+          s.push(d);
         }
 
         return s;
@@ -9878,7 +9879,19 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
       return a;
     }();
 
-    var l = {
+    function l(e) {
+      var t = e;
+      return {
+        get: function get() {
+          return t;
+        },
+        set: function set(e) {
+          t = e;
+        }
+      };
+    }
+
+    var c = {
       undefinedErr: r,
       htmltag: i,
       changeTitle: function changeTitle(e) {
@@ -9970,18 +9983,19 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         throw new Error(e);
       },
       match: s,
-      OperateURL: a
+      OperateURL: a,
+      state: l
     };
-    var c;
+    var u;
     !function (e) {
-      e[e.set = 0] = "set", e[e.countTTK = 1] = "countTTK", e[e.countTTKuntil = 2] = "countTTKuntil", e[e.start = 3] = "start", e[e.end = 4] = "end", e[e.move = 5] = "move", e[e.action = 6] = "action", e[e.start_sort = 7] = "start_sort", e[e.end_sort = 8] = "end_sort", e[e.move_list = 9] = "move_list", e[e.buffset = 10] = "buffset", e[e.buffadd = 11] = "buffadd", e[e.buffminus = 12] = "buffminus", e[e.switch = 13] = "switch", e[e.order = 14] = "order", e[e.skillcard = 15] = "skillcard", e[e.color = 16] = "color", e[e.add = 17] = "add", e[e.nomove = 18] = "nomove";
-    }(c || (c = {}));
+      e[e.set = 0] = "set", e[e.countTTK = 1] = "countTTK", e[e.countTTKuntil = 2] = "countTTKuntil", e[e.start = 3] = "start", e[e.end = 4] = "end", e[e.move = 5] = "move", e[e.action = 6] = "action", e[e.start_sort = 7] = "start_sort", e[e.end_sort = 8] = "end_sort", e[e.move_list = 9] = "move_list", e[e.buffset = 10] = "buffset", e[e.buffadd = 11] = "buffadd", e[e.buffminus = 12] = "buffminus", e[e.switch = 13] = "switch", e[e.order = 14] = "order", e[e.skillcard = 15] = "skillcard", e[e.color = 16] = "color", e[e.add = 17] = "add", e[e.nomove = 18] = "nomove", e[e.ttk_stop = 19] = "ttk_stop";
+    }(u || (u = {}));
 
-    var u = function () {
+    var d = function () {
       var e = {};
-      return ["set", "countTTK", "countTTKuntil", "start", "end", "move", "action", "start_sort", "end_sort", "move_list", "buffset", "buffadd", "buffminus", "switch", "order", "skillcard", "color", "add", "nomove"].forEach(function (t) {
-        e[t] = c[t];
-      }), [["ttk", c.countTTK], ["ttk_until", c.countTTKuntil], ["mv_ls", c.move_list], ["b", c.buffset], ["b+", c.buffadd], ["b-", c.buffminus], ["a", c.add], ["m", c.move], ["ac", c.action], ["sw", c.switch], ["c", c.color], ["sc", c.skillcard]].forEach(function (_ref) {
+      return ["set", "countTTK", "countTTKuntil", "start", "end", "move", "action", "start_sort", "end_sort", "move_list", "buffset", "buffadd", "buffminus", "switch", "order", "skillcard", "color", "add", "nomove", "ttk_stop"].forEach(function (t) {
+        e[t] = u[t];
+      }), [["ttk", u.countTTK], ["ttk_until", u.countTTKuntil], ["mv_ls", u.move_list], ["b", u.buffset], ["b+", u.buffadd], ["b-", u.buffminus], ["a", u.add], ["m", u.move], ["ac", u.action], ["sw", u.switch], ["c", u.color], ["sc", u.skillcard]].forEach(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
             t = _ref2[0],
             n = _ref2[1];
@@ -10084,7 +10098,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
           var t = this.now_val.value,
               n = function () {
-            var e = u[t];
+            var e = d[t];
             if (void 0 !== e) return e;
             throw Error("コマンド名に誤りがあります");
           }();
@@ -10095,7 +10109,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             e.push(_this2.now_val.value), _this2.nextVal();
           };
 
-          if (n === c.move_list) {
+          if (n === u.move_list) {
             (function () {
               _this2.checkIsWord();
 
@@ -10140,14 +10154,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
                     if (_this2.nextVal(), 10 === _this2.now_val_type) {
                       var _n4 = _this2.now_val.value;
-                      l.isNaturalString(_n4) || _t8();
+                      c.isNaturalString(_n4) || _t8();
 
                       var _i2 = Number(_n4);
 
                       _i2 < 0 && _t8(), _i2 > 20 && _this2.error_unexpectedToken("エラー : 20回を超える繰り返しはできません(極端な値が入力され重くなることを防ぐため)");
 
                       for (var _t9 = 0; _t9 < _i2; _t9++) {
-                        var _t10 = l.objectCopy(_e5);
+                        var _t10 = c.objectCopy(_e5);
 
                         r.push(_t10);
                       }
@@ -10194,7 +10208,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           e: for (;;) {
             s(this.now_val_type).case(10, function () {
               if (0 === t) {
-                var _t11 = u[_this3.now_val.value];
+                var _t11 = d[_this3.now_val.value];
                 _t11 ? e.push(_t11) : _this3.error_unexpectedToken("コマンド名に誤りがあります");
               } else e.push(_this3.now_val.value);
 
@@ -10269,8 +10283,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         key: "error_unexpectedToken",
         value: function error_unexpectedToken() {
           var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-          var t = l.htmltag("span");
-          if (t.appendChild(l.htmltag("span", "→→" + this.now_val.value + "←←", "errMsg")), 1 !== this.now_val.type) for (var _e6 = this.i_loading + 1; _e6 < this.timeline_parsed.length && 1 !== this.timeline_parsed[_e6].type; _e6++) {
+          var t = c.htmltag("span");
+          if (t.appendChild(c.htmltag("span", "→→" + this.now_val.value + "←←", "errMsg")), 1 !== this.now_val.type) for (var _e6 = this.i_loading + 1; _e6 < this.timeline_parsed.length && 1 !== this.timeline_parsed[_e6].type; _e6++) {
             t.insertAdjacentText("beforeend", this.timeline_parsed[_e6].value);
           }
 
@@ -10279,22 +10293,22 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           }
 
           9 === this.now_val.type && (e = "予約文字です");
-          var n = l.htmltag("span");
-          throw n.insertAdjacentText("beforeend", "想定外の値: 「" + JSON.stringify(this.now_val.value) + "」"), n.appendChild(l.htmltag("br")), n.appendChild(t), n.appendChild(l.htmltag("br")), n.insertAdjacentText("beforeend", e), Error(n.outerHTML);
+          var n = c.htmltag("span");
+          throw n.insertAdjacentText("beforeend", "想定外の値: 「" + JSON.stringify(this.now_val.value) + "」"), n.appendChild(c.htmltag("br")), n.appendChild(t), n.appendChild(c.htmltag("br")), n.insertAdjacentText("beforeend", e), Error(n.outerHTML);
         }
       }]);
 
       return h;
     }();
 
-    var d = /*#__PURE__*/function () {
-      function d(e) {
-        _classCallCheck(this, d);
+    var f = /*#__PURE__*/function () {
+      function f(e) {
+        _classCallCheck(this, f);
 
         this.timeline_str = e, this.timeline_parsed = [], this._now_str = "", this.i_nowloadstr = 0;
       }
 
-      _createClass(d, [{
+      _createClass(f, [{
         key: "parse",
         value: function parse() {
           return this.timeline_parsed = this.lexicalAnalysis(), this.timeline_parsed;
@@ -10382,58 +10396,58 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
       }]);
 
-      return d;
+      return f;
     }();
 
-    var f,
-        p,
+    var p,
         m,
-        g = !1,
-        v = function v() {};
-
-    function y() {
-      f = new Worker("./js/pyodide/webworker.js");
-    }
+        g,
+        v = !1,
+        y = function y() {};
 
     function b() {
-      f.onmessage = function (e) {
+      p = new Worker("./js/pyodide/webworker.js");
+    }
+
+    function x() {
+      p.onmessage = function (e) {
         var _e$data = e.data,
             t = _e$data.id,
             n = _objectWithoutProperties(_e$data, _excluded);
 
-        if (-1 === t) return g = !0, v(), void (v = function v() {});
+        if (-1 === t) return v = !0, y(), void (y = function y() {});
 
-        if (t === m) {
-          var _e8 = p;
-          clearInterval(m), m = void 0, _e8(n);
+        if (t === g) {
+          var _e8 = m;
+          clearInterval(g), g = void 0, _e8(n);
         }
       };
     }
 
-    function x() {
+    function w() {
       return new Promise(function (e, t) {
-        f || (y(), b()), g ? e() : v = e;
+        p || (b(), x()), v ? e() : y = e;
       });
     }
 
-    var w = function () {
+    var C = function () {
       var e = 0;
       return function (t, n) {
-        return f || (y(), b()), e = (e + 1) % Number.MAX_SAFE_INTEGER, new Promise(function (e) {
-          p = e, x().then(function () {
-            m && (clearInterval(m), m = void 0), m = setTimeout(function () {
-              f.terminate(), g = !1, clearInterval(m), m = void 0, y(), b(), e({
+        return p || (b(), x()), e = (e + 1) % Number.MAX_SAFE_INTEGER, new Promise(function (e) {
+          m = e, w().then(function () {
+            g && (clearInterval(g), g = void 0), g = setTimeout(function () {
+              p.terminate(), v = !1, clearInterval(g), g = void 0, b(), x(), e({
                 error: "Error:timeout\n"
               });
-            }, 3e3), f.postMessage(_objectSpread(_objectSpread({}, n), {}, {
+            }, 3e3), p.postMessage(_objectSpread(_objectSpread({}, n), {}, {
               python: t,
-              id: m
+              id: g
             }));
           });
         });
       };
     }(),
-        C = {
+        k = {
       main: function () {
         var _main = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
           var t;
@@ -10443,7 +10457,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 case 0:
                   _context.prev = 0;
                   _context.next = 3;
-                  return w((t = e, "\n_output = []\n\n_command__ = [\n    \"set\",\n    \"countTTK\",\n    \"countTTKuntil\",\n    \"start\",\n    \"end\",\n    \"move\",\n    \"action\",\n    \"start_sort\",\n    \"end_sort\",\n    \"move_list\",\n    \"buffset\",\n    \"buffadd\",\n    \"buffminus\",\n    \"switch\",\n    \"order\",\n    \"skillcard\",\n    \"color\",\n    \"add\",\n    \"nomove\"\n]\n\n\ndef _command_fn(command, *args):\n    tmp = [command]\n    tmp += list(args)\n    _output.append(tmp)\n\n\nclass _wrapper_command:\n    def __init__(self, command):\n        self.command = command\n        self.isCommand = True\n\n    def __call__(self, *args):\n        _command_fn(self.command, *args)\n\n\nfor _cmd__ in _command__:\n    globals()[_cmd__] = _wrapper_command(_cmd__)\n\n\nttk = countTTK\nttk_until = countTTKuntil\nmv_ls = move_list\nbs = buffset\nbp = buffadd\nbm = buffminus\n# a = add\n# m = move\n# ac = action\nsw = switch\n# c = color\nsc = skillcard\n\n\ndef ___set(*args):\n    globals()[list(args)[0]] = list(args)[0]\n    _wrapper_command(\"set\")(*args)\n\n\nset = ___set\n\n\n# b-10 -> \"b10\"\nclass _color__():\n    def __init__(self, color):\n        self.color = color\n\n    def __sub__(self, num):\n        if(type(num) != int and type(num) != float):\n            raise TypeError(\"num must be Number\")\n        return self.color + str(num)\n\n\nfor _alp_num in range(26):\n    alphabet = str(chr(_alp_num + 97))\n    globals()[alphabet] = _color__(alphabet)\n\n\nclass _mv_ls():\n    def __call__(self):\n        return _color__(\"m\")\n\n    def _obj(self, mode, arg):\n        return {\"mode\": mode, \"value\": list(arg)}\n\n    def s(self, *args):\n        return self._obj(0, args)\n\n    def o(self, *args):\n        return self._obj(1, args)\n\n    def order(self, *args):\n        return self.o(*args)\n\n    def c(self, *args):\n        args = list(args)\n        if args[0].isCommand != True:\n            raise Exception(\"args[0] must be command function\")\n        args[0] = args[0].command\n        return self._obj(2, args)\n\n    def command(self, *args):\n        return self.c(*args)\n\n    def a(self, *args):\n        return self._obj(3, args)\n\n\nm = _mv_ls()\n\n######################\n\n".concat(t, "\n\n######################\n\nm = _mv_ls()\nfor (i, cmd) in enumerate(_output):\n    if(cmd[0] == \"move_list\"):\n        for (j, o) in enumerate(cmd[2]):\n            o_type = type(o)\n\n            if(o_type == int or o_type == float or o_type == str):\n                _output[i][2][j] = m.a(o)\n            elif(o_type == list):\n                _output[i][2][j] = m.s(*o)\n\nimport json\njson.dumps(_output)\n")), {});
+                  return C((t = e, "\n_output = []\n\n_command__ = [\n    \"set\",\n    \"countTTK\",\n    \"countTTKuntil\",\n    \"start\",\n    \"end\",\n    \"move\",\n    \"action\",\n    \"start_sort\",\n    \"end_sort\",\n    \"move_list\",\n    \"buffset\",\n    \"buffadd\",\n    \"buffminus\",\n    \"switch\",\n    \"order\",\n    \"skillcard\",\n    \"color\",\n    \"add\",\n    \"nomove\"\n]\n\n\ndef _command_fn(command, *args):\n    tmp = [command]\n    tmp += list(args)\n    _output.append(tmp)\n\n\nclass _wrapper_command:\n    def __init__(self, command):\n        self.command = command\n        self.isCommand = True\n\n    def __call__(self, *args):\n        _command_fn(self.command, *args)\n\n\nfor _cmd__ in _command__:\n    globals()[_cmd__] = _wrapper_command(_cmd__)\n\n\nttk = countTTK\nttk_until = countTTKuntil\nmv_ls = move_list\nbs = buffset\nbp = buffadd\nbm = buffminus\n# a = add\n# m = move\n# ac = action\nsw = switch\n# c = color\nsc = skillcard\n\n\ndef ___set(*args):\n    globals()[list(args)[0]] = list(args)[0]\n    _wrapper_command(\"set\")(*args)\n\n\nset = ___set\n\n\n# b-10 -> \"b10\"\nclass _color__():\n    def __init__(self, color):\n        self.color = color\n\n    def __sub__(self, num):\n        if(type(num) != int and type(num) != float):\n            raise TypeError(\"num must be Number\")\n        return self.color + str(num)\n\n\nfor _alp_num in range(26):\n    alphabet = str(chr(_alp_num + 97))\n    globals()[alphabet] = _color__(alphabet)\n\n\nclass _mv_ls():\n    def __call__(self):\n        return _color__(\"m\")\n\n    def _obj(self, mode, arg):\n        return {\"mode\": mode, \"value\": list(arg)}\n\n    def s(self, *args):\n        return self._obj(0, args)\n\n    def o(self, *args):\n        return self._obj(1, args)\n\n    def order(self, *args):\n        return self.o(*args)\n\n    def c(self, *args):\n        args = list(args)\n        if args[0].isCommand != True:\n            raise Exception(\"args[0] must be command function\")\n        args[0] = args[0].command\n        return self._obj(2, args)\n\n    def command(self, *args):\n        return self.c(*args)\n\n    def a(self, *args):\n        return self._obj(3, args)\n\n\nm = _mv_ls()\n\n######################\n\n".concat(t, "\n\n######################\n\nm = _mv_ls()\nfor (i, cmd) in enumerate(_output):\n    if(cmd[0] == \"move_list\"):\n        for (j, o) in enumerate(cmd[2]):\n            o_type = type(o)\n\n            if(o_type == int or o_type == float or o_type == str):\n                _output[i][2][j] = m.a(o)\n            elif(o_type == list):\n                _output[i][2][j] = m.s(*o)\n\nimport json\njson.dumps(_output)\n")), {});
 
                 case 3:
                   return _context.abrupt("return", _context.sent);
@@ -10467,12 +10481,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
         return main;
       }(),
-      waitInit: x
+      waitInit: w
     };
 
-    function k(e) {
+    function S(e) {
       return t = this, n = void 0, i = /*#__PURE__*/regeneratorRuntime.mark(function i() {
-        var t, n, r, i, _yield$C$main, o, s;
+        var t, n, r, i, _yield$k$main, o, s;
 
         return regeneratorRuntime.wrap(function i$(_context2) {
           while (1) {
@@ -10492,7 +10506,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   t.classList.remove("hide");
                 }, 1500);
                 _context2.next = 6;
-                return C.waitInit();
+                return k.waitInit();
 
               case 6:
                 clearTimeout(r);
@@ -10501,12 +10515,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   n.classList.remove("hide");
                 }, 1500);
                 _context2.next = 11;
-                return C.main(e);
+                return k.main(e);
 
               case 11:
-                _yield$C$main = _context2.sent;
-                o = _yield$C$main.results;
-                s = _yield$C$main.error;
+                _yield$k$main = _context2.sent;
+                o = _yield$k$main.results;
+                s = _yield$k$main.error;
 
                 if (!(clearTimeout(i), n.classList.add("hide"), s)) {
                   _context2.next = 16;
@@ -10520,7 +10534,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                   var t = [],
                       n = e[0],
                       r = function () {
-                    var e = u[n];
+                    var e = d[n];
                     if (void 0 !== e) return e;
                     throw Error("コマンド名に誤りがあります");
                   }();
@@ -10532,12 +10546,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
                     if ("number" === _i5) t.push(String(e[_n7]));else if ("string" === _i5) t.push(e[_n7]);else {
                       if (!Array.isArray(e[_n7])) throw Error("不正な型です: " + JSON.stringify(e) + " -> " + e[_n7]);
-                      if (r !== c.move_list) throw Error("move_list以外に配列が指定されています");
+                      if (r !== u.move_list) throw Error("move_list以外に配列が指定されています");
                       {
                         var _r2 = e[_n7].map(function (e) {
                           e.mode = e.mode;
                           var t = 2 === e.mode;
-                          t && (e.value[0] = u[e.value[0]]);
+                          t && (e.value[0] = d[e.value[0]]);
 
                           for (var _n8 = Number(t); _n8 < e.value.length; _n8++) {
                             "number" == typeof e.value[_n8] && (e.value[_n8] = String(e.value[_n8]));
@@ -10589,7 +10603,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
       var t, n, r, i;
     }
 
-    function S(e) {
+    function _(e) {
       return t = this, n = void 0, i = /*#__PURE__*/regeneratorRuntime.mark(function i() {
         var t;
         return regeneratorRuntime.wrap(function i$(_context4) {
@@ -10604,7 +10618,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 }
 
                 _context4.next = 4;
-                return k(e);
+                return S(e);
 
               case 4:
                 t.AST = _context4.sent;
@@ -10621,7 +10635,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                       while (1) {
                         switch (_context3.prev = _context3.next) {
                           case 0:
-                            t = new d(e).parse();
+                            t = new f(e).parse();
                             return _context3.abrupt("return", new h(t).parse());
 
                           case 2:
@@ -10720,14 +10734,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
       return o ? o[1] : 0;
     };
 
-    var _ = /*#__PURE__*/function () {
-      function _() {
-        _classCallCheck(this, _);
+    var M = /*#__PURE__*/function () {
+      function M() {
+        _classCallCheck(this, M);
 
         this.current = [], this.switchData = [], this.cardData = [], this.comment = [], this.color = void 0, this.place_of_currentTimeline = 0;
       }
 
-      _createClass(_, [{
+      _createClass(M, [{
         key: "move",
         value: function move(e) {
           var t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.ID_of_firstChara();
@@ -10768,7 +10782,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           var n;
 
           try {
-            n = l.objectCopy(this.get_chara_by_ID(e));
+            n = c.objectCopy(this.get_chara_by_ID(e));
           } catch (t) {
             n = {
               id: e
@@ -10885,19 +10899,19 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
       }]);
 
-      return _;
+      return M;
     }();
 
-    var M = /*#__PURE__*/function () {
-      function M(e, t, n) {
+    var L = /*#__PURE__*/function () {
+      function L(e, t, n) {
         var r = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
 
-        _classCallCheck(this, M);
+        _classCallCheck(this, L);
 
         this.id = e, this.SPD = t, this._SPD_buff = [], this.SPD_buff = n, this.LoadFactorReduce = r;
       }
 
-      _createClass(M, [{
+      _createClass(L, [{
         key: "calculateOrderValue",
         value: function calculateOrderValue(e) {
           var t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -10950,84 +10964,87 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
       }]);
 
-      return M;
+      return L;
     }();
 
-    function L(e, t, n, r, i, o, a) {
+    function O(e, t, n, r, i, o, a) {
       for (var _len = arguments.length, l = new Array(_len > 7 ? _len - 7 : 0), _key = 7; _key < _len; _key++) {
         l[_key - 7] = arguments[_key];
       }
 
-      var u = l[0],
-          h = l[1],
-          d = l[2],
+      var c = l[0],
+          d = l[1],
+          h = l[2],
           f = l[3],
           p = l[4],
           m = function m(t) {
-        e.place_of_currentTimeline < o && a(t);
+        var n = o.get();
+        e.place_of_currentTimeline < n && a(t);
       };
 
-      if (u !== c.end) {
+      if (c !== u.end) {
         var _e9 = l;
-        _e9[0] = c[u], 0 === t.main.length && (t.main = []), t.main.push(_e9);
+        _e9[0] = u[c], 0 === t.main.length && (t.main = []), t.main.push(_e9);
       }
 
       var g = function g(e) {
         return Number.isNaN(Number(e)) ? 1 / 0 : Number(e);
       };
 
-      return s(u).case(c.buffset, function () {
-        var e = h,
-            t = Number(d) || 0,
+      return s(c).case(u.buffset, function () {
+        var e = d,
+            t = Number(h) || 0,
             n = g(f);
         i[e]._SPD_buff = [], i[e].setSPDbuff(t, n);
-      }).case(c.buffadd, function () {
-        var e = h,
-            t = Number(d) || 0,
+      }).case(u.buffadd, function () {
+        var e = d,
+            t = Number(h) || 0,
             n = g(f);
         i[e].setSPDbuff(t, n);
-      }).case(c.buffminus, function () {
-        var e = h,
-            t = Number(d) || 0,
+      }).case(u.buffminus, function () {
+        var e = d,
+            t = Number(h) || 0,
             n = g(f);
         i[e].setSPDbuff(-t, n);
-      }).case(c.add, function () {
-        var t = h,
-            n = Number(d),
+      }).case(u.add, function () {
+        var t = d,
+            n = Number(h),
             r = Number(f) || 0;
-        i[t] = new M(t, n, r), e.addChara(t, i[t].initOrderValue());
-      }).case([c.move, c.action], function () {
+        i[t] = new L(t, n, r), e.addChara(t, i[t].initOrderValue());
+      }).case([u.move, u.action], function () {
         var t, n;
-        u === c.move ? (n = Number(h), t = d) : (t = h, n = Number(d));
+        c === u.move ? (n = Number(d), t = h) : (t = d, n = Number(h));
         var o = "true" === f;
         r[t] && m(T(n, !1)), e.move(i[e.ID_of_firstChara()].calculateOrderValue(n), t, o), i[t].nextTurn();
-      }).case(c.order, function () {
-        var t = h,
-            n = Number(d);
+      }).case(u.order, function () {
+        var t = d,
+            n = Number(h);
         e.move(n, t, !1), i[t].nextTurn();
-      }).case(c.switch, function () {
-        var t = h,
-            n = d,
+      }).case(u.switch, function () {
+        var t = d,
+            n = h,
             r = Number(f),
             o = Number(p) || 0;
-        e.switchChara(t, n), i[n] = new M(n, r, o);
-      }).case(c.color, function () {
-        var t = h;
+        e.switchChara(t, n), i[n] = new L(n, r, o);
+      }).case(u.color, function () {
+        var t = d;
         e.color = t;
-      }).case(c.skillcard, function () {
-        var t = h,
-            n = Number(d),
+      }).case(u.skillcard, function () {
+        var t = d,
+            n = Number(h),
             o = Number(f),
             s = Number(p);
         if ([n, o, s].includes(NaN)) throw Error("引数不足です");
-        var a = new M(t, n, 0);
+        var a = new L(t, n, 0);
         i[t] = a, e.addSkillCard(t, a.calculateOrderValue(o), s, function (e, t, n) {
           return m(r[e] ? T(Number(f), !0) : 0);
         });
-      }).case(c.nomove, function () {
+      }).case(u.nomove, function () {
         e.skip();
-      }).case(c.end, function () {
+      }).case(u.end, function () {
         n = 4;
+      }).case(u.ttk_stop, function () {
+        o.set(e.place_of_currentTimeline);
       }).default(function () {
         throw Error("no command found");
       }), {
@@ -11037,30 +11054,30 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
       };
     }
 
-    var O = n(4631),
-        A = n.n(O),
-        N = (n(790), n(4504), n(1707), n(5321), n(3379)),
-        E = n.n(N),
-        D = n(7795),
-        P = n.n(D),
-        I = n(569),
-        W = n.n(I),
-        H = n(3565),
-        F = n.n(H),
-        z = n(9216),
-        j = n.n(z),
-        R = n(4589),
-        B = n.n(R),
-        V = n(3501),
-        U = {};
-    U.styleTagTransform = B(), U.setAttributes = F(), U.insert = W().bind(null, "head"), U.domAPI = P(), U.insertStyleElement = j(), E()(V.Z, U), V.Z && V.Z.locals && V.Z.locals;
-    var K = n(2875),
-        G = {};
-    G.styleTagTransform = B(), G.setAttributes = F(), G.insert = W().bind(null, "head"), G.domAPI = P(), G.insertStyleElement = j(), E()(K.Z, G), K.Z && K.Z.locals && K.Z.locals, n(2801);
-    var $ = n(1368),
-        X = {};
+    var A = n(4631),
+        N = n.n(A),
+        E = (n(790), n(4504), n(1707), n(5321), n(3379)),
+        D = n.n(E),
+        P = n(7795),
+        I = n.n(P),
+        W = n(569),
+        H = n.n(W),
+        F = n(3565),
+        z = n.n(F),
+        j = n(9216),
+        R = n.n(j),
+        B = n(4589),
+        V = n.n(B),
+        U = n(3501),
+        K = {};
+    K.styleTagTransform = V(), K.setAttributes = z(), K.insert = H().bind(null, "head"), K.domAPI = I(), K.insertStyleElement = R(), D()(U.Z, K), U.Z && U.Z.locals && U.Z.locals;
+    var G = n(2875),
+        $ = {};
+    $.styleTagTransform = V(), $.setAttributes = z(), $.insert = H().bind(null, "head"), $.domAPI = I(), $.insertStyleElement = R(), D()(G.Z, $), G.Z && G.Z.locals && G.Z.locals, n(2801);
+    var X = n(1368),
+        Z = {};
 
-    function Z(e) {
+    function Y(e) {
       var t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
       var _e$getCursor = e.getCursor(),
@@ -11070,7 +11087,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
       return e.getLine(n).substring(r, r + t);
     }
 
-    function Y(e, t) {
+    function q(e, t) {
       var _e$getCursor2 = e.getCursor(),
           n = _e$getCursor2.line,
           r = _e$getCursor2.ch;
@@ -11081,8 +11098,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
       });
     }
 
-    function q(e) {
-      var t = Object.keys(u);
+    function J(e) {
+      var t = Object.keys(d);
       return new Promise(function (n) {
         setTimeout(function () {
           var r = e.getCursor(),
@@ -11121,53 +11138,53 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             return l.push(e);
           }), l.length > 0 ? n({
             list: l,
-            from: A().Pos(r.line, o),
-            to: A().Pos(r.line, s)
+            from: N().Pos(r.line, o),
+            to: N().Pos(r.line, s)
           }) : n(void 0);
         }, 100);
       });
     }
 
-    function J(e, t) {
+    function Q(e, t) {
       var n = document.getElementById("firstchara");
       n && (n.innerText = t);
       var r = document.getElementById("now_place");
       r && (r.innerText = String(e));
     }
 
-    function Q() {
+    function ee() {
       var e = new a(location.href).getParam("TL"),
           t = new a(location.href),
           n = String(new Date()) + "自動保存:TL生成ツール";
-      e !== t.getParam("TL") && (0 === e.length ? history.pushState(null, n, t.href) : history.replaceState(null, n, t.href), l.changeTitle(n));
+      e !== t.getParam("TL") && (0 === e.length ? history.pushState(null, n, t.href) : history.replaceState(null, n, t.href), c.changeTitle(n));
     }
 
-    function ee(e, t, n, r) {
+    function te(e, t, n, r) {
       var i;
-      var o = l.htmltag("thead"),
-          s = l.htmltag("tr");
+      var o = c.htmltag("thead"),
+          s = c.htmltag("tr");
       if (null == (null === (i = e[0]) || void 0 === i ? void 0 : i.length)) return;
 
       for (var _t14 = 0; _t14 <= e[0].length; _t14++) {
         var _e10 = void 0;
 
-        _e10 = _t14 === r ? l.htmltag("th", _t14.toString(), "now_place") : 0 === _t14 ? l.htmltag("th", "", "nowrap") : l.htmltag("th", _t14.toString()), s.appendChild(_e10);
+        _e10 = _t14 === r ? c.htmltag("th", _t14.toString(), "now_place") : 0 === _t14 ? c.htmltag("th", "", "nowrap") : c.htmltag("th", _t14.toString()), s.appendChild(_e10);
       }
 
       o.appendChild(s);
 
       var _loop3 = function _loop3(_r3) {
-        var i = l.htmltag("tr");
-        i.appendChild(l.htmltag("td", t[_r3], "nowrap"));
+        var i = c.htmltag("tr");
+        i.appendChild(c.htmltag("td", t[_r3], "nowrap"));
 
         var _loop4 = function _loop4(_o3) {
           var s = void 0;
           var a = n.find(function (e) {
             return "color" === e[0] && e[1] === t[_r3] && e[2] === _o3;
           }),
-              c = e[_r3][_o3];
+              l = e[_r3][_o3];
           var u = void 0;
-          u = "string" == typeof c ? c : "number" == typeof c ? String(c) : "", s = a ? l.htmltag("td", u, "color-" + a[3]) : l.htmltag("td", u), i.appendChild(s);
+          u = "string" == typeof l ? l : "number" == typeof l ? String(l) : "", s = a ? c.htmltag("td", u, "color-" + a[3]) : c.htmltag("td", u), i.appendChild(s);
         };
 
         for (var _o3 = 0; _o3 < e[0].length; _o3++) {
@@ -11182,17 +11199,17 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
       }
 
       var a = document.querySelector("table");
-      if (!a) throw l.undefinedErr;
+      if (!a) throw c.undefinedErr;
       a.innerHTML = "", a.appendChild(o);
     }
 
-    function te(e) {
+    function ne(e) {
       var t = document.getElementById("popup");
-      if (!t) throw l.undefinedErr;
-      t.innerText = ne(e);
+      if (!t) throw c.undefinedErr;
+      t.innerText = re(e);
     }
 
-    function ne(e) {
+    function re(e) {
       return e.set.map(function (e) {
         return e ? e.join(" ") : "";
       }).join("\n") + "\n\nstart\n" + e.main.map(function (e) {
@@ -11200,16 +11217,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
       }).join("\n") + "\nend";
     }
 
-    X.styleTagTransform = B(), X.setAttributes = F(), X.insert = W().bind(null, "head"), X.domAPI = P(), X.insertStyleElement = j(), E()($.Z, X), $.Z && $.Z.locals && $.Z.locals;
+    Z.styleTagTransform = V(), Z.setAttributes = z(), Z.insert = H().bind(null, "head"), Z.domAPI = I(), Z.insertStyleElement = R(), D()(X.Z, Z), X.Z && X.Z.locals && X.Z.locals;
 
-    var re = /*#__PURE__*/function () {
-      function re(e, t) {
-        _classCallCheck(this, re);
+    var ie = /*#__PURE__*/function () {
+      function ie(e, t) {
+        _classCallCheck(this, ie);
 
         this._editor_init = e, this._update_data = t, this._editor_init = e, this._update_data = t;
       }
 
-      _createClass(re, [{
+      _createClass(ie, [{
         key: "switch_editor",
         value: function switch_editor(e) {
           this._editor_init.switch_editor(e);
@@ -11221,39 +11238,105 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
       }]);
 
-      return re;
+      return ie;
     }();
 
-    function ie(e, t, n, r, i, o, s) {
-      var c = function (e, t, n, r, i, o, s) {
-        var c = document.getElementById("copyTL"),
-            u = document.getElementById("jumpTwitter"),
+    function oe(e, t, n, r, o, s, l) {
+      var u = function (e, t, n, r, o, s, l) {
+        var u = document.getElementById("copyTL"),
+            d = document.getElementById("jumpTwitter"),
             h = document.getElementById("unzipMoveList"),
-            d = document.getElementById("csvDownload"),
-            f = document.getElementById("copy_ConvertedTL"),
-            p = document.getElementById("pop11"),
-            m = document.getElementById("isSet_onbeforeunload");
-        if (!(c && u && h && m && p && d && f)) throw l.undefinedErr;
+            f = document.getElementById("csvDownload"),
+            p = document.getElementById("copy_ConvertedTL"),
+            m = document.getElementById("pop11"),
+            g = document.getElementById("isSet_onbeforeunload");
+        if (function () {
+          var e = document.getElementById("readme");
+          if (!e) throw c.undefinedErr;
+          var t = i("span");
+          [{
+            title: "#[comment]",
+            text: ["#から始まるものは行末まで無視されます(コメントに使用)", "命令の最後に書いてもよい", "ショートカットは「Ctrl + /」", "例:", "move 125 enemy", "#ここからデバフを入れる", "例:", "move 125 momo #とっておき"]
+          }, {
+            title: "set [name] [SPD] ([buff(%)])",
+            text: ["開始(start)前にフィールドに出すキャラを設定", "SPDの優先度の高いキャラから先に書く", "nameにスペースを含めるのは禁止"]
+          }, {
+            title: "start",
+            text: ["メインモード切り替え", "setを書き終わったら記入"]
+          }, {
+            title: "end",
+            text: ["メインモードモード終了", "その後ろにstart、start_sortを書くことでまた別のモードに切り替えられる"]
+          }, {
+            title: "move [硬直(%)] [name]",
+            text: ["行動", "先頭のキャラ以外をnameに記入した場合errorを吐く", "moveの代わりにmでも可"]
+          }, {
+            title: "action [name] [硬直(%)]",
+            text: ["行動", "moveと引数の順番が異なる以外同じ", "actionの代わりにacでも可"]
+          }, {
+            title: "move_list [name] [[硬直(%)],[交代後のname,SPD,(buff)],[硬直(%)],{command,argments1,argments2...}...]",
+            text: ["行動リスト", "move_list nagi [40,{buffset,nagi,24},100,[ren,141,100],100]", "のように書く", "スペースを空けるのは厳禁", "内側にある[]は途中で交代することを示す", "{}でコマンドを使用可能", "<>で硬直値を直接入力可能", "move_listの代わりにmv_lsでも可"]
+          }, {
+            title: "----ここからほとんどデバッグしていないので正しく動かない可能性大----",
+            text: []
+          }, {
+            title: ["buffset [name] [buff(%)] ([turn])", "buffadd [name] [buff(%)] ([turn])", "buffminus [name] [buff(%)] ([turn])"],
+            text: ["バフ設定", "それぞれ b,b+,b-と省略可"]
+          }, {
+            title: "switch [from_name] [to_name] [SPD] ([buff])",
+            text: ["from_nameに交代前のキャラ名、to_nameに交代後のキャラ名を記入", "swと省略可"]
+          }, {
+            title: "order [name] [name] [SPD]",
+            text: ["硬直地直接入力"]
+          }, {
+            title: "skillcard [name] [SPD] [硬直] [回数]",
+            text: ["スキルカード"]
+          }, {
+            title: "color [色]",
+            text: ["r red", "g green", "b blue", "p purple", "s silver", "y yellow", "o orange", "c copper", "d dark"]
+          }, {
+            title: ["ttk[name][name][name] ...", "ttk_until[n行目]"],
+            text: ["とっておきカウント", "ttkは引数にプレイヤーのキャラ、スキルカードの名前を書きます", "ttk_untilは引数に何行目までカウントしたいか書きます", "", "使用しているテーブル(以下にないものは0として計算)", "スキル"],
+            html: '<table class="normal-table"><thead><th>硬直</th><th>チャージ</th></thead><tbody><tr><td>0</td><td>5</td></tr><tr><td>10</td><td>0</td></tr><tr><td>35</td><td>17</td></tr><tr><td>40</td><td>8</td></tr><tr><td>45</td><td>2</td></tr><tr><td>50</td><td>5</td></tr><tr><td>55</td><td>8</td></tr><tr><td>60</td><td>8</td></tr><tr><td>65</td><td>8</td></tr><tr><td>67.5</td><td>17</td></tr><tr><td>70</td><td>17</td></tr><tr><td>75</td><td>17</td></tr><tr><td>80</td><td>5</td></tr><tr><td>100</td><td>17</td></tr><tr><td>110</td><td>22</td></tr><tr><td>120</td><td>8</td></tr><tr><td>125</td><td>0</td></tr><tr><td>130</td><td>10</td></tr><tr><td>135</td><td>17</td></tr><tr><td>140</td><td>8</td></tr><tr><td>145</td><td>8</td></tr><tr><td>150</td><td>17</td></tr><tr><td>155</td><td>8</td></tr><tr><td>165</td><td>10</td></tr><tr><td>170</td><td>17</td></tr><tr><td>190</td><td>17</td></tr><tr><td>200</td><td>17</td></tr></tbody></table>\n         <br />\n         スキルカード<br />\n        <table class="normal-table"><thead><th>硬直</th><th>チャージ</th></thead><tbody><tr><td>75</td><td>5</td></tr><tr><td>80</td><td>22</td></tr><tr><td>100</td><td>22</td></tr></tbody></table>\n      '
+          }, {
+            title: "#python#",
+            text: ["一番最初に#python#を入れるとpythonとして入力できます", "各コマンドは関数になっているのでそれを呼び出すと反映されます", "交代はそのままlistで書き、硬直値入力はm.order,コマンド入力はm.commandです", "注意点として、m.commandの第一引数はfunctionを渡します", "", "一部のコマンドの略称が変わります", "bs = buffset", "bp = buffadd", "bm = buffminus", "", "色を付ける場合、色-数字としてください", "b-40", "m.order(b-40)"],
+            html: '<textarea cols="30" rows="10">\n#python#\nset("syaro",144)\nset("media",124)\n\nmv_ls(syaro,[m.command(bp,syaro,-200),10,99,m.order(10.66)])\nmv_ls(media,[d-80,80,69,m.order(c-14.5),["I",140],60])\n\n    </textarea>'
+          }].forEach(function (e) {
+            var n;
+
+            if (n = "string" == typeof e.title ? [e.title] : e.title, n.forEach(function (e) {
+              t.appendChild(i("strong", e)), t.appendChild(i("br"));
+            }), e.text.forEach(function (e) {
+              t.appendChild(i("span", e)), t.appendChild(i("br"));
+            }), e.html) {
+              var _n9 = i("span");
+
+              _n9.innerHTML = e.html, t.appendChild(_n9);
+            }
+
+            t.appendChild(i("br"));
+          }), e.innerHTML = "", e.appendChild(t);
+        }(), !(u && d && h && g && m && f && p)) throw c.undefinedErr;
         setInterval(function () {
-          Q();
+          ee();
         }, 3e5), window.onbeforeunload = function (t) {
-          Q(), 0 !== e().length && m.checked && (t.preventDefault(), t.returnValue = "ページから離れますか？");
-        }, u.onclick = function () {
+          ee(), 0 !== e().length && g.checked && (t.preventDefault(), t.returnValue = "ページから離れますか？");
+        }, d.onclick = function () {
           window.open("https://twitter.com/Y52en/status/1402239605978517505?s=20", "_blank");
         }, h.onclick = function () {
-          p.checked = !0;
+          m.checked = !0;
         };
-        var g = new a(void 0, !1);
-        return c.onclick = function () {
+        var v = new a(void 0, !1);
+        return u.onclick = function () {
           return function (e) {
-            l.textCopy(e);
+            c.textCopy(e);
             var t = document.getElementById("copyed");
-            if (!t) throw l.undefinedErr;
+            if (!t) throw c.undefinedErr;
             t.style.display = "block", setTimeout(function () {
               t.style.display = "none";
             }, 1e3);
-          }(g.href);
-        }, d.onclick = function () {
+          }(v.href);
+        }, f.onclick = function () {
           return function (e, t) {
             var n = "";
 
@@ -11284,28 +11367,28 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
               o.href = i, o.download = t, o.style.display = "none", document.body.appendChild(o), o.click(), document.body.removeChild(o), URL.revokeObjectURL(i);
             }(n);
           }(t, n);
-        }, te(r), f.onclick = function () {
+        }, ne(r), p.onclick = function () {
           return function (e) {
-            l.textCopy(ne(e));
+            c.textCopy(re(e));
             var t = document.getElementById("copyed_popup");
-            if (!t) throw l.undefinedErr;
+            if (!t) throw c.undefinedErr;
             t.style.display = "block", setTimeout(function () {
               t.style.display = "none";
             }, 1e3);
           }(r);
-        }, ee(t, n, i, o), J(o, s), function (e) {
+        }, te(t, n, o, s), Q(s, l), function (e) {
           var _e11;
 
-          var a;
-          (_e11 = e, t = _e11.json, n = _e11.charalist, i = _e11.comment, r = _e11.convertedTLdata, o = _e11.now_place, a = _e11.TL_input, s = _e11.firstchara, _e11), g.setParam("TL", a), ee(t, n, i, o), te(r), J(o, s);
+          var i;
+          (_e11 = e, t = _e11.json, n = _e11.charalist, o = _e11.comment, r = _e11.convertedTLdata, s = _e11.now_place, i = _e11.TL_input, l = _e11.firstchara, _e11), v.setParam("TL", i), te(t, n, o, s), ne(r), Q(s, l);
         };
       }(function () {
         return "";
-      }, t, n, r, i, o, s),
-          u = function (e) {
+      }, t, n, r, o, s, l),
+          d = function (e) {
         var t = document.getElementById("editor");
-        if (!t) throw l.undefinedErr;
-        A().defineSimpleMode("kirafan-timeline", {
+        if (!t) throw c.undefinedErr;
+        N().defineSimpleMode("kirafan-timeline", {
           start: [{
             regex: /(mv_ls|move_list)[ \u3000]+/,
             token: "keyword",
@@ -11409,7 +11492,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         var n = new a(location.href).getParam("TL");
         var r = "";
         null !== typeof n && (r = n);
-        var i = A()(t, {
+        var i = N()(t, {
           mode: "kirafan-timeline",
           lineNumbers: !0,
           indentUnit: 4,
@@ -11421,7 +11504,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             "Ctrl-Space": "autocomplete"
           },
           hintOptions: {
-            hint: q
+            hint: J
           }
         });
         i.on("keydown", function (e, t) {
@@ -11435,12 +11518,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             if (t.key === n && (function (e, t) {
               var n = e.getCursor();
               e.replaceRange(t, n);
-            }(e, r), Y(e, -1)), t.key === r && Z(e) === r) {
-              if (l.isAndroid()) return;
-              Y(e, 1), t.preventDefault();
+            }(e, r), q(e, -1)), t.key === r && Y(e) === r) {
+              if (c.isAndroid()) return;
+              q(e, 1), t.preventDefault();
             }
 
-            "Backspace" === t.key && Z(e, -1) === n && Z(e, 1) === r && (function (e) {
+            "Backspace" === t.key && Y(e, -1) === n && Y(e, 1) === r && (function (e) {
               var _e$getCursor3 = e.getCursor(),
                   t = _e$getCursor3.line,
                   n = _e$getCursor3.ch;
@@ -11453,7 +11536,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                 ch: n + 1
               });
             }(e), t.preventDefault());
-          }), l.isPC() && t.key.match(/^\w$/) && e.showHint();
+          }), c.isPC() && t.key.match(/^\w$/) && e.showHint();
         });
 
         var o = {
@@ -11474,17 +11557,17 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           s();
         }), i.scrollTo(3, 3), s(), o;
       }(function (t, n) {
-        return e(t, n, c);
+        return e(t, n, u);
       });
 
-      return new re(u, c);
+      return new ie(d, u);
     }
 
     window.debug = {}, function (e) {
       e.onload = function () {
-        ie(function (e, t, n) {
+        oe(function (e, t, n) {
           return r = this, i = void 0, a = /*#__PURE__*/regeneratorRuntime.mark(function a() {
-            var r, i, o, a, u, h, _n9, _t17, _ref5, d, f, p, m, g, v, y, _ref9, b, x;
+            var r, i, o, a, d, h, _n10, _t17, _ref5, f, p, m, g, v, y, b, _ref9, x, w;
 
             return regeneratorRuntime.wrap(function a$(_context5) {
               while (1) {
@@ -11497,17 +11580,17 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                       break;
                     }
 
-                    throw l.undefinedErr;
+                    throw c.undefinedErr;
 
                   case 3:
                     h = !1;
                     _context5.prev = 4;
                     _context5.next = 7;
-                    return S(e);
+                    return _(e);
 
                   case 7:
-                    _n9 = _context5.sent;
-                    h = "python" === _n9.type, t.switch_editor(_n9.type), u = _n9.AST;
+                    _n10 = _context5.sent;
+                    h = "python" === _n10.type, t.switch_editor(_n10.type), d = _n10.AST;
                     _context5.next = 15;
                     break;
 
@@ -11526,55 +11609,55 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                     i.innerHTML = "", r.innerHTML = "";
                     _ref5 = function (e) {
                       var t, n, r, i;
-                      var o = new _(),
+                      var o = new M(),
                           a = {};
-                      var l = {};
-                      var u = {
+                      var c = {};
+                      var d = {
                         main: [],
                         set: []
                       };
                       var h = {};
-                      var d,
-                          f,
-                          p = 0,
-                          m = 1 / 0,
-                          g = 0;
+                      var f = 0;
+                      var p = l(1 / 0);
+                      var m,
+                          g,
+                          v = 0;
 
-                      var v = function v(e) {
-                        p += e;
+                      var y = function y(e) {
+                        f += e;
                       },
-                          y = function y() {
+                          b = function b() {
                         var _ref6 = function (e, t, n, r, i, o, s, a) {
                           var l;
-                          var u;
+                          var c;
 
-                          var h = function h() {
+                          var d = function d() {
                             for (var _len2 = arguments.length, t = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
                               t[_key2] = arguments[_key2];
                             }
 
-                            var _L = L.apply(void 0, [e, n, r, i, o, s, a].concat(t));
+                            var _O = O.apply(void 0, [e, n, r, i, o, s, a].concat(t));
 
-                            e = _L.TL;
-                            n = _L.convertedTLdata;
-                            r = _L.mode;
+                            e = _O.TL;
+                            n = _O.convertedTLdata;
+                            r = _O.mode;
                           };
 
                           for (; 0 !== e.current.length;) {
-                            var _n10 = e.ID_of_firstChara();
+                            var _n11 = e.ID_of_firstChara();
 
-                            if (void 0 === (null === (l = t[_n10]) || void 0 === l ? void 0 : l[0])) {
+                            if (void 0 === (null === (l = t[_n11]) || void 0 === l ? void 0 : l[0])) {
                               var _ret2 = function () {
                                 var e = {};
                                 Object.keys(t).forEach(function (n) {
                                   0 !== t[n].length && (e[n] = t[n]);
-                                }), 0 !== Object.keys(e).length && (u = "ⓘinfo :move_listに使われていないスキルがあります:" + JSON.stringify(Object.fromEntries(Object.entries(e).map(function (_ref7) {
+                                }), 0 !== Object.keys(e).length && (c = "ⓘinfo :move_listに使われていないスキルがあります:" + JSON.stringify(Object.fromEntries(Object.entries(e).map(function (_ref7) {
                                   var _ref8 = _slicedToArray(_ref7, 2),
                                       e = _ref8[0],
                                       t = _ref8[1];
 
                                   return [e, t.map(function (e) {
-                                    return e.value.length > 0 && 2 === e.mode && (e.value[0] = c[e.value[0]]), 1 === e.value.length && (e.value = e.value[0]), e.value;
+                                    return e.value.length > 0 && 2 === e.mode && (e.value[0] = u[e.value[0]]), 1 === e.value.length && (e.value = e.value[0]), e.value;
                                   })];
                                 }))).replaceAll('"', ""));
                                 return "break";
@@ -11583,7 +11666,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                               if (_ret2 === "break") break;
                             }
 
-                            var _r5 = t[_n10].shift();
+                            var _r5 = t[_n11].shift();
 
                             if (!_r5) throw Error("内部エラーの可能性があります。このメッセージが出たらお知らせお願いします。");
 
@@ -11594,26 +11677,26 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                                     _t18 = _e12.match(/^[a-zA-Z]/g),
                                     _i7 = _e12.match(/\d+(\.(\d+)?)?/g);
 
-                                if (_t18 && h(c.color, _t18[0]), !_i7) throw Error("硬直が見つかりませんでした");
-                                h(c.order, _n10, _i7[0]);
+                                if (_t18 && d(u.color, _t18[0]), !_i7) throw Error("硬直が見つかりませんでした");
+                                d(u.order, _n11, _i7[0]);
                               } else if (3 === _r5.mode) {
                                 var _r5$value2 = _slicedToArray(_r5.value, 1),
                                     _e13 = _r5$value2[0],
                                     _t19 = _e13.match(/^[a-zA-Z]/g),
                                     _i8 = _e13.match(/\d+/g);
 
-                                if (_t19 && h(c.color, _t19[0]), !_i8) throw Error("硬直値が見つかりませんでした");
-                                h(c.action, _n10, _i8[0]);
+                                if (_t19 && d(u.color, _t19[0]), !_i8) throw Error("硬直値が見つかりませんでした");
+                                d(u.action, _n11, _i8[0]);
                               } else if (0 === _r5.mode) {
                                 var _r5$value3 = _slicedToArray(_r5.value, 3),
                                     _e14 = _r5$value3[0],
                                     _i9 = _r5$value3[1],
                                     _o4 = _r5$value3[2];
 
-                                h(c.switch, _n10, _e14, _i9, _o4 || "0"), t[_e14] = t[_n10], t[_n10] = [];
+                                d(u.switch, _n11, _e14, _i9, _o4 || "0"), t[_e14] = t[_n11], t[_n11] = [];
                               } else {
                                 if (2 !== _r5.mode) throw Error("テキストのパースエラー");
-                                h.apply(void 0, _toConsumableArray(_r5.value));
+                                d.apply(void 0, _toConsumableArray(_r5.value));
                               }
                             } catch (e) {
                               throw Error(e + ":  " + JSON.stringify(_r5.value) + " ");
@@ -11623,103 +11706,103 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                           return {
                             TL: e,
                             chara_move_list: t,
-                            info: u
+                            info: c
                           };
-                        }(o, a, u, g, h, l, m, v);
+                        }(o, a, d, v, h, c, p, y);
 
                         o = _ref6.TL;
-                        d = _ref6.info;
+                        m = _ref6.info;
                         a = _ref6.chara_move_list;
                       };
 
                       try {
-                        var _loop5 = function _loop5(_d3) {
-                          var f = null === (t = e[_d3]) || void 0 === t ? void 0 : t[0],
-                              p = null === (n = e[_d3]) || void 0 === n ? void 0 : n[1],
-                              b = null === (r = e[_d3]) || void 0 === r ? void 0 : r[2],
-                              x = null === (i = e[_d3]) || void 0 === i ? void 0 : i[3];
-                          s(g).case([0], function () {
-                            s(f).case(c.set, function () {
-                              var t = p.toString(),
-                                  n = Number(b),
+                        var _loop5 = function _loop5(_l2) {
+                          var f = null === (t = e[_l2]) || void 0 === t ? void 0 : t[0],
+                              m = null === (n = e[_l2]) || void 0 === n ? void 0 : n[1],
+                              g = null === (r = e[_l2]) || void 0 === r ? void 0 : r[2],
+                              x = null === (i = e[_l2]) || void 0 === i ? void 0 : i[3];
+                          s(v).case([0], function () {
+                            s(f).case(u.set, function () {
+                              var t = m.toString(),
+                                  n = Number(g),
                                   r = Number(x) || 0;
-                              l[t] = new M(t, n, r), o.setChara(t, l[t].initOrderValue()), 0 === u.set.length ? u.set = [e[_d3]] : u.set.push(e[_d3]);
-                            }).case(c.countTTK, function () {
-                              e[_d3].slice(1).forEach(function (e) {
+                              c[t] = new L(t, n, r), o.setChara(t, c[t].initOrderValue()), 0 === d.set.length ? d.set = [e[_l2]] : d.set.push(e[_l2]);
+                            }).case(u.countTTK, function () {
+                              e[_l2].slice(1).forEach(function (e) {
                                 "string" == typeof e && (h[e] = !0);
                               });
-                            }).case(c.countTTKuntil, function () {
-                              m = Number(p) || 1 / 0;
-                            }).case(c.start, function () {
-                              g = 1, o.inited();
-                            }).case(c.start_sort, function () {
-                              g = 2, o.inited();
-                            }).case(c.move_list, function () {
-                              g = 2, o.inited(), _d3--;
+                            }).case(u.countTTKuntil, function () {
+                              p.set(Number(m) || 1 / 0);
+                            }).case(u.start, function () {
+                              v = 1, o.inited();
+                            }).case(u.start_sort, function () {
+                              v = 2, o.inited();
+                            }).case(u.move_list, function () {
+                              v = 2, o.inited(), _l2--;
                             }).default(function () {
                               throw Error("need 'start'");
                             });
                           }).case(1, function () {
-                            var t = e[_d3];
-                            if (t[0] === c.move_list) throw Error("start_sort ~ end_sort内にmove_listを書いてください");
+                            var t = e[_l2];
+                            if (t[0] === u.move_list) throw Error("start_sort ~ end_sort内にmove_listを書いてください");
 
-                            var _L2 = L.apply(void 0, [o, u, g, h, l, m, v].concat(_toConsumableArray(t)));
+                            var _O2 = O.apply(void 0, [o, d, v, h, c, p, y].concat(_toConsumableArray(t)));
 
-                            g = _L2.mode;
-                            u = _L2.convertedTLdata;
-                            o = _L2.TL;
+                            v = _O2.mode;
+                            d = _O2.convertedTLdata;
+                            o = _O2.TL;
                           }).case(2, function () {
-                            s(f).case(c.move_list, function () {
-                              var e = b;
-                              a[p] = e;
-                            }).case(c.end_sort, function () {
-                              y(), g = 4;
+                            s(f).case(u.move_list, function () {
+                              var e = g;
+                              a[m] = e;
+                            }).case(u.end_sort, function () {
+                              b(), v = 4;
                             }).default(function () {
                               throw Error("no command found:「" + f + "」");
                             });
                           }).case(4, function () {
-                            s(f).case(c.start, function () {
-                              g = 1;
-                            }).case(c.start_sort, function () {
-                              g = 2;
+                            s(f).case(u.start, function () {
+                              v = 1;
+                            }).case(u.start_sort, function () {
+                              v = 2;
                             }).default(function () {
                               throw Error("need 'start'");
                             });
                           }).default(function () {
                             throw Error("内部エラー");
                           });
-                          _d2 = _d3;
+                          _l = _l2;
                         };
 
-                        for (var _d2 = 0; _d2 < e.length; _d2++) {
-                          _loop5(_d2);
+                        for (var _l = 0; _l < e.length; _l++) {
+                          _loop5(_l);
                         }
 
-                        0 === g && (o.inited(), g = 2), 2 === g && y();
+                        0 === v && (o.inited(), v = 2), 2 === v && b();
                       } catch (e) {
-                        console.error(e), f = e;
+                        console.error(e), g = e;
                       }
 
                       return {
-                        info: d,
-                        error: f,
+                        info: m,
+                        error: g,
                         TL: o,
-                        ttk: p,
-                        convertedTLdata: u,
-                        chara_list: l,
+                        ttk: f,
+                        convertedTLdata: d,
+                        chara_list: c,
                         count_ttk_ls: h
                       };
-                    }(u), d = _ref5.chara_list, f = _ref5.count_ttk_ls, p = _ref5.TL, m = _ref5.ttk, g = _ref5.info, v = _ref5.error, y = _ref5.convertedTLdata;
+                    }(d), f = _ref5.chara_list, p = _ref5.count_ttk_ls, m = _ref5.TL, g = _ref5.ttk, v = _ref5.info, y = _ref5.error, b = _ref5.convertedTLdata;
 
-                    if (!v) {
+                    if (!y) {
                       _context5.next = 19;
                       break;
                     }
 
-                    return _context5.abrupt("return", void (r.innerHTML = v));
+                    return _context5.abrupt("return", void (r.innerHTML = y));
 
                   case 19:
-                    g && (i.innerHTML = g);
+                    v && (i.innerHTML = v);
                     _ref9 = function (e, t) {
                       var n = [];
 
@@ -11751,20 +11834,20 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
                         outputTL: r,
                         chara_array: n
                       };
-                    }(d, p), b = _ref9.outputTL, x = _ref9.chara_array;
+                    }(f, m), x = _ref9.outputTL, w = _ref9.chara_array;
                     n({
-                      json: b,
-                      charalist: x,
-                      convertedTLdata: y,
-                      comment: p.comment,
-                      now_place: p.place_of_currentTimeline + 1,
+                      json: x,
+                      charalist: w,
+                      convertedTLdata: b,
+                      comment: m.comment,
+                      now_place: m.place_of_currentTimeline + 1,
                       TL_input: e,
-                      firstchara: p.ID_of_firstChara()
+                      firstchara: m.ID_of_firstChara()
                     }), document.querySelectorAll(".ttk").forEach(function (e) {
-                      0 === Object.values(f).filter(function (e) {
+                      0 === Object.values(p).filter(function (e) {
                         return e;
                       }).length ? e.classList.add("display-none") : (e.classList.remove("display-none"), document.querySelectorAll(".ttk-value").forEach(function (e) {
-                        e.textContent = String(m);
+                        e.textContent = String(g);
                       }));
                     });
 

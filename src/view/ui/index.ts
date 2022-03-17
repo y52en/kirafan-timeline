@@ -2,6 +2,7 @@ import lib, { htmltag, OperateURL } from "../../lib";
 import {
   obj_update_data,
   type_convertedTLdata,
+  type_count_ttk_ls,
   type_tableData_json,
   type_tl_comment,
 } from "../../types";
@@ -70,7 +71,7 @@ export function init(
 
   const _url = new OperateURL(undefined, false);
   const update_data = (data: obj_update_data) => {
-    let TL_input;
+    let TL_input, count_ttk_ls, ttk;
     ({
       json,
       charalist,
@@ -79,11 +80,13 @@ export function init(
       now_place,
       TL_input,
       firstchara,
+      count_ttk_ls,
+      ttk,
     } = data);
     _url.setParam("TL", TL_input);
     outputAsTable(json, charalist, comment, now_place);
     printConvertedTL(convertedTLdata);
-
+    show_ttk(count_ttk_ls, ttk);
     updateInfo(now_place, firstchara);
   };
 
@@ -118,6 +121,19 @@ function save() {
     }
     lib.changeTitle(title);
   }
+}
+
+function show_ttk(count_ttk_ls: type_count_ttk_ls, ttk: number) {
+  document.querySelectorAll(".ttk").forEach((elm) => {
+    if (Object.values(count_ttk_ls).filter((x) => x).length === 0) {
+      elm.classList.add("display-none");
+    } else {
+      elm.classList.remove("display-none");
+      document.querySelectorAll(".ttk-value").forEach((elm) => {
+        elm.textContent = String(ttk);
+      });
+    }
+  });
 }
 
 function outputAsTable(
@@ -434,7 +450,15 @@ set("media",124)
 mv_ls(syaro,[m.command(bp,syaro,-200),10,99,m.order(10.66)])
 mv_ls(media,[d-80,80,69,m.order(c-14.5),["I",140],60])
 
-    </textarea>`,
+    </textarea><br>`,
+    },
+    {
+      title: "ttk_stop",
+      text: ["とっておきカウントストップ"],
+    },
+    {
+      title: "nomove",
+      text: ["キャラの行動を止める(スキップ)"],
     },
   ];
 

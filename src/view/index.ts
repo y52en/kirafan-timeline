@@ -12,7 +12,8 @@ import { init as ui_init } from "./ui";
 class wrapper {
   constructor(
     private _editor_init: type_editor_init,
-    private _update_data: (data: obj_update_data) => void
+    private _update_data: (data: obj_update_data) => void,
+    // private _show_ttk: (is_show: boolean, ttk: number) => void
   ) {
     this._editor_init = _editor_init;
     this._update_data = _update_data;
@@ -25,6 +26,10 @@ class wrapper {
   update_data(obj: obj_update_data) {
     this._update_data(obj);
   }
+
+  // show_ttk(is_show: boolean, ttk: number) {
+  //   this._show_ttk(is_show, ttk);
+  // }
 }
 
 export function init(

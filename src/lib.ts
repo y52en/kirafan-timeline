@@ -23,7 +23,7 @@ function changeTitle(title: string): void {
   }
 }
 // eslint-disable-next-line
-function objectCopy(obj: object | any[]): object | any[] {
+function objectCopy<T>(obj: T): T {
   return clonedeep(obj);
 }
 
@@ -106,7 +106,7 @@ function match<T>(val: T, ismatch?: symbol): match_result<T> {
 
 function _matcher<T>(
   val: T,
-  matcher_val: T,
+  matcher_val: T|T[],
   fn: () => void,
   ismatch?: symbol
 ): match_result<T> {

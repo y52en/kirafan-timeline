@@ -21,6 +21,7 @@ export enum command {
   add,
   nomove,
   ttk_stop,
+  ttkttk,
 }
 
 export const commandStr2Enum = (() => {
@@ -46,6 +47,7 @@ export const commandStr2Enum = (() => {
     "add",
     "nomove",
     "ttk_stop",
+    "ttkttk",
   ];
   command_list.forEach((x) => {
     // @ts-ignore
@@ -74,10 +76,28 @@ export const commandStr2Enum = (() => {
 export interface lexicallyAnalyzed {
   type: lexicallyAnalyzeStr;
   value: string;
+  addtional_info: addtional_info;
 }
 
-export type AST_command = [command, ...string[]];
-export type AST_mvls = [command.move_list, string, move_list[]];
+export type _addtional_info<T> = {
+  value: T;
+  
+};
+
+export type AST_command = {
+  value: [Exclude<command, command.move_list>, ...string[]];
+  option: {
+    [s: string]: string;
+  };
+  mv_ls: false;
+  addtional_info: addtional_info;
+};
+
+export type AST_mvls = {
+  mv_ls: true;
+  value: [command.move_list, string, move_list[]];
+  addtional_info: addtional_info;
+};
 export type AST = AST_command | AST_mvls;
 /*  [
             [set,syaro,144],
@@ -97,19 +117,27 @@ export const enum mvls_mode {
   action,
 }
 export interface mvls_normal {
-  mode: mvls_mode.action | mvls_mode.order | mvls_mode.switch;
+  mode: Exclude<mvls_mode, mvls_mode.command>;
+  // mode: mvls_mode.action | mvls_mode.order | mvls_mode.switch;
+
   value: string[];
+  option: {
+    [s: string]: string;
+  };
+  addtional_info: addtional_info;
 }
 
 export interface mvls_command {
   mode: mvls_mode.command;
   value: AST_command;
+  addtional_info: addtional_info;
 }
 
 export type move_list = mvls_normal | mvls_command;
 
 export const enum lexicallyAnalyzeStr {
   commma,
+  comment,
   new_line,
   braceL,
   braceR,
@@ -120,6 +148,7 @@ export const enum lexicallyAnalyzeStr {
   asterisk,
   reserved,
   word,
+  equal,
 }
 
 export const enum TL_type {
@@ -130,6 +159,7 @@ export interface TL_chara {
   timeline_OrderValue: number;
   id: string;
   type: TL_type.chara;
+  nomove: boolean;
 }
 
 export type card_event = (id: string, OrderValue: number, time: number) => void;
@@ -141,6 +171,7 @@ export interface TL_skillcard {
   timeline_OrderValue: number;
   type: TL_type.skillcard;
   event: card_event;
+  nomove: false;
 }
 
 export interface buff {
@@ -217,9 +248,23 @@ export interface obj_update_data {
   now_place: number;
   TL_input: string;
   firstchara: string;
+  count_ttk_ls: type_count_ttk_ls;
+  ttk: number;
 }
 
 export interface type_state<T> {
   get: () => T;
   set: (val: T) => void;
 }
+
+// export enum value_info_type {
+//   colon
+// }
+
+// export type value_with_colon = {type: value_info_type.colon, value: [string,string]};
+
+export type command_array = string[];
+
+export type addtional_info = {
+  where: [number, number];
+};

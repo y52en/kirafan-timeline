@@ -1,5 +1,12 @@
 import lib from "../lib";
-import { card_event, TL_chara, TL_obj, TL_type, buff, type_tl_comment } from "../types";
+import {
+  card_event,
+  TL_chara,
+  TL_obj,
+  TL_type,
+  buff,
+  type_tl_comment,
+} from "../types";
 
 export class timeline {
   current: TL_obj[];
@@ -44,6 +51,42 @@ export class timeline {
     this.nextturn();
   }
 
+  moveTTK(charas: string[], OrderValues: number[]): void {
+    if (charas.length > 3 || charas.length <= 0) {
+      throw new Error("移動するキャラが4人以上あるか、1人もありません");
+    }
+    if (charas.length !== OrderValues.length) {
+      throw new Error("charasとOrderValuesの長さが一致しません");
+    }
+
+    let nextturn = false;
+
+    for (let i = 0; i < charas.length; i++) {
+      if (this.get_chara_by_ID(charas[i]).type !== TL_type.chara) {
+        throw new Error("とっておきの対象にスキルカードは指定できません");
+      }
+      for (let j = i + 1; j < charas.length; j++) {
+        if (charas[i] === charas[j]) {
+          throw new Error("同じキャラが指定されています");
+        }
+      }
+      if (this.firstChara.id === charas[i]) {
+        nextturn = true;
+      }
+    }
+
+    const first_chara_ov = this.OrderValue_of_firstChara();
+
+
+    charas.forEach((id, i) => {
+      this.get_chara_by_ID(id).nomove = true;
+      this.pushChara(id, first_chara_ov + OrderValues[i]);
+    });
+    if(nextturn) {
+      this.nextturn();
+    }
+  }
+
   setColor(chara: string, place: number): void {
     if (this.color) {
       this.comment.push(["color", chara, place, this.color]);
@@ -82,11 +125,23 @@ export class timeline {
   pushChara(id: string, calculated_moved_OrderValue: number): void {
     let tmp_movechara;
     try {
-      tmp_movechara = lib.objectCopy(this.get_chara_by_ID(id)) as TL_obj;
+      tmp_movechara = lib.objectCopy(this.get_chara_by_ID(id));
     } catch {
-      tmp_movechara = { id } as TL_chara;
+      tmp_movechara = {
+        id,
+        nomove: false,
+        timeline_OrderValue: calculated_moved_OrderValue,
+        type: TL_type.chara,
+      } as TL_chara;
     }
+    this._pushChara(id, calculated_moved_OrderValue, tmp_movechara);
+  }
 
+  _pushChara(
+    id: string,
+    calculated_moved_OrderValue: number,
+    tmp_movechara: TL_obj
+  ): void {
     tmp_movechara.timeline_OrderValue = calculated_moved_OrderValue;
 
     const place_to_moved = this.place_to_moved(calculated_moved_OrderValue);
@@ -98,6 +153,7 @@ export class timeline {
       id: id,
       timeline_OrderValue: initOrderValue,
       type: TL_type.chara,
+      nomove: false,
     };
     this.current.splice(this.place_of_currentTimeline, 0, chara);
   }
@@ -136,6 +192,7 @@ export class timeline {
         timeline_OrderValue: target_ov,
         OrderValue,
         event,
+        nomove: false,
       });
 
       this.cardData.push([this.place_of_currentTimeline, id]);
@@ -209,6 +266,8 @@ export class timeline {
       } else {
         this.move(this.firstChara.OrderValue, this.ID_of_firstChara(), false);
       }
+    }else if(this.firstChara.nomove){
+      this.nextturn();
     }
   }
 
@@ -222,7 +281,7 @@ export class timeline {
 
   placeToChara(id: string): number {
     for (let i = this.place_of_currentTimeline; i < this.current.length; i++) {
-      if (this.current[i].id === id) {
+      if (this.current[i].id === id && !this.current[i].nomove ) {
         return i;
       }
     }
@@ -235,13 +294,21 @@ export class chara {
   SPD: number;
   _SPD_buff: buff[];
   LoadFactorReduce: number;
+  ttk_val: number;
 
-  constructor(id: string, SPD: number, SPD_buff: number, LoadFactorReduce = 0) {
+  constructor(
+    id: string,
+    SPD: number,
+    SPD_buff: number,
+    LoadFactorReduce = 0,
+    ttk_val: number
+  ) {
     this.id = id;
     this.SPD = SPD;
     this._SPD_buff = [];
     this.SPD_buff = SPD_buff;
     this.LoadFactorReduce = LoadFactorReduce;
+    this.ttk_val = ttk_val;
   }
 
   calculateOrderValue(LoadFactor: number, LoadFactorReduce = 0): number {
@@ -286,5 +353,13 @@ export class chara {
         return buff;
       })
       .filter((buff) => buff.turn > 0);
+  }
+
+  getTTK(consumeBuffTurn: boolean): number {
+    const output = this.calculateOrderValue(this.ttk_val);
+    if (consumeBuffTurn) {
+      this.nextTurn();
+    }
+    return output;
   }
 }

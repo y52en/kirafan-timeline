@@ -165,6 +165,10 @@ export function init(
     ];
 
     bracket.forEach(([open, close]) => {
+      if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) {
+        return;
+      }
+
       if (e.key === open) {
         insertString(cm, close);
         moveCursor(cm, -1);

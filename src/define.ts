@@ -67,6 +67,9 @@ function getCharge(load: number, isCard: boolean): number {
   return 0;
 }
 
+const ttk_val = 125;
+
 export default {
   getCharge,
+  ttk_val
 };
