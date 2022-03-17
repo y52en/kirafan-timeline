@@ -286,7 +286,7 @@ function mainMode(
     mode = mode_list.waiting_mode;
   } else if (load_text_command === command.ttk_stop) {
     ttk_count_until.set(TL.place_of_currentTimeline);
-  } else if (load_text_command === command.ttkttk) {
+  } else if (load_text_command === command.move_ttk) {
     const charas = arg.value.slice(1) as string[];
     const ttk = charas.map((id) => {
       return chara_list[id].getTTK(false);

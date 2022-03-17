@@ -134,11 +134,10 @@ export class timeline {
         type: TL_type.chara,
       } as TL_chara;
     }
-    this._pushChara(id, calculated_moved_OrderValue, tmp_movechara);
+    this._pushChara(calculated_moved_OrderValue, tmp_movechara);
   }
 
   _pushChara(
-    id: string,
     calculated_moved_OrderValue: number,
     tmp_movechara: TL_obj
   ): void {

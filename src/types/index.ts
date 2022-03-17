@@ -21,7 +21,7 @@ export enum command {
   add,
   nomove,
   ttk_stop,
-  ttkttk,
+  move_ttk,
 }
 
 export const commandStr2Enum = (() => {
@@ -47,7 +47,7 @@ export const commandStr2Enum = (() => {
     "add",
     "nomove",
     "ttk_stop",
-    "ttkttk",
+    "move_ttk",
   ];
   command_list.forEach((x) => {
     // @ts-ignore
