@@ -95,11 +95,12 @@ function sorting(
 
     const _mainmode = (
       _command: Exclude<command, command.move_list>,
+      option: { [s: string]: string } = {},
       ...val: string[]
     ) =>
       _mainMode({
         value: [_command, ...val],
-        option: {},
+        option,
         mv_ls: false,
 
         addtional_info: {
@@ -113,9 +114,9 @@ function sorting(
         const Color = Color_OrderValue.match(/^[a-zA-Z]/g);
         const OrderValue = Color_OrderValue.match(/\d+(\.(\d+)?)?/g);
 
-        if (Color) _mainmode(command.color, Color[0]);
+        if (Color) _mainmode(command.color,input.option, Color[0]);
         if (OrderValue) {
-          _mainmode(command.order, id, OrderValue[0]);
+          _mainmode(command.order, input.option, id, OrderValue[0]);
         } else {
           throw Error("硬直が見つかりませんでした");
         }
@@ -125,15 +126,15 @@ function sorting(
         const Color = Color_LoadFactor.match(/^[a-zA-Z]/g);
         const LoadFactor = Color_LoadFactor.match(/\d+/g);
 
-        if (Color) _mainmode(command.color, Color[0]);
+        if (Color) _mainmode(command.color, input.option, Color[0]);
         if (LoadFactor) {
-          _mainmode(command.action, id, LoadFactor[0]);
+          _mainmode(command.action, input.option, id, LoadFactor[0]);
         } else {
           throw Error("硬直値が見つかりませんでした");
         }
       } else if (input.mode === mvls_mode.switch) {
         const [to_name, SPD, buff] = input.value;
-        _mainmode(command.switch, id, to_name, SPD, buff || "0");
+        _mainmode(command.switch, input.option, id, to_name, SPD, buff || "0");
         chara_move_list[to_name] = chara_move_list[id];
         chara_move_list[id] = [];
       } else if (input.mode === mvls_mode.command) {
@@ -484,7 +485,6 @@ export function execTL(_parsed_tldata: AST[], str: string): execTL_result {
       exec_mvls();
     }
   } catch (e) {
-    console.error(e);
     error = e as string;
     // +
     // `「${str.substring(..._parsed_tldata[i].addtional_info.where)}」`;

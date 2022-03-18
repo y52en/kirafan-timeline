@@ -58,7 +58,6 @@ window.debug = {};
         } else {
           err.innerHTML = String(e);
         }
-        console.error("e :>> ", e);
         info_elm.innerHTML = "";
         return;
         // throw e;
