@@ -1,6 +1,9 @@
 import define from "../define";
 import { match, state } from "../lib";
 import {
+  arg_num,
+  arg_num_to_arg,
+  arg_num_to_arg_u,
   AST,
   AST_command,
   command,
@@ -8,6 +11,7 @@ import {
   mode_list,
   move_list,
   mvls_mode,
+  type_arg,
   type_chara_list,
   type_chara_move_list,
   type_convertedTLdata,
@@ -16,6 +20,25 @@ import {
   type_tableData_json,
 } from "../types";
 import { timeline, chara } from "./timeline";
+
+type arg_taple<T extends arg_num, U extends arg_num> = type_arg<
+  arg_num_to_arg<T>,
+  arg_num_to_arg_u<U>
+>;
+function arg2taple<T extends arg_num, U extends arg_num, X>(
+  arg: X[],
+  arg_len: T,
+  option: U
+): arg_taple<T, U> {
+  if (arg.length < arg_len) {
+    throw new Error(`引数不足です: 必要引数:${arg_len} , オプション引数:${option}`);
+  }
+  const output: [...(X | undefined)[]] = [...arg.slice(0, arg_len + option)];
+  for (let i = arg.length; i < arg_len + option; i++) {
+    output.push(undefined);
+  }
+  return output as type_arg<arg_num_to_arg<T>, arg_num_to_arg_u<U>>;
+}
 
 function sorting(
   TL: timeline,
@@ -32,89 +55,88 @@ function sorting(
 
   let input;
 
-  const _mainMode = (_arg: AST_command) => {
-    ({ TL, convertedTLdata, mode } = mainMode(
-      TL,
-      convertedTLdata,
-      mode,
-      count_ttk_ls,
-      chara_list,
-      ttk_count_until,
-      call_add_ttk,
-      _arg
-    ));
-  };
+  try {
+    const _mainMode = (_arg: AST_command) => {
+      ({ TL, convertedTLdata, mode } = mainMode(
+        TL,
+        convertedTLdata,
+        mode,
+        count_ttk_ls,
+        chara_list,
+        ttk_count_until,
+        call_add_ttk,
+        _arg
+      ));
+    };
 
-  while (true) {
-    if (TL.current.length === 0) {
-      break;
-    }
-    const id = TL.ID_of_firstChara();
-    if (chara_move_list[id]?.[0] === undefined) {
-      const output: { [s: string]: move_list[] } = {};
-      Object.keys(chara_move_list).forEach(function (key) {
-        if (chara_move_list[key].length !== 0) {
-          output[key] = chara_move_list[key];
-        }
-      });
-      if (Object.keys(output).length !== 0) {
-        info =
-          "ⓘinfo :move_listに使われていないスキルがあります:" +
-          JSON.stringify(
-            Object.fromEntries(
-              Object.entries(output).map(([key, value]) => [
-                key,
-                // @ts-ignore
-                value.map((x: { value: string[] | AST_command["value"] }) => {
-                  if (x.value.length > 0) {
-                    // @ts-ignore
-                    if (x.mode === mvls_mode.command) {
-                      // @ts-ignore
-                      x.value[0] = command[x.value[0]];
-                    }
-                  }
-                  if (x.value.length === 1) {
-                    // @ts-ignore
-                    x.value = x.value[0];
-                  }
-                  return x.value;
-                }),
-              ])
-            )
-          ).replaceAll('"', "");
+    while (true) {
+      if (TL.current.length === 0) {
+        break;
       }
-      break;
-    }
+      const id = TL.ID_of_firstChara();
+      if (chara_move_list[id]?.[0] === undefined) {
+        const output: { [s: string]: move_list[] } = {};
+        Object.keys(chara_move_list).forEach(function (key) {
+          if (chara_move_list[key].length !== 0) {
+            output[key] = chara_move_list[key];
+          }
+        });
+        if (Object.keys(output).length !== 0) {
+          info =
+            "ⓘinfo :move_listに使われていないスキルがあります:" +
+            JSON.stringify(
+              Object.fromEntries(
+                Object.entries(output).map(([key, value]) => [
+                  key,
+                  // @ts-ignore
+                  value.map((x: { value: string[] | AST_command["value"] }) => {
+                    if (x.value.length > 0) {
+                      // @ts-ignore
+                      if (x.mode === mvls_mode.command) {
+                        // @ts-ignore
+                        x.value[0] = command[x.value[0]];
+                      }
+                    }
+                    if (x.value.length === 1) {
+                      // @ts-ignore
+                      x.value = x.value[0];
+                    }
+                    return x.value;
+                  }),
+                ])
+              )
+            ).replaceAll('"', "");
+        }
+        break;
+      }
+      input = chara_move_list[id].shift();
 
-    input = chara_move_list[id].shift();
+      if (!input)
+        throw Error(
+          "内部エラーの可能性があります。このメッセージが出たらお知らせお願いします。"
+        );
 
-    if (!input)
-      throw Error(
-        "内部エラーの可能性があります。このメッセージが出たらお知らせお願いします。"
-      );
+      const _mainmode = (
+        _command: Exclude<command, command.move_list>,
+        option: { [s: string]: string } = {},
+        ...val: string[]
+      ) =>
+        _mainMode({
+          value: [_command, ...val],
+          option,
+          mv_ls: false,
 
-    const _mainmode = (
-      _command: Exclude<command, command.move_list>,
-      option: { [s: string]: string } = {},
-      ...val: string[]
-    ) =>
-      _mainMode({
-        value: [_command, ...val],
-        option,
-        mv_ls: false,
+          addtional_info: {
+            where: [0, 0],
+          },
+        });
 
-        addtional_info: {
-          where: [0, 0],
-        },
-      });
-
-    try {
       if (input.mode === mvls_mode.order) {
         const [Color_OrderValue] = input.value;
         const Color = Color_OrderValue.match(/^[a-zA-Z]/g);
         const OrderValue = Color_OrderValue.match(/\d+(\.(\d+)?)?/g);
 
-        if (Color) _mainmode(command.color,input.option, Color[0]);
+        if (Color) _mainmode(command.color, input.option, Color[0]);
         if (OrderValue) {
           _mainmode(command.order, input.option, id, OrderValue[0]);
         } else {
@@ -142,10 +164,15 @@ function sorting(
       } else {
         throw Error("テキストのパースエラー");
       }
-    } catch (e) {
+    }
+  } catch (e) {
+    if (input) {
       throw Error(
         `「${input_str.substring(...input.addtional_info.where)}」 : ${e}`
       );
+    } else {
+      console.log('e is undefined');
+      throw Error(e as string);
     }
   }
 
@@ -166,13 +193,12 @@ function mainMode(
   call_add_ttk: (ttk: number) => void,
   arg: AST_command
 ) {
-  const [
-    load_text_command,
-    load_text_arg1,
-    load_text_arg2,
-    load_text_arg3,
-    load_text_arg4,
-  ] = arg.value;
+  const [load_text_command, ...arg_string] = arg.value;
+  const get_arg = <T extends arg_num, U extends arg_num>(
+    arg_len: T,
+    option: U
+  ): arg_taple<T, U> => arg2taple(arg_string, arg_len, option);
+
   const add_ttk = (n: number) => {
     const ttk_until = ttk_count_until.get();
     if (TL.place_of_currentTimeline < ttk_until) {
@@ -190,45 +216,46 @@ function mainMode(
     convertedTLdata.main.push(tmp as string[]);
   }
 
-  const str2num_inf = (n: string) =>
+  const str2num_inf = (n: string | undefined) =>
     Number.isNaN(Number(n)) ? Infinity : Number(n);
 
   if (load_text_command === command.buffset) {
-    const id = load_text_arg1;
-    const buff = Number(load_text_arg2) || 0;
-    const turn = str2num_inf(load_text_arg3);
+    const [id, _buff, _turn] = get_arg(2, 1);
+    const buff = Number(_buff) || 0;
+    const turn = str2num_inf(_turn);
     chara_list[id]._SPD_buff = [];
     chara_list[id].setSPDbuff(buff, turn);
   } else if (load_text_command === command.buffadd) {
-    const id = load_text_arg1;
-    const buff = Number(load_text_arg2) || 0;
-    const turn = str2num_inf(load_text_arg3);
+    const [id, _buff, _turn] = get_arg(2, 1);
+    const buff = Number(_buff) || 0;
+    const turn = str2num_inf(_turn);
     chara_list[id].setSPDbuff(buff, turn);
   } else if (load_text_command === command.buffminus) {
-    const id = load_text_arg1;
-    const buff = Number(load_text_arg2) || 0;
-    const turn = str2num_inf(load_text_arg3);
+    const [id, _buff, _turn] = get_arg(2, 1);
+    const buff = Number(_buff) || 0;
+    const turn = str2num_inf(_turn);
     chara_list[id].setSPDbuff(-buff, turn);
   } else if (load_text_command === command.add) {
-    const id = load_text_arg1;
-    const SPD = Number(load_text_arg2);
-    const buff = Number(load_text_arg3) || 0;
+    const [id, _SPD, _buff] = get_arg(2, 1);
+    const SPD = Number(_SPD);
+    const buff = Number(_buff) || 0;
     chara_list[id] = new chara(id, SPD, buff, 0, define.ttk_val);
     TL.addChara(id, chara_list[id].initOrderValue());
   } else if (
     load_text_command === command.move ||
     load_text_command === command.action
   ) {
+    const [arg1, arg2, arg3] = get_arg(2, 1);
     let id, LoadFactor;
     if (load_text_command === command.move) {
-      LoadFactor = Number(load_text_arg1);
-      id = load_text_arg2;
+      LoadFactor = Number(arg1);
+      id = arg2;
     } else {
-      id = load_text_arg1;
-      LoadFactor = Number(load_text_arg2);
+      id = arg1;
+      LoadFactor = Number(arg2);
     }
 
-    const canMoveWithout1stChara = load_text_arg3 === "true";
+    const canMoveWithout1stChara = arg3 === "true";
     if (count_ttk_ls[id]) {
       add_ttk(define.getCharge(LoadFactor, false));
     }
@@ -239,16 +266,15 @@ function mainMode(
     );
     chara_list[id].nextTurn();
   } else if (load_text_command === command.order) {
-    const id = load_text_arg1;
-    const ordervalue = Number(load_text_arg2);
+    const [id, _order] = get_arg(2, 0);
+    const ordervalue = Number(_order) || 0;
 
     TL.move(ordervalue, id, false);
     chara_list[id].nextTurn();
   } else if (load_text_command === command.switch) {
-    const to = load_text_arg1;
-    const from = load_text_arg2;
-    const SPD = Number(load_text_arg3);
-    const buff = Number(load_text_arg4) || 0;
+    const [to, from, _SPD, _buff] = get_arg(3, 1);
+    const SPD = Number(_SPD);
+    const buff = Number(_buff) || 0;
     TL.switchChara(to, from);
     chara_list[from] = new chara(
       from,
@@ -258,17 +284,13 @@ function mainMode(
       Number(arg?.option?.ttk ?? define.ttk_val)
     );
   } else if (load_text_command === command.color) {
-    const color = load_text_arg1;
+    const [color] = get_arg(1, 0);
     TL.color = color;
   } else if (load_text_command === command.skillcard) {
-    const name = load_text_arg1;
-    const spd = Number(load_text_arg2);
-    const LoadFactor = Number(load_text_arg3);
-    const time = Number(load_text_arg4);
-
-    if ([spd, LoadFactor, time].includes(NaN)) {
-      throw Error("引数不足です");
-    }
+    const [name, _spd, _LoadFactor, _time] = get_arg(4, 0);
+    const spd = Number(_spd);
+    const LoadFactor = Number(_LoadFactor);
+    const time = Number(_time);
 
     const skillcard = new chara(name, spd, 0, 0, 0);
     chara_list[name] = skillcard;
@@ -277,9 +299,7 @@ function mainMode(
       skillcard.calculateOrderValue(LoadFactor),
       time,
       (id, _, _i) =>
-        add_ttk(
-          count_ttk_ls[id] ? define.getCharge(Number(load_text_arg3), true) : 0
-        )
+        add_ttk(count_ttk_ls[id] ? define.getCharge(LoadFactor, true) : 0)
     );
   } else if (load_text_command === command.nomove) {
     TL.skip();
@@ -342,10 +362,15 @@ export function execTL(_parsed_tldata: AST[], str: string): execTL_result {
 
   try {
     for (i = 0; i < _parsed_tldata.length; i++) {
-      const load_text_command = parsed_tldata[i]?.[0] as command;
-      const load_text_arg1 = parsed_tldata[i]?.[1];
-      const load_text_arg2 = parsed_tldata[i]?.[2];
-      const load_text_arg3 = parsed_tldata[i]?.[3];
+      const [load_text_command, ...arg_string] = parsed_tldata[i];
+
+      const get_arg = <T extends arg_num, U extends arg_num>(
+        arg_len: T,
+        option: U
+      ): arg_taple<T, U> => arg2taple(arg_string, arg_len, option);
+      // const load_text_arg1 = parsed_tldata[i]?.[1];
+      // const load_text_arg2 = parsed_tldata[i]?.[2];
+      // const load_text_arg3 = parsed_tldata[i]?.[3];
       // const load_text_arg4 = parsed_tldata[i]?.[4];
 
       const tmp = _parsed_tldata[i];
@@ -361,9 +386,9 @@ export function execTL(_parsed_tldata: AST[], str: string): execTL_result {
         .case([mode_list.init], () => {
           match(load_text_command)
             .case(command.set, () => {
-              const id = load_text_arg1.toString();
-              const SPD = Number(load_text_arg2);
-              const buff = Number(load_text_arg3) || 0;
+              const [id, _order, _buff] = get_arg(2, 1);
+              const SPD = Number(_order);
+              const buff = Number(_buff) || 0;
               let ttk_val = define.ttk_val;
               if (!tmp.mv_ls) {
                 ttk_val = Number(tmp?.option?.ttk ?? ttk_val);
@@ -389,7 +414,8 @@ export function execTL(_parsed_tldata: AST[], str: string): execTL_result {
             })
 
             .case(command.countTTKuntil, () => {
-              ttk_count_until.set(Number(load_text_arg1) || Infinity);
+              const [_ttk_ls] = get_arg(1, 0);
+              ttk_count_until.set(Number(_ttk_ls) || Infinity);
             })
 
             .case(command.start, () => {
@@ -438,12 +464,9 @@ export function execTL(_parsed_tldata: AST[], str: string): execTL_result {
         .case(mode_list.start_sort, () => {
           match(load_text_command)
             .case(command.move_list, () => {
-              const id = load_text_arg1;
-              const LoadFactor_list = load_text_arg2;
-              if (typeof id !== "string") {
-                throw Error("idが文字列ではありません");
-              }
-              chara_move_list[id] = LoadFactor_list as move_list[];
+              const [id, _] = get_arg(2, 0);
+              const LoadFactor_list = parsed_tldata[i][2] as move_list[];
+              chara_move_list[id] = LoadFactor_list;
             })
 
             .case(command.end_sort, () => {
@@ -485,7 +508,14 @@ export function execTL(_parsed_tldata: AST[], str: string): execTL_result {
       exec_mvls();
     }
   } catch (e) {
-    error = e as string;
+    if (mode === mode_list.start_sort) {
+      error = e as string;
+    } else {
+      error = `「${str.substring(
+        ..._parsed_tldata[i].addtional_info.where
+      )}」 : ${e}`;
+    }
+
     // +
     // `「${str.substring(..._parsed_tldata[i].addtional_info.where)}」`;
   }

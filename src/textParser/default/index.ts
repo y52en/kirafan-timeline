@@ -11,6 +11,7 @@ import {
 } from "../../types";
 
 import lib, { match } from "../../lib";
+import { show_error } from "../../view/ui";
 
 const TIMES_FAILSAFE = 20;
 
@@ -595,52 +596,7 @@ class parser_lexicallyAnalyze2AST {
   }
 
   error_unexpectedToken(errMsg = "") {
-    const output_err_where = lib.htmltag("span");
-    output_err_where.appendChild(
-      lib.htmltag("span", "→→" + this.now_val.value + "←←", "errMsg")
-    );
-    // ....... \n
-    if (this.now_val.type !== lexicallyAnalyzeStr.new_line) {
-      let end = this.now_val.addtional_info.where[1];
-      for (let i = this.i_loading + 1; i < this.timeline_parsed.length; i++) {
-        if (this.timeline_parsed[i].type === lexicallyAnalyzeStr.new_line) {
-          end = this.timeline_parsed[i].addtional_info.where[0];
-          break;
-        }
-      }
-      output_err_where.insertAdjacentText(
-        "beforeend",
-        this.str.substring(this.now_val.addtional_info.where[1], end)
-      );
-    }
-
-    let start = this.now_val.addtional_info.where[0];
-    for (let i = this.i_loading - 1; i >= 0; i--) {
-      if (this.timeline_parsed[i].type === lexicallyAnalyzeStr.new_line) {
-        start = this.timeline_parsed[i].addtional_info.where[1];
-        break;
-      }
-    }
-    output_err_where.insertAdjacentText(
-      "afterbegin",
-      this.str.substring(start, this.now_val.addtional_info.where[0])
-    );
-
-    if (this.now_val.type === lexicallyAnalyzeStr.reserved) {
-      errMsg = "予約文字です";
-    }
-    const output = lib.htmltag("span");
-
-    output.insertAdjacentText(
-      "beforeend",
-      "想定外の値: 「" + JSON.stringify(this.now_val.value) + "」"
-    );
-    output.appendChild(lib.htmltag("br"));
-    output.appendChild(output_err_where);
-    output.appendChild(lib.htmltag("br"));
-    output.insertAdjacentText("beforeend", errMsg);
-
-    throw Error(output.outerHTML);
+    show_error(this.timeline_parsed, this.i_loading, this.str, errMsg);
   }
 }
 

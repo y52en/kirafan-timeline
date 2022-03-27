@@ -1,3 +1,4 @@
+import exp from "constants";
 import { chara, timeline } from "../timeline/timeline";
 
 export enum command {
@@ -81,7 +82,6 @@ export interface lexicallyAnalyzed {
 
 export type _addtional_info<T> = {
   value: T;
-  
 };
 
 export type AST_command = {
@@ -268,3 +268,45 @@ export type command_array = string[];
 export type addtional_info = {
   where: [number, number];
 };
+
+export type arg_0<_T> = [];
+export type arg_1<T> = [T];
+export type arg_2<T> = [T, T];
+export type arg_3<T> = [T, T, T];
+export type arg_4<T> = [T, T, T, T];
+
+export type arg_n1 = [string];
+export type arg_n2 = [string, string];
+export type arg_n3 = [string, string, string];
+export type arg_n4 = [string, string, string, string];
+
+export type arg_u1 = [string?];
+export type arg_u2 = [string?, string?];
+export type arg_u3 = [string?, string?, string?];
+
+export type type_arg<
+  T extends Array<string>,
+  U extends Array<string | undefined>
+> = [...T, ...U];
+
+export type arg_num = 0 | 1 | 2 | 3 | 4;
+
+export type arg_num_to_arg<T extends arg_num> = {
+  0: arg_0<string>;
+  1: arg_1<string>;
+  2: arg_2<string>;
+  3: arg_3<string>;
+  4: arg_4<string>;
+}[T];
+
+type arg_option = string | undefined;
+export type arg_num_to_arg_u<T extends arg_num> = {
+  0: arg_0<arg_option>;
+  1: arg_1<arg_option>;
+  2: arg_2<arg_option>;
+  3: arg_3<arg_option>;
+  4: arg_4<arg_option>;
+}[T];
+
+// ["1","2", string?] ,2 ,1
+// 
