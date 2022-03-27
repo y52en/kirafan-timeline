@@ -1,4 +1,3 @@
-import exp from "constants";
 import { chara, timeline } from "../timeline/timeline";
 
 export enum command {
