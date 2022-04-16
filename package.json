@@ -5,7 +5,8 @@
     "watch": "webpack -w",
     "start": "webpack -w & lite-server",
     "ie11": "npx babel docs/js/bundle.js --out-file  docs/js/ie11.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "wasm": "echo 'run : wasm-pack build --release --out-dir ../src/textParser/default/wasm/'"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.1",

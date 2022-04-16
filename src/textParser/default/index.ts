@@ -12,6 +12,7 @@ import {
 
 import lib, { match } from "../../lib";
 import { show_error } from "../../view/ui";
+import {parse as wasm_parse} from "./wasm/kirafan_tl";
 
 const TIMES_FAILSAFE = 20;
 
@@ -308,7 +309,7 @@ class parser_lexicallyAnalyze2AST {
           // @ts-ignore
           if (this.now_val_type === lexicallyAnalyzeStr.bracketR) {
             break;
-          } else if (this.now_val_type === lexicallyAnalyzeStr.commma) {
+          } else if (this.now_val_type === lexicallyAnalyzeStr.comma) {
             this.nextVal();
           } else {
             this.error_unexpectedToken(
@@ -467,7 +468,7 @@ class parser_lexicallyAnalyze2AST {
           this.nextVal();
           is_end = true;
         })
-        .case(lexicallyAnalyzeStr.commma, () => {
+        .case(lexicallyAnalyzeStr.comma, () => {
           this.nextVal();
         })
         .default(() => {
@@ -547,7 +548,7 @@ class parser_lexicallyAnalyze2AST {
           is_end = true;
         })
 
-        .case(lexicallyAnalyzeStr.commma, () => {
+        .case(lexicallyAnalyzeStr.comma, () => {
           this.nextVal();
         })
 
@@ -586,7 +587,7 @@ class parser_lexicallyAnalyze2AST {
   }
 
   checkIsCommma() {
-    if (this.now_val_type !== lexicallyAnalyzeStr.commma) {
+    if (this.now_val_type !== lexicallyAnalyzeStr.comma) {
       this.error_unexpectedToken();
     }
   }
@@ -614,7 +615,11 @@ class parser_lexicallyAnalyze {
     this.i_nowloadstr = 0;
   }
 
-  parse(): lexicallyAnalyzed[] {
+  async parse(): Promise<lexicallyAnalyzed[]> {
+    return await JSON.parse(wasm_parse(this.timeline_str));
+  }
+
+  parse_no_wasm(): lexicallyAnalyzed[] {
     this.timeline_parsed = this.lexicalAnalysis();
     return this.timeline_parsed;
   }
@@ -650,7 +655,7 @@ class parser_lexicallyAnalyze {
       const loop_continue = () => (isContinue = true);
       match(char)
         .case(",", () => {
-          changeType(lexicallyAnalyzeStr.commma);
+          changeType(lexicallyAnalyzeStr.comma);
         })
         .case("\n", () => {
           changeType(lexicallyAnalyzeStr.new_line);
@@ -753,7 +758,7 @@ class parser_lexicallyAnalyze {
     };
     match(char)
       .case(",", () => {
-        changeType(lexicallyAnalyzeStr.commma);
+        changeType(lexicallyAnalyzeStr.comma);
       })
       .case("\n", () => {
         changeType(lexicallyAnalyzeStr.new_line);
@@ -812,7 +817,11 @@ class parser_lexicallyAnalyze {
 
 export default async function parse(text: string): Promise<AST[]> {
   const tl_parser_lexicallyAnalyze = new parser_lexicallyAnalyze(text);
-  const lexicallyAnalyzed = tl_parser_lexicallyAnalyze.parse();
+
+  // const lexicallyAnalyzed = await tl_parser_lexicallyAnalyze.parse();
+  const lexicallyAnalyzed = await tl_parser_lexicallyAnalyze.parse_no_wasm();
+
+  
   const tl_parser_AST = new parser_lexicallyAnalyze2AST(
     lexicallyAnalyzed,
     text

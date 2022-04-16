@@ -135,7 +135,7 @@ export interface mvls_command {
 export type move_list = mvls_normal | mvls_command;
 
 export const enum lexicallyAnalyzeStr {
-  commma,
+  comma,
   comment,
   new_line,
   braceL,
