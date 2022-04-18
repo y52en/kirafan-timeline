@@ -45,7 +45,7 @@ fn _parse(s: String) -> Vec<LexicallyAnalyzed> {
   let s_len = chars.len();
   let mut i = 0;
   while i < s_len {
-    let mut position = (i as usize, i + 1 as usize);
+    let mut position = (i , i + 1);
     let value_chr = chars.get(i).unwrap();
     let mut value = value_chr.to_string();
     let chr_type = get_char_type(*value_chr);

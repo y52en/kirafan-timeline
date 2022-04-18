@@ -148,6 +148,7 @@ export const enum lexicallyAnalyzeStr {
   reserved,
   word,
   equal,
+  space = 999
 }
 
 export const enum TL_type {

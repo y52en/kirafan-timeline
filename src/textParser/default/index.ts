@@ -12,7 +12,7 @@ import {
 
 import lib, { match } from "../../lib";
 import { show_error } from "../../view/ui";
-import {parse as wasm_parse} from "./wasm/kirafan_tl";
+import { parse as wasm_parse } from "./wasm/kirafan_tl";
 
 const TIMES_FAILSAFE = 20;
 
@@ -247,7 +247,7 @@ class parser_lexicallyAnalyze2AST {
             })
 
             .case(lexicallyAnalyzeStr.word, () => {
-              arg2.push( {
+              arg2.push({
                 mode: mvls_mode.action,
                 value: [this.now_val.value],
                 addtional_info: {
@@ -625,129 +625,69 @@ class parser_lexicallyAnalyze {
   }
 
   lexicalAnalysis(): lexicallyAnalyzed[] {
-    let string = this.timeline_str;
-    const output: lexicallyAnalyzed[] = [];
-    // let tmp = "";
-    const space = this.space;
-    string = string.replaceAll(/\\(\n|$)/g, space + space);
+    const string = this.timeline_str;
+    const parsed_data: lexicallyAnalyzed[] = [];
 
+    const chars = string.split("");
+    const s_len = chars.length;
     let i = 0;
-    let berore_i = 0;
-
-    loop: for (i = 0; i < string.length; i++) {
-      const char = string[i];
-
-      let val: lexicallyAnalyzed | { value: string } = { value: char };
-
-      const changeType = (type: lexicallyAnalyzeStr) => {
-        const tmp = berore_i;
-        berore_i = i;
-        val = {
-          type,
-          value: char,
-          addtional_info: {
-            where: [tmp + 1, i + 1] as [number, number],
-          },
-        };
-      };
+    while (i < s_len) {
+      const position: [number, number] = [i, i + 1];
+      const value_chr = chars[i];
+      let value = value_chr;
+      const chr_type = this.getNextCharType(i);
 
       let isContinue = false;
-      const loop_continue = () => (isContinue = true);
-      match(char)
-        .case(",", () => {
-          changeType(lexicallyAnalyzeStr.comma);
+      const continue_loop = () => {
+        isContinue = true;
+      };
+
+      match(chr_type)
+        .case(lexicallyAnalyzeStr.space, () => {
+          i += 1;
+          continue_loop();
         })
-        .case("\n", () => {
-          changeType(lexicallyAnalyzeStr.new_line);
-        })
-        .case([space, "　", "\t"], () => {
-          // skip
-          // push();
-          berore_i = i;
-          loop_continue();
-        })
-        .case("#", () => {
-          let tmp = "";
-          for (; i < string.length; i++) {
-            if (this.getNextCharType(i) === lexicallyAnalyzeStr.new_line) {
-              i--;
+        .case(lexicallyAnalyzeStr.comment, () => {
+          value = "";
+          while (i < s_len) {
+            const value_chr = chars[i];
+            const chr_type = this.getNextCharType(i);
+            if (chr_type === lexicallyAnalyzeStr.new_line) {
+              i -= 1;
               break;
             }
-            tmp += string[i];
+            value += value_chr;
+            i += 1;
           }
-          // loop_continue();
-          changeType(lexicallyAnalyzeStr.comment);
-          val.value = tmp;
         })
-        .case("{", () => {
-          changeType(lexicallyAnalyzeStr.braceL);
-        })
-        .case("}", () => {
-          changeType(lexicallyAnalyzeStr.braceR);
-        })
-        .case("[", () => {
-          changeType(lexicallyAnalyzeStr.bracketL);
-        })
-        .case("]", () => {
-          changeType(lexicallyAnalyzeStr.bracketR);
-        })
-        .case("<", () => {
-          changeType(lexicallyAnalyzeStr.angle_bracketL);
-        })
-        .case(">", () => {
-          changeType(lexicallyAnalyzeStr.angle_bracketR);
-        })
-
-        .case("*", () => {
-          changeType(lexicallyAnalyzeStr.asterisk);
-        })
-        .case("=", () => {
-          changeType(lexicallyAnalyzeStr.equal);
-        })
-
-        .case(
-          ["(", ")", '"', "'", "!", "$", "%", "&", "^", "~", "?", ";", "`"],
-          () => {
-            // not @ _
-            changeType(lexicallyAnalyzeStr.reserved);
-          }
-        )
-
-        .default(() => {
-          let tmp = "";
-          for (; i < string.length; i++) {
-            if (this.getNextCharType(i) !== lexicallyAnalyzeStr.word) {
-              i--;
+        .case(lexicallyAnalyzeStr.word, () => {
+          value = "";
+          while (i < s_len) {
+            const value_chr = chars[i];
+            const chr_type = this.getNextCharType(i);
+            if (chr_type !== lexicallyAnalyzeStr.word) {
+              i -= 1;
               break;
             }
-            tmp += string[i];
+            value += value_chr;
+            i += 1;
           }
-          // loop_continue();
-          changeType(lexicallyAnalyzeStr.word);
-          val.value = tmp;
-        });
+        })
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        .default(() => {});
       if (isContinue) {
-        continue loop;
+        continue;
       }
 
-      // push();
-      if ("type" in val) {
-        output.push(val);
-      } else {
-        throw Error("未到達コード");
-      }
+      position[1] = i + 1;
+      parsed_data.push({
+        type: chr_type,
+        value: value,
+        addtional_info: { where: position },
+      });
+      i += 1;
     }
-
-    // push();
-
-    // function push() {
-    //   if (tmp.length > 0) {
-    //     output.push(parsed(lexicallyAnalyzeStr.word, tmp));
-    //     tmp = "";
-    //   }
-    // }
-
-    return output;
+    return parsed_data;
   }
 
   getNextCharType(i: number): lexicallyAnalyzeStr {
@@ -763,9 +703,9 @@ class parser_lexicallyAnalyze {
       .case("\n", () => {
         changeType(lexicallyAnalyzeStr.new_line);
       })
-      .case([this.space, "　", "\t"], () => {
-        changeType(lexicallyAnalyzeStr.comment);
-      })
+      // .case([this.space, "　", "\t"], () => {
+      //   changeType(lexicallyAnalyzeStr.comment);
+      // })
       .case("#", () => {
         changeType(lexicallyAnalyzeStr.comment);
       })
@@ -801,9 +741,12 @@ class parser_lexicallyAnalyze {
           changeType(lexicallyAnalyzeStr.reserved);
         }
       )
-
       .default(() => {
-        changeType(lexicallyAnalyzeStr.word);
+        if (char.trim() === "") {
+          changeType(lexicallyAnalyzeStr.space);
+        } else {
+          changeType(lexicallyAnalyzeStr.word);
+        }
       });
 
     // type = type as lexicallyAnalyzeStr;
@@ -818,10 +761,13 @@ class parser_lexicallyAnalyze {
 export default async function parse(text: string): Promise<AST[]> {
   const tl_parser_lexicallyAnalyze = new parser_lexicallyAnalyze(text);
 
+  // console.time("1");
   // const lexicallyAnalyzed = await tl_parser_lexicallyAnalyze.parse();
-  const lexicallyAnalyzed = await tl_parser_lexicallyAnalyze.parse_no_wasm();
+  // console.timeEnd("1");
+  // console.time("2");
+  const lexicallyAnalyzed = tl_parser_lexicallyAnalyze.parse_no_wasm();
+  // console.timeEnd("2");
 
-  
   const tl_parser_AST = new parser_lexicallyAnalyze2AST(
     lexicallyAnalyzed,
     text
