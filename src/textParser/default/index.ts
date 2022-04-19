@@ -12,7 +12,7 @@ import {
 
 import lib, { match } from "../../lib";
 import { show_error } from "../../view/ui";
-import { parse as wasm_parse } from "./wasm/kirafan_tl";
+// import { parse as wasm_parse } from "./wasm/kirafan_tl";
 
 const TIMES_FAILSAFE = 20;
 
@@ -615,9 +615,9 @@ class parser_lexicallyAnalyze {
     this.i_nowloadstr = 0;
   }
 
-  async parse(): Promise<lexicallyAnalyzed[]> {
-    return await JSON.parse(wasm_parse(this.timeline_str));
-  }
+  // async parse(): Promise<lexicallyAnalyzed[]> {
+  //   return await JSON.parse(wasm_parse(this.timeline_str));
+  // }
 
   parse_no_wasm(): lexicallyAnalyzed[] {
     this.timeline_parsed = this.lexicalAnalysis();
