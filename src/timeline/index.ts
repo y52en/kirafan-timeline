@@ -4,9 +4,11 @@ import {
   arg_num,
   arg_num_to_arg,
   arg_num_to_arg_u,
+  arg_type,
   AST,
   AST_command,
   command,
+  ConvertStr2Type,
   execTL_result,
   mode_list,
   move_list,
@@ -18,8 +20,67 @@ import {
   type_count_ttk_ls,
   type_state,
   type_tableData_json,
+  _arg_type,
 } from "../types";
 import { timeline, chara } from "./timeline";
+
+function isNumberStr(str: string): boolean {
+  return !Number.isNaN(Number(str));
+}
+
+function str2type<T extends arg_type>(
+  arg: string | undefined,
+  type: T
+): _arg_type[T] {
+  if (type === "number" || (type === "number?" && arg !== undefined)) {
+    if (!isNumberStr(arg || "0")) {
+      throw Error(`引数に数値が指定されていません: ${arg}`);
+    }
+  }
+  switch (type) {
+    case "number":
+      return Number(arg) as _arg_type[T];
+    case "number?":
+      return (arg === undefined ? undefined : Number(arg)) as _arg_type[T];
+    case "string":
+    case "string?":
+      return arg as _arg_type[T];
+    case undefined:
+      throw new Error(`引数が多すぎます: ${arg}`);
+    default:
+      throw new Error(`unknown type: ${type}`);
+  }
+}
+
+function getArg<X extends readonly arg_type[]>(
+  arg: string[],
+  types: X
+): ConvertStr2Type<X> {
+  let optionIndex = types.length;
+  types.forEach((type, i) => {
+    if (type.match(/\?$/)) {
+      optionIndex = i;
+      return;
+    }
+  });
+  const arg_len = optionIndex;
+  const option_len = types.length - arg_len;
+
+  if (arg.length < arg_len) {
+    throw new Error(
+      `引数不足です: 必要引数:${arg_len} , オプション引数:${option_len}`
+    );
+  }
+
+  // @ts-ignore
+  const output: ConvertStr2Type<X> = new Array(arg_len).fill(undefined);
+  for (let i = 0; i < arg.length; i++) {
+    // @ts-ignore
+    output[i] = str2type(arg[i], types[i]);
+  }
+
+  return output;
+}
 
 type arg_taple<T extends arg_num, U extends arg_num> = type_arg<
   arg_num_to_arg<T>,
@@ -31,13 +92,15 @@ function arg2taple<T extends arg_num, U extends arg_num, X>(
   option: U
 ): arg_taple<T, U> {
   if (arg.length < arg_len) {
-    throw new Error(`引数不足です: 必要引数:${arg_len} , オプション引数:${option}`);
+    throw new Error(
+      `引数不足です: 必要引数:${arg_len} , オプション引数:${option}`
+    );
   }
   const output: [...(X | undefined)[]] = [...arg.slice(0, arg_len + option)];
   for (let i = arg.length; i < arg_len + option; i++) {
     output.push(undefined);
   }
-  return output as type_arg<arg_num_to_arg<T>, arg_num_to_arg_u<U>>;
+  return output as arg_taple<T, U>;
 }
 
 function sorting(
@@ -171,7 +234,7 @@ function sorting(
         `「${input_str.substring(...input.addtional_info.where)}」 : ${e}`
       );
     } else {
-      console.log('e is undefined');
+      console.log("e is undefined");
       throw Error(e as string);
     }
   }
@@ -194,10 +257,14 @@ function mainMode(
   arg: AST_command
 ) {
   const [load_text_command, ...arg_string] = arg.value;
-  const get_arg = <T extends arg_num, U extends arg_num>(
-    arg_len: T,
-    option: U
-  ): arg_taple<T, U> => arg2taple(arg_string, arg_len, option);
+  // const get_arg = <T extends arg_num, U extends arg_num>(
+  //   arg_len: T,
+  //   option: U
+  // ): arg_taple<T, U> => arg2taple(arg_string, arg_len, option);
+
+  const getArgWithType = <X extends readonly arg_type[]>(arg: X): ConvertStr2Type<X> =>
+    getArg(arg_string, arg);
+  // function Arg<X extends readonly arg_type[]>(arg: X): ConvertStr2Type<X> { return getArg(arg_string, arg) }
 
   const add_ttk = (n: number) => {
     const ttk_until = ttk_count_until.get();
@@ -216,43 +283,41 @@ function mainMode(
     convertedTLdata.main.push(tmp as string[]);
   }
 
-  const str2num_inf = (n: string | undefined) =>
-    Number.isNaN(Number(n)) ? Infinity : Number(n);
+  // const str2num_inf = (n: string | undefined) =>
+  //   Number.isNaN(Number(n)) ? Infinity : Number(n);
 
   if (load_text_command === command.buffset) {
-    const [id, _buff, _turn] = get_arg(2, 1);
-    const buff = Number(_buff) || 0;
-    const turn = str2num_inf(_turn);
+    const [id, buff, _turn] = getArgWithType(["string", "number", "number?"] as const);
+    const turn = _turn ?? Infinity;
     chara_list[id]._SPD_buff = [];
     chara_list[id].setSPDbuff(buff, turn);
+    //
   } else if (load_text_command === command.buffadd) {
-    const [id, _buff, _turn] = get_arg(2, 1);
-    const buff = Number(_buff) || 0;
-    const turn = str2num_inf(_turn);
+    const [id, buff, _turn] = getArgWithType(["string", "number", "number?"] as const);
+    const turn = _turn ?? Infinity;
     chara_list[id].setSPDbuff(buff, turn);
+    //
   } else if (load_text_command === command.buffminus) {
-    const [id, _buff, _turn] = get_arg(2, 1);
-    const buff = Number(_buff) || 0;
-    const turn = str2num_inf(_turn);
+    const [id, buff, _turn] = getArgWithType(["string", "number", "number?"] as const);
+    const turn = _turn ?? Infinity;
     chara_list[id].setSPDbuff(-buff, turn);
+    //
   } else if (load_text_command === command.add) {
-    const [id, _SPD, _buff] = get_arg(2, 1);
-    const SPD = Number(_SPD);
-    const buff = Number(_buff) || 0;
+    const [id, SPD, _buff] = getArgWithType(["string", "number", "number?"] as const);
+    const buff = Number(_buff) ?? 0;
     chara_list[id] = new chara(id, SPD, buff, 0, define.ttk_val);
     TL.addChara(id, chara_list[id].initOrderValue());
+    //
   } else if (
     load_text_command === command.move ||
     load_text_command === command.action
   ) {
-    const [arg1, arg2, arg3] = get_arg(2, 1);
-    let id, LoadFactor;
+    // const [arg1, arg2, arg3] = get_arg(2, 1);
+    let id, LoadFactor, arg3;
     if (load_text_command === command.move) {
-      LoadFactor = Number(arg1);
-      id = arg2;
+      [LoadFactor,id,arg3] = getArgWithType(["number", "string", "string?"] as const);
     } else {
-      id = arg1;
-      LoadFactor = Number(arg2);
+      [id, LoadFactor, arg3] = getArgWithType(["string", "number", "string?"] as const);
     }
 
     const canMoveWithout1stChara = arg3 === "true";
@@ -265,16 +330,15 @@ function mainMode(
       canMoveWithout1stChara
     );
     chara_list[id].nextTurn();
+    //
   } else if (load_text_command === command.order) {
-    const [id, _order] = get_arg(2, 0);
-    const ordervalue = Number(_order) || 0;
-
+    const [id, ordervalue] = getArgWithType(["string", "number"] as const);
     TL.move(ordervalue, id, false);
     chara_list[id].nextTurn();
+    //
   } else if (load_text_command === command.switch) {
-    const [to, from, _SPD, _buff] = get_arg(3, 1);
-    const SPD = Number(_SPD);
-    const buff = Number(_buff) || 0;
+    const [to, from, SPD, _buff] = getArgWithType(["string", "string", "number", "number?"] as const);
+    const buff = _buff ?? 0;
     TL.switchChara(to, from);
     chara_list[from] = new chara(
       from,
@@ -283,15 +347,18 @@ function mainMode(
       0,
       Number(arg?.option?.ttk ?? define.ttk_val)
     );
+    //
   } else if (load_text_command === command.color) {
-    const [color] = get_arg(1, 0);
+    const [color] = getArgWithType(["string"] as const);
     TL.color = color;
+    //
   } else if (load_text_command === command.skillcard) {
-    const [name, _spd, _LoadFactor, _time] = get_arg(4, 0);
-    const spd = Number(_spd);
-    const LoadFactor = Number(_LoadFactor);
-    const time = Number(_time);
-
+    const [name, spd, LoadFactor, time] = getArgWithType([
+      "string",
+      "number",
+      "number",
+      "number",
+    ] as const);
     const skillcard = new chara(name, spd, 0, 0, 0);
     chara_list[name] = skillcard;
     TL.addSkillCard(
@@ -301,12 +368,16 @@ function mainMode(
       (id, _, _i) =>
         add_ttk(count_ttk_ls[id] ? define.getCharge(LoadFactor, true) : 0)
     );
+    //
   } else if (load_text_command === command.nomove) {
     TL.skip();
+    //
   } else if (load_text_command === command.end) {
     mode = mode_list.waiting_mode;
+    //
   } else if (load_text_command === command.ttk_stop) {
     ttk_count_until.set(TL.place_of_currentTimeline);
+    //
   } else if (load_text_command === command.move_ttk) {
     const charas = arg.value.slice(1) as string[];
     const ttk = charas.map((id) => {
@@ -314,6 +385,7 @@ function mainMode(
     });
     chara_list[charas[0]].nextTurn();
     TL.moveTTK(charas, ttk);
+    //
   } else {
     throw Error("no command found");
   }
@@ -364,6 +436,21 @@ export function execTL(_parsed_tldata: AST[], str: string): execTL_result {
     for (i = 0; i < _parsed_tldata.length; i++) {
       const [load_text_command, ...arg_string] = parsed_tldata[i];
 
+      const isArgStringIsArray = (
+        load_text_command: command,
+        _arg_string: string[] | [string, move_list[]]
+      ): _arg_string is string[] => load_text_command !== command.move_list;
+
+      const getArgWithType = <X extends readonly arg_type[]>(
+        arg: X
+      ): ConvertStr2Type<X> => {
+        if (isArgStringIsArray(load_text_command, arg_string)) {
+          return getArg(arg_string, arg);
+        } else {
+          throw Error("move_list is not allowed");
+        }
+      };
+
       const get_arg = <T extends arg_num, U extends arg_num>(
         arg_len: T,
         option: U
@@ -386,9 +473,8 @@ export function execTL(_parsed_tldata: AST[], str: string): execTL_result {
         .case([mode_list.init], () => {
           match(load_text_command)
             .case(command.set, () => {
-              const [id, _order, _buff] = get_arg(2, 1);
-              const SPD = Number(_order);
-              const buff = Number(_buff) || 0;
+              const [id, SPD, _buff] = getArgWithType(["string", "number", "number?"] as const);
+              const buff = _buff ?? 0;
               let ttk_val = define.ttk_val;
               if (!tmp.mv_ls) {
                 ttk_val = Number(tmp?.option?.ttk ?? ttk_val);
@@ -414,8 +500,8 @@ export function execTL(_parsed_tldata: AST[], str: string): execTL_result {
             })
 
             .case(command.countTTKuntil, () => {
-              const [_ttk_ls] = get_arg(1, 0);
-              ttk_count_until.set(Number(_ttk_ls) || Infinity);
+              const [ttk_ls] = getArgWithType(["number"] as const);
+              ttk_count_until.set(ttk_ls);
             })
 
             .case(command.start, () => {

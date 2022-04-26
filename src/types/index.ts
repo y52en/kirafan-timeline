@@ -275,14 +275,14 @@ export type arg_2<T> = [T, T];
 export type arg_3<T> = [T, T, T];
 export type arg_4<T> = [T, T, T, T];
 
-export type arg_n1 = [string];
-export type arg_n2 = [string, string];
-export type arg_n3 = [string, string, string];
-export type arg_n4 = [string, string, string, string];
+// export type arg_n1 = [string];
+// export type arg_n2 = [string, string];
+// export type arg_n3 = [string, string, string];
+// export type arg_n4 = [string, string, string, string];
 
-export type arg_u1 = [string?];
-export type arg_u2 = [string?, string?];
-export type arg_u3 = [string?, string?, string?];
+// export type arg_u1 = [string?];
+// export type arg_u2 = [string?, string?];
+// export type arg_u3 = [string?, string?, string?];
 
 export type type_arg<
   T extends Array<string>,
@@ -291,22 +291,43 @@ export type type_arg<
 
 export type arg_num = 0 | 1 | 2 | 3 | 4;
 
-export type arg_num_to_arg<T extends arg_num> = {
-  0: arg_0<string>;
-  1: arg_1<string>;
-  2: arg_2<string>;
-  3: arg_3<string>;
-  4: arg_4<string>;
+export type arg_num_taple<T extends arg_num,U> = {
+  0: arg_0<U>;
+  1: arg_1<U>;
+  2: arg_2<U>;
+  3: arg_3<U>;
+  4: arg_4<U>;
 }[T];
 
+export type arg_num_to_arg<T extends arg_num> = arg_num_taple<T, string>;
+
 type arg_option = string | undefined;
-export type arg_num_to_arg_u<T extends arg_num> = {
-  0: arg_0<arg_option>;
-  1: arg_1<arg_option>;
-  2: arg_2<arg_option>;
-  3: arg_3<arg_option>;
-  4: arg_4<arg_option>;
-}[T];
+export type arg_num_to_arg_u<T extends arg_num> = arg_num_taple<T, arg_option>;
+
+
+
+export type arg_type = "string" | "number" | "string?" | "number?";
+
+type GetWithoutLastValue<T> = T extends readonly [...infer A, infer _]
+  ? A
+  : never;
+type GetLastValue<T> = T extends readonly [...infer _, infer B] ? B : never;
+
+export type _arg_type = {
+  string: string;
+  "string?": string | undefined;
+  number: number;
+  "number?": number | undefined;
+};
+
+export type ConvertStr2Type<T> = T extends readonly []
+  ? []
+  : [
+      ...ConvertStr2Type<GetWithoutLastValue<T>>,
+      _arg_type[GetLastValue<T> extends keyof _arg_type
+        ? GetLastValue<T>
+        : never]
+    ];
 
 // ["1","2", string?] ,2 ,1
 // 

@@ -204,6 +204,7 @@ function state<T>(val: T): type_state<T> {
   };
 }
 
+
 // XXX:どう直したらいいかわからない
 const _export = {
   undefinedErr,
