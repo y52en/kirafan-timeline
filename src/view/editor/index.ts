@@ -6,7 +6,7 @@ import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/addon/hint/show-hint.css";
 import "codemirror/addon/edit/closebrackets";
-import "../../../public/css/panda-syntax.css";
+import "../../css/panda-syntax.css";
 
 import lib, { OperateURL } from "../../lib";
 import { commandStr2Enum, editor_mode, type_editor_init } from "../../types";

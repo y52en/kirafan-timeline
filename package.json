@@ -1,12 +1,16 @@
 {
   "scripts": {
-    "build": "webpack -c ./webpack-release.config.js",
+    "build-old": "webpack -c ./webpack-release.config.js",
     "copy": "rsync -a public/ docs/ --exclude '/js'",
     "watch": "webpack -w",
     "start": "webpack -w & lite-server",
     "ie11": "npx babel docs/js/bundle.js --out-file  docs/js/ie11.js",
     "lint": "eslint src",
-    "wasm": "echo 'run : wasm-pack build --release --out-dir ../src/textParser/default/wasm/'"
+    "wasm": "echo 'run : wasm-pack build --release --out-dir ../src/textParser/default/wasm/'",
+
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.1",
@@ -21,15 +25,22 @@
     "lite-server": "^2.6.1",
     "style-loader": "^3.0.0",
     "ts-loader": "^9.2.3",
-    "typescript": "^4.3.5",
     "webpack": "^5.44.0",
     "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^4.4.0"
+    "webpack-dev-server": "^4.4.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^1.3.0",
+    "typescript": "^4.6.3",
+    "vite": "^2.9.7"
   },
   "private": true,
   "dependencies": {
     "codemirror": "^5.62.0",
     "core-js": "^3.21.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "vite": "^2.9.8",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   }
 }

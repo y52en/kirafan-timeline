@@ -75,7 +75,7 @@ function getArg<X extends readonly arg_type[]>(
   // @ts-ignore
   const output: ConvertStr2Type<X> = new Array(arg_len).fill(undefined);
   for (let i = 0; i < arg.length; i++) {
-    // @ts-ignore
+    // @ts-ignoreu
     output[i] = str2type(arg[i], types[i]);
   }
 

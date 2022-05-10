@@ -1,14 +1,45 @@
+// {
+//   "compilerOptions": {
+//     "target": "ES2015",
+//     "module": "ES2015",
+//     "moduleResolution": "node",
+//     "strict": true,
+//     "lib": [
+//       "esnext",
+//       "DOM"
+//     ],
+//     "allowSyntheticDefaultImports": true,
+//     "sourceMap": true,
+//     "removeComments": true,
+//     "noImplicitAny": true,
+//     "strictNullChecks": true,
+//     "strictBindCallApply": true,
+//     "noImplicitThis": true,
+//     "noUnusedLocals": true,
+//     "noUnusedParameters": true,
+//     "noImplicitReturns": true,
+//     "noFallthroughCasesInSwitch": true,
+//   },
+// }
+
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "module": "ES2015",
-    "moduleResolution": "node",
-    "strict": true,
-    "lib": [
-      "esnext",
-      "DOM"
-    ],
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
     "sourceMap": true,
     "removeComments": true,
     "noImplicitAny": true,
@@ -20,4 +51,6 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
   },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
