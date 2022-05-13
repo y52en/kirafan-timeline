@@ -274,8 +274,7 @@ table.normal-table > thead > th {
   background-color: rgba(39, 33, 33);
   color: #eee;
 }
-table.normal-table > *
- {
+table.normal-table > * {
   background: #eee;
 }
 .normal-table > tbody > tr:nth-child(odd) td {
@@ -291,14 +290,17 @@ table.normal-table > *
 }
 
 .CodeMirror-wrap > div > textarea {
-    top: 0;
-    height: 26px;
-    min-height: 26px;
-    margin-bottom: -26px;
+  top: 0;
+  height: 26px;
+  min-height: 26px;
+  margin-bottom: -26px;
 }
 
-
-
-#TL_table>*>*>*>*,#TL_table > * > * > * {
-  border: solid 1px #272727;
+#TL_table > * {
+   border: outset 1px rgb(128, 128, 128);
 }
+#TL_table > * > * > * > *,
+#TL_table > * > * > * {
+  border: inset 1px rgb(128, 128, 128);
+}
+

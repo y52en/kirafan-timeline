@@ -4,7 +4,7 @@
     "copy": "rsync -a public/ docs/ --exclude '/js'",
     "watch": "webpack -w",
     "start": "webpack -w & lite-server",
-    "ie11": "npx babel docs/js/bundle.js --out-file  docs/js/ie11.js",
+    "ie11": "npx babel docs/assets/index.a4aac5fd.js --out-file  docs/assets/ie11.js",
     "lint": "eslint src",
     "wasm": "echo 'run : wasm-pack build --release --out-dir ../src/textParser/default/wasm/'",
     "dev": "vite",

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { main } from "./timeline/index";
 import {
   obj_update_data,
@@ -49,7 +49,14 @@ function App(): JSX.Element {
   const updateError = (error: string) => {
     setError(error);
   };
-  window.onload = () => main(updateData, updateInfo, updateError);
+  
+  // document.addEventListener(
+  //   "onload",
+  //   () => main(updateData, updateInfo, updateError)
+  // );
+  useEffect(() => {
+    main(updateData, updateInfo, updateError);
+  }, []);
   // window.onload = main
   return (
     <div className="App">

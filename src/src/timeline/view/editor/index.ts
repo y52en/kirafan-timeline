@@ -19,7 +19,7 @@ export function init(
   if (!elm_editor) {
     throw lib.undefinedErr;
   }
-
+  elm_editor.innerHTML = ""
   const enum state {
     start = "start",
     move_list = "move_list",
