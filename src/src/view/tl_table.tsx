@@ -17,7 +17,6 @@ export function TLTable(props: Props): JSX.Element {
         width="100"
         style={{
           minHeight,
-          border: "solid 1px",
         }}
       >
         {outputAsTable(
