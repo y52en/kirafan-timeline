@@ -8,9 +8,9 @@ import {
   mvls_mode,
   AST_command,
   command_array,
-} from "../../types";
+} from "../../../types";
 
-import lib, { match } from "../../lib";
+import lib, { match } from "../../../lib";
 import { show_error } from "../../view/ui";
 // import { parse as wasm_parse } from "./wasm/kirafan_tl";
 

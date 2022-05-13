@@ -1,5 +1,5 @@
 import python from "./python";
-import { command, AST, commandStr2Enum, mvls_mode } from "../../types";
+import { command, AST, commandStr2Enum, mvls_mode } from "../../../types";
 function transfer(arr: any): AST[] {
   return arr.map((x: any) => {
     const output = [];

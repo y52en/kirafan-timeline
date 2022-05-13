@@ -296,3 +296,9 @@ table.normal-table > *
     min-height: 26px;
     margin-bottom: -26px;
 }
+
+
+
+#TL_table>*>*>*>*,#TL_table > * > * > * {
+  border: solid 1px #272727;
+}

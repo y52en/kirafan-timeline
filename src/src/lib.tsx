@@ -106,7 +106,7 @@ function match<T>(val: T, ismatch?: symbol): match_result<T> {
 
 function _matcher<T>(
   val: T,
-  matcher_val: T|T[],
+  matcher_val: T | T[],
   fn: () => void,
   ismatch?: symbol
 ): match_result<T> {
@@ -193,7 +193,6 @@ class OperateURL {
 //   return /^[+-]?\d+$/.test(str);
 // }
 
-
 function state<T>(val: T): type_state<T> {
   let _val = val;
   return {
@@ -204,6 +203,38 @@ function state<T>(val: T): type_state<T> {
   };
 }
 
+function getRandomStr(): string {
+  return Math.random().toString(36).slice(2);
+}
+
+function innerText(str: string): JSX.Element {
+  const split_str = str.split("\n");
+  return (
+    <>
+      {split_str.map((line, i) => {
+        return (
+          <span key={i}>
+            {line}
+            <br />
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
+function rangeIterator<T>(
+  index: [number, number] | number,
+  callback: (i: number) => T
+): T[] {
+  const output: T[] = [];
+  const index_: [number, number] =
+    typeof index === "number" ? [0, index - 1] : index;
+  for (let i = index_[0]; i <= index_[1]; i++) {
+    output.push(callback(i));
+  }
+  return output;
+}
 
 // XXX:どう直したらいいかわからない
 const _export = {
@@ -220,6 +251,9 @@ const _export = {
   match,
   OperateURL,
   state,
+  getRandomStr,
+  innerText,
+  rangeIterator,
 };
 
 export {
@@ -236,5 +270,8 @@ export {
   match,
   OperateURL,
   state,
+  getRandomStr,
+  innerText,
+  rangeIterator,
 };
 export default _export;

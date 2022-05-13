@@ -1,5 +1,5 @@
 import define from "../define";
-import { match, state } from "../lib";
+import { match, state } from "../../lib";
 import {
   arg_num,
   arg_num_to_arg,
@@ -21,7 +21,7 @@ import {
   type_state,
   type_tableData_json,
   _arg_type,
-} from "../types";
+} from "../../types";
 import { timeline, chara } from "./timeline";
 
 function isNumberStr(str: string): boolean {

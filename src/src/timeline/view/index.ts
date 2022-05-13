@@ -5,16 +5,16 @@ import {
   type_editor_init,
   type_tableData_json,
   type_tl_comment,
-} from "../types";
+} from "../../types";
 import { init as editor_init } from "./editor";
 import { init as ui_init } from "./ui";
 
 class wrapper {
   constructor(
     private _editor_init: type_editor_init,
-    private _update_data: (data: obj_update_data) => void,
-    // private _show_ttk: (is_show: boolean, ttk: number) => void
-  ) {
+    private _update_data: (data: obj_update_data) => void
+  ) // private _show_ttk: (is_show: boolean, ttk: number) => void
+  {
     this._editor_init = _editor_init;
     this._update_data = _update_data;
   }
@@ -45,8 +45,9 @@ export function init(
   now_place: number,
   firstchara: string
 ): wrapper {
+  let _str = "";
   const update_data = ui_init(
-    () => "",
+    () => _str,
     json,
     charalist,
     convertedTLdata,
@@ -54,9 +55,10 @@ export function init(
     now_place,
     firstchara
   );
-  const tmp = editor_init((str: string, editor_fn: type_editor_init) =>
-    input_callback(str, editor_fn, update_data)
-  );
+  const tmp = editor_init((str: string, editor_fn: type_editor_init) => {
+    _str = str;
+    input_callback(str, editor_fn, update_data);
+  });
 
   return new wrapper(tmp, update_data);
 }

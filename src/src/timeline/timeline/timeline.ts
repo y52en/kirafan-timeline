@@ -1,4 +1,4 @@
-import lib from "../lib";
+import lib from "../../lib";
 import {
   card_event,
   TL_chara,
@@ -6,7 +6,7 @@ import {
   TL_type,
   buff,
   type_tl_comment,
-} from "../types";
+} from "../../types";
 
 export class timeline {
   current: TL_obj[];

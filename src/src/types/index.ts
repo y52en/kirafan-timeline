@@ -1,4 +1,4 @@
-import { chara, timeline } from "../timeline/timeline";
+import { chara, timeline } from "../timeline/timeline/timeline";
 
 export enum command {
   set,
@@ -250,6 +250,7 @@ export interface obj_update_data {
   firstchara: string;
   count_ttk_ls: type_count_ttk_ls;
   ttk: number;
+  info: string | undefined;
 }
 
 export interface type_state<T> {
