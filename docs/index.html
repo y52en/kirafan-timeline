@@ -1,206 +1,78 @@
 <!DOCTYPE html>
 <html lang="jp">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,height=1080, initial-scale=1.0" />
-  <!-- liveserver : 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE=' -->
-  <!-- Browsersync : 'sha256-ACotEtBlkqjCUAsddlA/3p2h7Q0iHuDXxk577uNsXwA=' -->
-  <!-- micropython : sha256-42w4hoKtyK3xF0okutlfQNLmYl3CkFq/V26KmFvzBFY= -->
-  <meta http-equiv="Content-Security-Policy"
-    content="script-src-elem polyfill.io 'self' 'sha256-kQ6QHFzio0zt6kfrDI7a8UP2/mff7Ig5luncggq7PIw=' 'unsafe-eval' 'sha256-42w4hoKtyK3xF0okutlfQNLmYl3CkFq/V26KmFvzBFY=' 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE=' 'sha256-ACotEtBlkqjCUAsddlA/3p2h7Q0iHuDXxk577uNsXwA=';">
-  <link rel="icon" href="./favicon.png" />
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1551475730309963"
-     crossorigin="anonymous"></script>
-     <script src="https://polyfill.io/v3/polyfill.min.js?features=String.prototype.at%2CArray.prototype.at"></script>
-  <title>TL生成ツール</title>
-  <!-- IEで表示した際にアラート
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,height=1080, initial-scale=1.0"
+    />
+    <!-- liveserver : 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE=' -->
+    <!-- Browsersync : 'sha256-ACotEtBlkqjCUAsddlA/3p2h7Q0iHuDXxk577uNsXwA=' -->
+    <!-- micropython : sha256-42w4hoKtyK3xF0okutlfQNLmYl3CkFq/V26KmFvzBFY= -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src-elem polyfill.io 'self' 'sha256-kQ6QHFzio0zt6kfrDI7a8UP2/mff7Ig5luncggq7PIw=' 'unsafe-eval' 'sha256-42w4hoKtyK3xF0okutlfQNLmYl3CkFq/V26KmFvzBFY=' 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE=' 'sha256-ACotEtBlkqjCUAsddlA/3p2h7Q0iHuDXxk577uNsXwA=';"
+    />
+    <link rel="icon" href="./assets/favicon.0963d827.png" />
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1551475730309963"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=String.prototype.at%2CArray.prototype.at"></script>
+    <title>TL生成ツール</title>
+    <!-- IEで表示した際にアラート
     IEではCSPは(ほとんど)未対応なので設定する必要性なし -->
-  <script>
-    function isIE() {
-      var userAgent = window.navigator.userAgent.toUpperCase();
-      return !(userAgent.indexOf('MSIE') === -1 && userAgent.indexOf('TRIDENT') === -1)
-    }
-    if (isIE()) {
-      // alert("IE未対応です。Chromeなどのブラウザを使用してください。\n対応ブラウザ:Chrome,Firefox,Safari,Edge")
-      document.write('<script src="https://unpkg.com/regenerator-runtime@0.13.9/runtime.js"><\/script>');
-      document.write('<script src="https://polyfill.io/v3/polyfill.min.js?features=es7%2Ces6%2Ces5%2Ces2022%2Ces2021%2Ces2020%2Ces2018%2Ces2019%2Ces2017%2Ces2016%2Ces2015%2Cdom4%2CURL%2CURLSearchParams"><\/script>')
-      document.write('<script src="./js/ie11.js"/><\/script>')
-    }
-  </script>
-  <script src="./js/bundle.js"></script>
-  <link rel="stylesheet" href="./css/style.css" />
-</head>
+    <script>
+      function isIE() {
+        var userAgent = window.navigator.userAgent.toUpperCase();
+        return !(
+          userAgent.indexOf("MSIE") === -1 &&
+          userAgent.indexOf("TRIDENT") === -1
+        );
+      }
+      if (isIE()) {
+        // alert("IE未対応です。Chromeなどのブラウザを使用してください。\n対応ブラウザ:Chrome,Firefox,Safari,Edge")
+        document.write(
+          '<script src="https://unpkg.com/regenerator-runtime@0.13.9/runtime.js"><\/script>'
+        );
+        document.write(
+          '<script src="https://polyfill.io/v3/polyfill.min.js?features=es7%2Ces6%2Ces5%2Ces2022%2Ces2021%2Ces2020%2Ces2018%2Ces2019%2Ces2017%2Ces2016%2Ces2015%2Cdom4%2CURL%2CURLSearchParams"><\/script>'
+        );
+        document.write('<script src="./js/ie11.js"/><\/script>');
+      }
+    </script>
+    <!-- <script src="./js/bundle.js"></script> -->
+    
+    <script type="module" crossorigin src="./assets/index.a4aac5fd.js"></script>
+    <link rel="stylesheet" href="./assets/index.6276cec3.css">
+  </head>
 
-<body>
-  <script>
-    if (isIE()) {
-      document.write('<p style="color:red">IEの使用はやめてください。セキュリティ上大きなリスクがあります。またIEで起きたバグは一切対処しません。</p>')
-      document.write('<p>推奨ブラウザ:Edge,Chrome,Firefox,Safari</p>')
-    }
-  </script>
+  <body>
+    <script>
+      if (isIE()) {
+        document.write(
+          '<p style="color:red">IEの使用はやめてください。セキュリティ上大きなリスクがあります。またIEで起きたバグは一切対処しません。</p>'
+        );
+        document.write("<p>推奨ブラウザ:Edge,Chrome,Firefox,Safari</p>");
+      }
+    </script>
 
-  <div class="keyboard"></div>
+    <div id="root"></div>
+    
 
-
-  <div id="TL_table">
-    <table width="100" height="200" border="1"></table>
-  </div>
-
-  現在先頭のキャラ:<span id="firstchara"> </span><br />
-  現在 <span id="now_place"></span> 行目 <br>
-  <div class="ttk display-none">とっておきゲージ:<span class="ttk-value"></span>%</div>
-  <div id="error"></div>
-  <div id="info"></div>
-  <span>
-    <div id="loading_python" class="hide">Python 初期化中…</div>
-    <div id="executing_python" class="hide">Python 実行中…</div>
-  </span>
-
-
-  <span id="cm-resize-frame">
-    <div id="editor">
-    </div>
-  </span>
-
-  <div>
-    <input type="checkbox" id="isSet_onbeforeunload">ページを離れる前に確認する</input>
-  </div>
-  ((iOSの?)safariの場合beforeunloadイベントが無視されるようなのでこの設定は使えません)
-  <br>
-
-  <div>
-    <button id="csvDownload">CSV形式で表をダウンロード</button>
-  </div>
-
-  <!-- <div>
-      <button id="QRDownload">QRコードでタイムラインのテキストを保存</button>
-    </div> -->
-
-  <div>
-    <button id="copyTL">タイムラインデータ付きのURLをコピー</button>
-  </div>
-  <div id="copyed" style="display: none">コピーしました</div>
-
-  <div style="display: none">
-    <button id="log_convertedTL">タイムラインデータをコンバート</button>
-  </div>
-
-  <div class="popupModal1">
-    <!-- https://qiita.com/dangoya/items/4176e8ef22e892570f4e -->
-    <input type="radio" name="modalPop" id="pop11" />
-    <label for="pop11"><button id="unzipMoveList">move_listの展開</button></label>
-    <input type="radio" name="modalPop" id="pop12" />
-    <label for="pop12">CLOSE</label>
-    <input type="radio" name="modalPop" id="pop13" />
-    <label for="pop13"></label>
-    <div class="modalPopup2">
-      <div class="modalPopup3">
-        <h2 class="modalTitle">展開済みのTLデータ</h2>
-        <button id="copy_ConvertedTL">コピーする</button>
-        <div id="copyed_popup" style="display: none">コピーしました</div>
-
-        <div class="modalMain" id="popup"></div>
-      </div>
-    </div>
-
-  </div>
-  
-
-  <br />
-  <div>
-    <button id="jumpTwitter">
-      基本的な使い方の説明(twitterにジャンプします)
-    </button>
-
-    <br>
-    上記のツイートからの変更点<br>
-    1.color追加 {c:copper,d:dark} <br>
-    2.\を文末に置くことで改行できる(改行を無いものとしてみなす) <br>
-    <br>
-    2021/06/23<br>
-    テキストのパース処理を変更 <br>
-    これにより、色々変わりましたが重要なものだけ記載 <br>
-    1.あいまいな記載が許されなくなった<br>
-    2. move_list内でコマンドとコンマの間に改行できるようになった<br>
-    もし正しい書き方であるのにパースエラーが出るときは@y52enに@ツイートなどでお知らせください<br>
-
-    <br>
-    2021/06/26<br>
-    (また)テキストのパース処理を変更 <br>
-    もし正しい書き方であるのにパースエラーが出るときは@y52enに@ツイートなどでお知らせください<br>
-
-    <br>
-    2021/07/10<br>
-    CodeMirror採用 <br>
-    色で見にくいかもしれないので意見募集中<br>
-    <a href="https://static-site-generator.com/entry3.html">ショートカット一覧</a><br />
-    上記以外に [
-    Ctrl + / : コメント ]
-    が使えます<br />
-    あとブラウザの機能ですがF11で全画面です<br />
-
-    <br>
-    2021/12/19<br>
-    ttk,ttk_untilを追加 <br>
-    ざっくりとしたとっておきの値を出せます<br>
-
-    <br />
-    <strong>使い方<br /></strong>
-    コマンドは半角で、またスペース区切りで設定すること<br />
-    []内が引数(かっこ自体は書かない) <br />
-    ()内のものは省略できる(バフなど) <br />
-    <br />
-
-    <span id="readme"></span>
-    <!-- <strong>start_sort</strong><br />
-    ソートモード<br />
-    end_sortを記入すると誰かのmove_listで書かれた硬直リストがなくなるまで行動する
-    <br />
-    (他のキャラにまだ硬直リストが残っていても終了) <br />
-    <br />
-
-    <strong>end_sort</strong><br />
-    ソートモード終了<br />
-    これを書かないとソートされない <br />
-    その後ろにstart、start_sortを書くことでまた別のモードに切り替えられる<br />
-    <br /> -->
-
-    <strong>例</strong><br />
-    <textarea readonly cols="60" rows="30">
-set enemy 224
-
-set aikawa 126 
-set kurumi 123
-set yuzuko 131
-
-#set hiro 130
-#set hideri 135
-
-ttk aikawa kurumi yuzuko hiro hideri heal
-ttk_until 34
-
-mv_ls enemy [{skillcard,dmg3000,224,1100,1},400*3,g400,r500,400,p200,{nomove}]
-
-mv_ls aikawa [40,70,[hiro,130],70,70,40,40,[kurumi,123],35,40,b125]
-
-mv_ls kurumi [[hideri,135],40,70,70,o40,[aikawa,123],70,[hideri,135],70,70,b125]
-
-mv_ls yuzuko [{sc,heal,131,100,5},g40,s40,{b+,yuzuko,22.4,3},100,70,70,100,s40,{b+,yuzuko,22.4,3},g40,b125]
-
-</textarea>
-  </div><br>
-  広告<br>
-      <!-- ad-1 -->
-      <ins class="adsbygoogle"
-          style="display:block"
-          data-ad-client="ca-pub-1551475730309963"
-          data-ad-slot="1369930607"
-          data-ad-format="auto"
-          data-full-width-responsive="true"></ins>
-      <script>
-          (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-</body>
-
+    広告<br />
+    <!-- ad-1 -->
+    <ins
+      class="adsbygoogle"
+      style="display: block"
+      data-ad-client="ca-pub-1551475730309963"
+      data-ad-slot="1369930607"
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+    ></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </body>
 </html>

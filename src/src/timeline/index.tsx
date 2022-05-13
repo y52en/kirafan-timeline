@@ -1,7 +1,6 @@
 /* eslint-disable no-constant-condition */
 "use strict";
 
-import lib from "../lib";
 import { AST, editor_mode, obj_update_data, type_editor_init } from "../types";
 import { textParser } from "./textParser";
 import { convertOutput, execTL } from "./timeline";
@@ -21,14 +20,14 @@ window.debug = {};
 //   window.onload = main;
 // })(window);
 
-export function main(onChanged: (arg:obj_update_data) => void,update_info:(arg:string)=> void,update_error:(arg:string)=>void): void {
-  view_init(main_, [], [], { main: [], set: [] }, [], 0, "");
+export function main(
+  onChanged: (arg: obj_update_data) => void,
+  update_info: (arg: string) => void,
+  update_error: (arg: string) => void
+): void {
+  view_init(main_);
 
-  async function main_(
-    str: string,
-    editor_fn: type_editor_init,
-    update_data: (obj: obj_update_data) => void
-  ) {
+  async function main_(str: string, editor_fn: type_editor_init) {
     // const err = document.getElementById("error");
 
     if (str.at(-1) !== "\n") {
@@ -89,7 +88,6 @@ export function main(onChanged: (arg:obj_update_data) => void,update_info:(arg:s
       ttk,
       info,
     };
-    update_data(_update_data);
-    if(onChanged) onChanged(_update_data);
+    if (onChanged) onChanged(_update_data);
   }
 }

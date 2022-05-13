@@ -1,5 +1,6 @@
 import python from "./python";
 import { command, AST, commandStr2Enum, mvls_mode } from "../../../types";
+import { HTMLSafeError } from "../../../lib";
 function transfer(arr: any): AST[] {
   return arr.map((x: any) => {
     const output = [];
@@ -45,7 +46,9 @@ function transfer(arr: any): AST[] {
           throw Error("move_list以外に配列が指定されています");
         }
       } else {
-        throw Error("不正な型です: " + JSON.stringify(x) + " -> " + x[i]);
+        throw HTMLSafeError(
+          "不正な型です: " + JSON.stringify(x) + " -> " + x[i]
+        );
       }
     }
 

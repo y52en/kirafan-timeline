@@ -1,4 +1,3 @@
-// import { useState } from 'react'
 import { useState } from "react";
 import { main } from "./timeline/index";
 import {

@@ -236,6 +236,14 @@ function rangeIterator<T>(
   return output;
 }
 
+function makeSafeText(str:string): string {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function HTMLSafeError(msg: string): Error {
+  return Error(makeSafeText(msg));
+}
+
 // XXX:どう直したらいいかわからない
 const _export = {
   undefinedErr,
@@ -254,6 +262,8 @@ const _export = {
   getRandomStr,
   innerText,
   rangeIterator,
+  makeSafeText,
+  HTMLSafeError,
 };
 
 export {
@@ -273,5 +283,7 @@ export {
   getRandomStr,
   innerText,
   rangeIterator,
+  makeSafeText,
+  HTMLSafeError,
 };
 export default _export;

@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     // root (= ./src) から見た相対パスで指定
-    outDir: "../public",
+    outDir: "../docs",
     emptyOutDir: true,
   },
 });

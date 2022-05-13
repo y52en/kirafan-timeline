@@ -1,5 +1,5 @@
 import define from "../define";
-import { match, state } from "../../lib";
+import { HTMLSafeError, match, state } from "../../lib";
 import {
   arg_num,
   arg_num_to_arg,
@@ -34,7 +34,7 @@ function str2type<T extends arg_type>(
 ): _arg_type[T] {
   if (type === "number" || (type === "number?" && arg !== undefined)) {
     if (!isNumberStr(arg || "0")) {
-      throw Error(`引数に数値が指定されていません: ${arg}`);
+      throw HTMLSafeError(`引数に数値が指定されていません: ${arg}`);
     }
   }
   switch (type) {
@@ -46,9 +46,9 @@ function str2type<T extends arg_type>(
     case "string?":
       return arg as _arg_type[T];
     case undefined:
-      throw new Error(`引数が多すぎます: ${arg}`);
+      throw HTMLSafeError(`引数が多すぎます: ${arg}`);
     default:
-      throw new Error(`unknown type: ${type}`);
+      throw HTMLSafeError(`unknown type: ${type}`);
   }
 }
 
@@ -67,7 +67,7 @@ function getArg<X extends readonly arg_type[]>(
   const option_len = types.length - arg_len;
 
   if (arg.length < arg_len) {
-    throw new Error(
+    throw HTMLSafeError(
       `引数不足です: 必要引数:${arg_len} , オプション引数:${option_len}`
     );
   }
@@ -92,7 +92,7 @@ function arg2taple<T extends arg_num, U extends arg_num, X>(
   option: U
 ): arg_taple<T, U> {
   if (arg.length < arg_len) {
-    throw new Error(
+    throw HTMLSafeError(
       `引数不足です: 必要引数:${arg_len} , オプション引数:${option}`
     );
   }
@@ -230,12 +230,12 @@ function sorting(
     }
   } catch (e) {
     if (input) {
-      throw Error(
+      throw HTMLSafeError(
         `「${input_str.substring(...input.addtional_info.where)}」 : ${e}`
       );
     } else {
       console.log("e is undefined");
-      throw Error(e as string);
+      throw HTMLSafeError(e as string);
     }
   }
 
@@ -561,7 +561,9 @@ export function execTL(_parsed_tldata: AST[], str: string): execTL_result {
             })
 
             .default(() => {
-              throw Error("no command found:「" + load_text_command + "」");
+              throw HTMLSafeError(
+                "no command found:「" + load_text_command + "」"
+              );
             });
         })
 

@@ -1,23 +1,12 @@
-import lib, { htmltag, OperateURL } from "../../../lib";
+import lib, { OperateURL } from "../../../lib";
 import {
   lexicallyAnalyzed,
   lexicallyAnalyzeStr,
-  obj_update_data,
-  type_convertedTLdata,
-  type_count_ttk_ls,
-  type_tableData_json,
-  type_tl_comment,
 } from "../../../types";
 
 export function init(
   getVal: () => string,
-  json: type_tableData_json,
-  charalist: string[],
-  convertedTLdata: type_convertedTLdata,
-  comment: type_tl_comment,
-  now_place: number,
-  firstchara: string
-): (data: obj_update_data) => void {
+): void{
   const SEC = 1000;
   const MIN = 60 * SEC;
   const HOUR = 60 * MIN;
@@ -28,18 +17,6 @@ export function init(
   })();
 
   window.addEventListener("beforeunload", () => save(getVal()));
-
-  const update_data = (data: obj_update_data) => {
-    ({
-      json,
-      charalist,
-      comment,
-      convertedTLdata,
-      now_place,
-    } = data);
-  };
-
-  return update_data;
 }
 
 function save(nowUrlTlParam:string) {
