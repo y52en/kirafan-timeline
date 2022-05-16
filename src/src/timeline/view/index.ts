@@ -15,6 +15,7 @@ class wrapper {
 export function init(
   input_callback: (text: string, editor_fn: type_editor_init) => void
 ): wrapper {
+  console.log('"stop" :>> ', "stop");
   let _str = "";
   ui_init(() => _str);
   const tmp = editor_init((str: string, editor_fn: type_editor_init) => {

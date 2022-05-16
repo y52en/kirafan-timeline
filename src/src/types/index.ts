@@ -148,7 +148,7 @@ export const enum lexicallyAnalyzeStr {
   reserved,
   word,
   equal,
-  space = 999
+  space = 999,
 }
 
 export const enum TL_type {
@@ -292,7 +292,7 @@ export type type_arg<
 
 export type arg_num = 0 | 1 | 2 | 3 | 4;
 
-export type arg_num_taple<T extends arg_num,U> = {
+export type arg_num_taple<T extends arg_num, U> = {
   0: arg_0<U>;
   1: arg_1<U>;
   2: arg_2<U>;
@@ -304,8 +304,6 @@ export type arg_num_to_arg<T extends arg_num> = arg_num_taple<T, string>;
 
 type arg_option = string | undefined;
 export type arg_num_to_arg_u<T extends arg_num> = arg_num_taple<T, arg_option>;
-
-
 
 export type arg_type = "string" | "number" | "string?" | "number?";
 
@@ -330,5 +328,11 @@ export type ConvertStr2Type<T> = T extends readonly []
         : never]
     ];
 
+export type type_TL_main = {
+  output: obj_update_data | undefined;
+  error: string | undefined;
+  // info: string | undefined;
+};
+
 // ["1","2", string?] ,2 ,1
-// 
+//

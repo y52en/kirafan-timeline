@@ -237,11 +237,11 @@ https://qiita.com/dangoya/items/4176e8ef22e892570f4e
   overflow: auto !important;
 }
 
-#editor > div {
+.editor > div {
   overflow: hidden !important;
 }
 
-#cm-resize-frame {
+.cm-resize-frame {
   overflow: hidden; /* CM will manage its own scrollbars. */
   resize: both;
 
