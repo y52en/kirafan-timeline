@@ -8,8 +8,9 @@ import "codemirror/addon/hint/show-hint.css";
 import "codemirror/addon/edit/closebrackets";
 import "../../../css/panda-syntax.css";
 import { useEffect, useRef, useState } from "react";
-import lib, { objectCopy, OperateURL } from "../../lib";
+import lib, { OperateURL } from "../../lib";
 import { commandStr2Enum, editor_mode } from "../../types";
+import { autosave } from "./autosave";
 
 type Props = {
   onChanged: (value: string) => void;
@@ -17,7 +18,15 @@ type Props = {
 
 export function Editor(props: Props): JSX.Element {
   const ref = useRef<HTMLDivElement | null>(null);
+  const [stopAutoSave, setStopAutoSave] = useState<{ fn: () => void }>({
+    fn: () => void 0,
+  });
+  const [x, setX] = useState<number>(0);
   useEffect(() => {
+    if (x != 0) {
+      return;
+    }
+    setX(x+1);
     const elm_editor = ref.current;
     if (!elm_editor) throw new Error("elm_editor is null");
     const enum state {
@@ -154,6 +163,7 @@ export function Editor(props: Props): JSX.Element {
       hintOptions: { hint: synonyms as CodeMirror.HintFunction },
     });
 
+
     cm.on("keydown", (cm, e) => {
       if (e.key === "/" && e.ctrlKey) {
         cm.toggleComment({ lineComment: "#" });
@@ -215,10 +225,12 @@ export function Editor(props: Props): JSX.Element {
 
     render();
 
+    setStopAutoSave(autosave(() => cm.getValue()));
     return () => {
       console.log("destroy");
       elm_editor.innerHTML = "";
-    }
+      stopAutoSave.fn();
+    };
   }, [ref]);
 
   return (

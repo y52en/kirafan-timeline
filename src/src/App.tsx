@@ -1,4 +1,4 @@
-import { Main } from "./view/main";
+import { Main } from "./view";
 
 function App(): JSX.Element {
   return (

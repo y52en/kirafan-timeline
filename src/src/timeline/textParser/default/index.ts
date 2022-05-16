@@ -11,7 +11,7 @@ import {
 } from "../../../types";
 
 import lib, { match } from "../../../lib";
-import { show_error } from "../../view/ui";
+import { show_error } from "../../error";
 // import { parse as wasm_parse } from "./wasm/kirafan_tl";
 
 const TIMES_FAILSAFE = 20;

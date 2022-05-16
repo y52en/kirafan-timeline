@@ -43,7 +43,7 @@ export function Main(): JSX.Element {
         return () => {
             console.log("destroy 2");
         }
-     },[]);
+     },[setTLInput]);
   return (
     <>
       <TLTable
