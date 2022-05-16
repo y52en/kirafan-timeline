@@ -1,7 +1,7 @@
 /* eslint-disable no-constant-condition */
 "use strict";
 
-import { AST, editor_mode, obj_update_data, type_editor_init, type_TL_main } from "../types";
+import { AST, editor_mode, type_TL_main } from "../types";
 import { textParser } from "./textParser";
 import { convertOutput, execTL } from "./timeline";
 // import { init as view_init } from "./view";

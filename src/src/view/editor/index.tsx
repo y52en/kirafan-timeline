@@ -243,15 +243,15 @@ export function Editor(props: Props): JSX.Element {
   );
 }
 
-function switch_editor(
-  cm: CodeMirror.Editor,
-  lang: editor_mode
-): CodeMirror.Editor {
-  if (cm.getOption("mode") !== lang) {
-    cm.setOption("mode", lang);
-  }
-  return cm;
-}
+// function switch_editor(
+//   cm: CodeMirror.Editor,
+//   lang: editor_mode
+// ): CodeMirror.Editor {
+//   if (cm.getOption("mode") !== lang) {
+//     cm.setOption("mode", lang);
+//   }
+//   return cm;
+// }
 
 function getPosition(pos: CodeMirror.Editor, to = 1): string {
   const { line, ch } = pos.getCursor();

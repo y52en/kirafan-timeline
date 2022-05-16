@@ -1,4 +1,4 @@
-import lib, { OperateURL } from "../../lib";
+import lib from "../../lib";
 import {
   lexicallyAnalyzed,
   lexicallyAnalyzeStr,

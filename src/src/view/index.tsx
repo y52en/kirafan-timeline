@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { main } from "../timeline";
-import { obj_update_data, type_count_ttk_ls, type_TL_main } from "../types";
+import { obj_update_data, type_count_ttk_ls } from "../types";
 import { CopyTLURL } from "./copytlurl";
 import { CsvDownload } from "./csvDownload";
 import { Editor } from "./editor";
