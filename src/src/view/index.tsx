@@ -4,11 +4,11 @@ import { obj_update_data, type_count_ttk_ls } from "../types";
 import { CopyTLURL } from "./copytlurl";
 import { CsvDownload } from "./csvDownload";
 import { Editor } from "./editor";
+import Ad from "./googleAd";
 import { Popup } from "./popup";
 import { Readme } from "./readme";
 import { SetBeforeUnload } from "./setBeforeUnload";
-import { TLTable } from "./tl_table";
-
+import { TLTable } from "./tlTable";
 
 export function Main(): JSX.Element {
   //   const Editor = props.editor;
@@ -38,12 +38,12 @@ export function Main(): JSX.Element {
       }
     });
   }, [TLInput]);
-    
-    useEffect(() => {
-        return () => {
-            console.log("destroy 2");
-        }
-     },[setTLInput]);
+
+  useEffect(() => {
+    return () => {
+      console.log("destroy 2");
+    };
+  }, [setTLInput]);
   return (
     <>
       <TLTable
@@ -76,7 +76,7 @@ export function Main(): JSX.Element {
       <CsvDownload json={data.json} charalist={data.charalist} />
       <CopyTLURL text={TLInput} />
       <Readme />
-      <br />
+      <Ad />
       <br />
     </>
   );

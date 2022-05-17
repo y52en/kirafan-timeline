@@ -9,8 +9,7 @@ type Props = {
 };
 
 export function TLTable(props: Props): JSX.Element {
-  const minHeight =
-   String(200) + "px";
+  const minHeight = String(200) + "px";
   return (
     <div id="TL_table">
       <table

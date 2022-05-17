@@ -2,7 +2,7 @@ import { useState } from "react";
 import { OperateURL, textCopy } from "../lib";
 
 type Props = {
-    text: string;
+  text: string;
 };
 
 export function CopyTLURL(TL_input: Props): JSX.Element {

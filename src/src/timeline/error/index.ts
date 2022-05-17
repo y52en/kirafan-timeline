@@ -1,15 +1,12 @@
 import lib from "../../lib";
-import {
-  lexicallyAnalyzed,
-  lexicallyAnalyzeStr,
-} from "../../types";
+import { lexicallyAnalyzed, lexicallyAnalyzeStr } from "../../types";
 
 export function show_error(
   timeline_parsed: lexicallyAnalyzed[],
   index: number,
   TL_str: string,
   errMsg = ""
-):never {
+): never {
   const now_val = timeline_parsed[index];
   // this.timeline_parsed[this.i_loading];
   const output_err_where = lib.htmltag("span");

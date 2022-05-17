@@ -71,5 +71,5 @@ const ttk_val = 125;
 
 export default {
   getCharge,
-  ttk_val
+  ttk_val,
 };

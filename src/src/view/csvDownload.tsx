@@ -1,4 +1,4 @@
-import { type_tableData_json} from "../types";
+import { type_tableData_json } from "../types";
 
 type Props = {
   json: type_tableData_json;

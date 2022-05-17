@@ -50,7 +50,6 @@ export async function main(
   let isPython = false;
   let parsed_tldata: AST[];
 
-
   try {
     const parseResult = await textParser(str);
     isPython = parseResult.type === editor_mode.python;
@@ -96,7 +95,7 @@ export async function main(
     firstchara: TL.ID_of_firstChara(),
     count_ttk_ls,
     ttk,
-    info:apply_info,
+    info: apply_info,
   };
   output.output = _update_data;
   return output;

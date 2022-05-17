@@ -236,7 +236,7 @@ function rangeIterator<T>(
   return output;
 }
 
-function makeSafeText(str:string): string {
+function makeSafeText(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 

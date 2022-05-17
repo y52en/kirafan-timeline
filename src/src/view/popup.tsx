@@ -8,7 +8,7 @@ type Props = {
 };
 
 export function Popup(props: Props): JSX.Element {
-  const str = joinedTLdata(props.text)
+  const str = joinedTLdata(props.text);
   const [showCopied, setShowCopied] = useState(false);
   const copy = () => {
     textCopy(str);
@@ -18,9 +18,9 @@ export function Popup(props: Props): JSX.Element {
     }, 1000);
   };
   // eslint-disable-next-line prefer-const
-    let input_elm = React.createRef<HTMLInputElement>();
-    
-    const [id_a, id_b, id_c] = [getRandomStr(), getRandomStr(), getRandomStr()];
+  let input_elm = React.createRef<HTMLInputElement>();
+
+  const [id_a, id_b, id_c] = [getRandomStr(), getRandomStr(), getRandomStr()];
   return (
     <>
       <div className="popupModal1">
@@ -46,14 +46,13 @@ export function Popup(props: Props): JSX.Element {
             <h2 className="modalTitle">展開済みのTLデータ</h2>
             <button onClick={copy}>コピーする</button>
             {showCopied ? <div>コピーしました</div> : <></>}
-                      <div className="modalMain">{ innerText(str) }</div>
+            <div className="modalMain">{innerText(str)}</div>
           </div>
         </div>
       </div>
     </>
   );
 }
-
 
 function joinedTLdata(convertedTLdata: type_convertedTLdata): string {
   return (

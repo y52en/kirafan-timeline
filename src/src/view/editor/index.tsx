@@ -21,12 +21,7 @@ export function Editor(props: Props): JSX.Element {
   const [stopAutoSave, setStopAutoSave] = useState<{ fn: () => void }>({
     fn: () => void 0,
   });
-  const [x, setX] = useState<number>(0);
   useEffect(() => {
-    if (x != 0) {
-      return;
-    }
-    setX(x+1);
     const elm_editor = ref.current;
     if (!elm_editor) throw new Error("elm_editor is null");
     const enum state {
@@ -162,7 +157,6 @@ export function Editor(props: Props): JSX.Element {
       extraKeys: { "Ctrl-Space": "autocomplete" },
       hintOptions: { hint: synonyms as CodeMirror.HintFunction },
     });
-
 
     cm.on("keydown", (cm, e) => {
       if (e.key === "/" && e.ctrlKey) {
